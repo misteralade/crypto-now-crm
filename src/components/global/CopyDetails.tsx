@@ -1,5 +1,6 @@
 import { useState, type MouseEvent } from 'react'
 import { Copy } from 'lucide-react'
+import ResponsiveText from './ResponsiveText.tsx'
 // import Copy from "../../assets/img/fluent_copy-16-regular.svg"
 
 interface CopyDetailsProps {
@@ -32,9 +33,9 @@ const CopyDetails = ({text, className, iconClassName, wrap}: CopyDetailsProps) =
         className={`flex gap-2 items-center relative ${!wrap ? "max-w-[400px]" : "w-full"} w-3/4 md:w-fit ${className}`}
       >
         <p
-          className={`text-black overflow-hidden ${wrap ? "break-all" : "whitespace-nowrap text-ellipsis"}`}
+          className={`text-black min-w-0 flex-1 ${wrap ? "break-all" : ""}`}
         >
-          {text}
+          {wrap ? text : <ResponsiveText text={text} />}
         </p>
 
         <button

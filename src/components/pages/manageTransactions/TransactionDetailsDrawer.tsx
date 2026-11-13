@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { formatCompact } from "../../../util/asset-precision";
 import momentClient from "../../../util/moment";
 import CopyDetails from "../../global/CopyDetails";
+import ReceiptViewer from "../../global/ReceiptViewer.tsx";
 import { StatusBadge } from "../../global/StatusBadge";
 import { setTransactionDetailUpdateField } from "../../../redux/transaction-management.slice";
 import TransactionStatusPicker from "./TransactionStatusPicker";
@@ -160,13 +161,9 @@ const TransactionDetailsDrawer = ({
     if (!file) return;
 
     // Validate file type
-    const validTypes = [
-      "image/png",
-      "image/jpeg",
-      "image/jpg",
-      "application/pdf",
-    ];
-    if (!validTypes.includes(file.type)) {
+    const validTypes: Record<string, string> = { png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", pdf: "application/pdf" };
+    const extension = file.name.split(".").pop()?.toLowerCase();
+    if (!extension || validTypes[extension] !== file.type) {
       alert("Please upload only PNG, JPG, JPEG, or PDF files");
       return;
     }
@@ -455,18 +452,8 @@ const TransactionDetailsDrawer = ({
                 </div>
               )}
 
-              {/* Receipt Url */}
               {transaction.type === "BUY" && transaction.receiptImageUrl && (
-                <div className="mt-4 flex justify-between items-start">
-                  <div className="text-[#828282] mb-1 text-[16px]">
-                    Uploaded receipt
-                  </div>
-                  <img
-                    src={transaction.receiptImageUrl}
-                    alt="Uploaded receipt"
-                    className="rounded-md border border-gray-200 w-48"
-                  />
-                </div>
+                <div className="mt-4"><ReceiptViewer url={transaction.receiptImageUrl} label="Uploaded receipt" /></div>
               )}
             </section>
 
@@ -677,101 +664,9 @@ const TransactionDetailsDrawer = ({
                         />
                       </label>
 
-                      {/* File Preview */}
-                      {uploadedFile ? (
-                        // Show uploaded file preview (takes priority)
-                        <div className="relative group">
-                          {previewUrl ? (
-                            // Image preview
-                            <div className="relative">
-                              <img
-                                src={previewUrl}
-                                alt="Upload preview"
-                                className="w-full h-48 object-cover rounded-lg border border-gray-200"
-                              />
-                              <button
-                                onClick={removeFile}
-                                className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                              >
-                                <X size={16} />
-                              </button>
-                              <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
-                                {uploadedFile.name}
-                              </div>
-                            </div>
-                          ) : (
-                            // PDF preview
-                            <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200">
-                              <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-red-100 rounded flex items-center justify-center">
-                                  <span className="text-red-600 font-semibold text-xs">
-                                    PDF
-                                  </span>
-                                </div>
-                                <div>
-                                  <p className="text-sm font-medium text-[#0E0F0C]">
-                                    {uploadedFile.name}
-                                  </p>
-                                  <p className="text-xs text-[#828282]">
-                                    {(uploadedFile.size / 1024).toFixed(2)} KB
-                                  </p>
-                                </div>
-                              </div>
-                              <button
-                                onClick={removeFile}
-                                className="text-red-500 hover:text-red-700"
-                              >
-                                <X size={20} />
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      ) : transaction.adminPaymentReceiptUrl ? (
-                        // Show admin transaction receipt when no file is uploaded
-                        <div className="relative group">
-                          {transaction.adminPaymentReceiptUrl
-                            .toLowerCase()
-                            .endsWith(".pdf") ? (
-                            // PDF preview
-                            <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200">
-                              <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-red-100 rounded flex items-center justify-center">
-                                  <span className="text-red-600 font-semibold text-xs">
-                                    PDF
-                                  </span>
-                                </div>
-                                <div>
-                                  <p className="text-sm font-medium text-[#0E0F0C]">
-                                    Admin Payment Receipt
-                                  </p>
-                                  <p className="text-xs text-[#828282]">
-                                    <a
-                                      href={transaction.adminPaymentReceiptUrl}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="text-[#03034D] hover:underline"
-                                    >
-                                      View receipt
-                                    </a>
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                          ) : (
-                            // Image preview
-                            <div className="relative">
-                              <img
-                                src={transaction.adminPaymentReceiptUrl}
-                                alt="Admin payment receipt"
-                                className="w-full h-48 object-cover rounded-lg border border-gray-200"
-                              />
-                              <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
-                                Admin Payment Receipt
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      ) : null}
+                      {uploadedFile && previewUrl ? (
+                        <div><ReceiptViewer url={previewUrl} label={uploadedFile.name} /><button type="button" onClick={removeFile} className="mt-2 text-sm text-red-600">Remove</button></div>
+                      ) : transaction.adminPaymentReceiptUrl ? <ReceiptViewer url={transaction.adminPaymentReceiptUrl} label="Admin payment receipt" /> : null}
                     </div>
                   </div>
                 </section>
