@@ -30,7 +30,8 @@ const CopyDetails = ({text, className, iconClassName, wrap}: CopyDetailsProps) =
 
     return (
       <div
-        className={`flex gap-2 items-center relative ${!wrap ? "max-w-[400px]" : "w-full"} w-3/4 md:w-fit ${className}`}
+        className={`flex w-full min-w-0 max-w-full gap-2 items-center relative ${className}`}
+        style={!wrap ? { maxWidth: "min(400px, 100%)" } : undefined}
       >
         <p
           className={`text-black min-w-0 flex-1 ${wrap ? "break-all" : ""}`}
