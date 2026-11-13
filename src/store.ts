@@ -1,3 +1,4 @@
+import { ENVIRONMENTS } from "./config/index.config";
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import storageSession from 'redux-persist/lib/storage/session'
 import {
@@ -72,7 +73,7 @@ export const store = configureStore({
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
     }),
-  devTools: BASIC.NODE_ENV !== 'production',
+  devTools: BASIC.NODE_ENV !== ENVIRONMENTS.PRODUCTION,
 })
 
 // persistor for PersistGate
