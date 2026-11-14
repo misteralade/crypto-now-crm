@@ -10,6 +10,7 @@ import DisputeAdminNotes from "../components/pages/disputes/edit/DisputeAdminNot
 import TransactionDetails from "../components/pages/disputes/edit/TransactionDetails.tsx";
 import DisputeUserInformation from "../components/pages/disputes/edit/DisputeUserInformation.tsx";
 import DisputeStatusUpdateModal from "../components/pages/disputes/edit/modal/DisputeStatusUpdateModal.tsx";
+import DisputeMessage from "../components/pages/disputes/details/DisputeMessage.tsx";
 import { formatCompact } from "../util/asset-precision";
 
 const EditDisputes = () => {
@@ -26,8 +27,11 @@ const EditDisputes = () => {
     selectedDisputeStatus,
     showStatusUpdateModal,
     selectedResolution,
+    disputeMessages,
+    loadingDisputeMessages,
     
     // ⚙️ Functions
+    adminSendDisputeMutation,
     goBack,
     toggleEditDisputeNotes,
     updateAdminNotes,
@@ -215,6 +219,15 @@ const EditDisputes = () => {
                         )}
                       </div>
                     </div>
+
+                    {/* Dispute Messages / Reply Thread */}
+                    <DisputeMessage
+                      loading={loadingDisputeMessages}
+                      messages={disputeMessages || []}
+                      sendMessageMutation={adminSendDisputeMutation}
+                      disputeId={disputeDetails.id}
+                      disputeStatus={disputeDetails.status}
+                    />
                   </div>
                   
                   {/* Right Column - User Information */}

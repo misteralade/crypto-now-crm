@@ -895,8 +895,8 @@ export default function SweepConfigModal({
                     {insufficientFuelBalance && (
                       <p className="text-[10px] text-red-700 font-semibold mt-2">
                         {fuelingWalletStatus.address
-                          ? `No ${previewData.feeAssetSymbol} in the fueling wallet to cover gas — top it up before sweeping.`
-                          : `No active fueling wallet configured for this network — gas cannot be funded.`}
+                          ? `No ${previewData.feeAssetSymbol} in the fueling wallet to cover gas. Top it up before sweeping.`
+                          : `No active fueling wallet configured for this network. Gas cannot be funded.`}
                       </p>
                     )}
                   </div>

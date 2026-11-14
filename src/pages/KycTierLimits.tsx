@@ -25,13 +25,13 @@ const boolOptions = [
 ];
 
 const TIER_LABELS: Record<KycTierType, string> = {
-  GUEST: 'Guest — unverified users',
-  VERIFIED: 'Verified — full verification',
+  GUEST: 'Guest: unverified users',
+  VERIFIED: 'Verified: full verification',
 };
 
 const tierOptions = [
-  { value: 'GUEST', label: 'Guest — unverified users' },
-  { value: 'VERIFIED', label: 'Verified — full verification' },
+  { value: 'GUEST', label: 'Guest: unverified users' },
+  { value: 'VERIFIED', label: 'Verified: full verification' },
 ];
 
 const KycTierLimits = () => {
@@ -219,7 +219,7 @@ const KycTierLimits = () => {
                           <div className="space-y-1">
                             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-left">Trans. Range</p>
                             <p className="text-sm font-bold text-[#03034D] text-left">
-                              {limit.minTransactionAmount} — {limit.maxTransactionAmount} <span className="text-[11px] font-medium text-gray-400">{limit.currencyCode}</span>
+                              {limit.minTransactionAmount} to {limit.maxTransactionAmount} <span className="text-[11px] font-medium text-gray-400">{limit.currencyCode}</span>
                             </p>
                           </div>
                           <div className="space-y-1">
