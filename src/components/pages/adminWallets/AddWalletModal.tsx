@@ -40,7 +40,7 @@ const AddWalletModal = ({
   const [walletLabel, setWalletLabel] = useState("");
   const [blockchainEnvironment, setBlockchainEnvironment] = useState<"testnet" | "mainnet">("mainnet");
 
-  const cryptoOptions = cryptos.map((c) => ({ value: c.id, label: `${c.symbol} — ${c.name}` }));
+  const cryptoOptions = cryptos.map((c) => ({ value: c.id, label: `${c.symbol} (${c.name})` }));
   const environmentOptions = [
     { value: "mainnet", label: "Mainnet" },
     { value: "testnet", label: "Testnet" },

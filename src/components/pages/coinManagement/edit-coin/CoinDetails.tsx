@@ -83,7 +83,7 @@ const EditCoinDetails = ({
               <Checkbox
                 key={opt.value}
                 id={`network-${opt.value}`}
-                label={`${opt.value} — ${opt.label}`}
+                label={`${opt.value} (${opt.label})`}
                 checked={selectedNetworks.includes(opt.value)}
                 disabled
                 onCheckedChange={() => {}}

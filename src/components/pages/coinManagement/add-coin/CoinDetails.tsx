@@ -61,7 +61,7 @@ const CoinDetails = ({ onChangeInputField }: CoinDetailsProps) => {
               <Checkbox
                 key={opt.value}
                 id={`network-${opt.value}`}
-                label={`${opt.value} — ${opt.label}`}
+                label={`${opt.value} (${opt.label})`}
                 checked={selectedNetworks.includes(opt.value)}
                 onCheckedChange={() => handleNetworkToggle(opt.value)}
               />

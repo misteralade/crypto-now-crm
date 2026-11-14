@@ -111,7 +111,7 @@ const EditTradeLimits = ({ cryptoId, symbol, buyAt, sellAt, minAmount, maxAmount
           placeholder="e.g. 1500 NGN per USD"
           value={buyRate}
           onChange={(e) => { setBuyRate(e.target.value); onChangeInputField("buyRate", e.target.value) }}
-          label="Rate to Sell to User (NGN per USD) — Sell Rate"
+          label="Rate to Sell to User (NGN per USD) : Sell Rate"
           type="text"
           inputMode="decimal"
         />
@@ -120,7 +120,7 @@ const EditTradeLimits = ({ cryptoId, symbol, buyAt, sellAt, minAmount, maxAmount
           placeholder="e.g. 1400 NGN per USD"
           value={sellRate}
           onChange={(e) => { setSellRate(e.target.value); onChangeInputField("sellRate", e.target.value) }}
-          label="Rate to Buy from User (NGN per USD) — Buy Rate"
+          label="Rate to Buy from User (NGN per USD) : Buy Rate"
           type="text"
           inputMode="decimal"
         />
@@ -221,7 +221,7 @@ const EditTradeLimits = ({ cryptoId, symbol, buyAt, sellAt, minAmount, maxAmount
           placeholder="e.g. 100"
           value={minTradeAmountForAnonymous}
           onChange={(e) => { setMinTradeAmountForAnonymous(e.target.value); onChangeInputField("minTradeAmountForAnonymous", e.target.value) }}
-          label="Min Transaction Amount — Anonymous (token)"
+          label="Min Transaction Amount : Anonymous (token)"
           type="text"
           inputMode="decimal"
           step="0.1"
@@ -231,7 +231,7 @@ const EditTradeLimits = ({ cryptoId, symbol, buyAt, sellAt, minAmount, maxAmount
           placeholder="e.g. 1000000"
           value={maxTradeAmountForAnonymous}
           onChange={(e) => { setMaxTradeAmountForAnonymous(e.target.value); onChangeInputField("maxTradeAmountForAnonymous", e.target.value) }}
-          label="Max Transaction Amount — Anonymous (token)"
+          label="Max Transaction Amount : Anonymous (token)"
           type="text"
           inputMode="decimal"
         />

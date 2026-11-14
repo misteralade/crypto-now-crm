@@ -273,39 +273,39 @@ export const CoinDetailsModal = ({
               <SectionHeader label="Trade Limits" />
               <div className="bg-white rounded-xl border border-[#ECECEC] px-4">
                 <InfoRow
-                  label="Authenticated — Min"
+                  label="Authenticated (Min)"
                   value={
                     coin.minTransactionLimit
                       ? `${Number(coin.minTransactionLimit).toLocaleString()} ${coin.symbol}`
-                      : "—"
+                      : "-"
                   }
                 />
                 <InfoRow
-                  label="Authenticated — Max"
+                  label="Authenticated (Max)"
                   value={
                     coin.maxTransactionLimit
                       ? `${Number(coin.maxTransactionLimit).toLocaleString()} ${coin.symbol}`
-                      : "—"
+                      : "-"
                   }
                 />
                 <InfoRow
-                  label="Anonymous — Min"
+                  label="Anonymous (Min)"
                   value={
                     coin.minTradeAmountForAnonymous
                       ? `${Number(
                           coin.minTradeAmountForAnonymous
                         ).toLocaleString()} ${coin.symbol}`
-                      : "—"
+                      : "-"
                   }
                 />
                 <InfoRow
-                  label="Anonymous — Max"
+                  label="Anonymous (Max)"
                   value={
                     coin.maxTradeAmountForAnonymous
                       ? `${Number(
                           coin.maxTradeAmountForAnonymous
                         ).toLocaleString()} ${coin.symbol}`
-                      : "—"
+                      : "-"
                   }
                 />
               </div>
