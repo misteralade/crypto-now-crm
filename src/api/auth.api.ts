@@ -15,8 +15,8 @@ class AuthServiceApi {
     return AuthServiceApi.instance;
   }
 
-  async login(payload: Record<string, any>): Promise<BaseApiResponse<null>> {
-    return await axiosPostRequestHandler("/admin/auth/sign-in", payload) as BaseApiResponse<null>;
+  async login(payload: Record<string, any>): Promise<BaseApiResponse<{ twoFactorRequired?: boolean; passwordResetRequired?: boolean; challengeToken?: string } | null>> {
+    return await axiosPostRequestHandler("/admin/auth/sign-in", payload);
   }
   
   async pingAdmin() {
@@ -49,12 +49,12 @@ class AuthServiceApi {
     return await axiosPatchRequestHandler("/admin/auth/two-factor-authentication", {}) as BaseApiResponse<null>;
   }
 
-  async verifyTwoFactorAuthenticationCode(code: string): Promise<BaseApiResponse<null>> {
-    return await axiosPostRequestHandler("/admin/auth/two-factor-authentication/verify", { code }) as BaseApiResponse<null>;
+  async verifyTwoFactorAuthenticationCode(code: string, challengeToken: string): Promise<BaseApiResponse<null>> {
+    return await axiosPostRequestHandler("/admin/auth/two-factor-authentication/verify", { code, challengeToken }) as BaseApiResponse<null>;
   }
 
-  async resendTwoFactorAuthenticationCode(email: string): Promise<BaseApiResponse<null>> {
-    return await axiosGetRequestHandler("/admin/auth/two-factor-authentication/resend-code", { email }) as BaseApiResponse<null>;
+  async resendTwoFactorAuthenticationCode(challengeToken: string): Promise<BaseApiResponse<{ challengeToken: string }>> {
+    return await axiosPostRequestHandler("/admin/auth/two-factor-authentication/resend-code", { challengeToken }) as BaseApiResponse<{ challengeToken: string }>;
   }
 }
 

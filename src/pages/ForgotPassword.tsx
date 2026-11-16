@@ -1,5 +1,5 @@
 import { Fragment, useState } from 'react'
-import { Link, useNavigate } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import AuthLayout from '../layout/AuthLayout'
 import CustomButton from '../components/global/Button'
 import { authServiceApi } from '../api/auth.api'
@@ -9,7 +9,6 @@ import type { FormEvent } from 'react'
 import { PillInput } from '../components/ui/input'
 
 const ForgotPassword = () => {
-  const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -28,20 +27,16 @@ const ForgotPassword = () => {
       const { success: apiSuccess, message } = await authServiceApi.requestPasswordReset(validatedEmail)
 
       if (apiSuccess) {
-        setSuccess(message || 'Password reset email sent successfully. Please check your inbox.')
+        setSuccess(message)
         setEmail('')
-        // Optionally redirect after a delay
-        setTimeout(() => {
-          navigate({ to: ROUTES.LOGIN })
-        }, 3000)
       } else {
         setError(message || 'Failed to send password reset email. Please try again.')
       }
     } catch (err: any) {
       if (err.errors && err.errors[0]) {
         setError(err.errors[0].message || 'Invalid email address')
-      } else if (err.response?.data?.message) {
-        setError(err.response.data.message)
+      } else if (err instanceof Error) {
+        setError(err.message)
       } else {
         setError('An error occurred. Please try again.')
       }
@@ -56,7 +51,7 @@ const ForgotPassword = () => {
         {/* Form Header */}
         <div className="mb-10">
           <h1 className="md:text-[40px] text-3xl md:leading-[48px] font-semibold text-[#0E0F0C] mb-1 md:mb-2">
-            Forgot Password
+            Forgot password
           </h1>
           <p className="md:text-[18px] text-base md:leading-[24px] text-[#454745] font-normal">
             Enter your email address and we'll send you a link to reset your password.
@@ -76,7 +71,7 @@ const ForgotPassword = () => {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="jonas@gmail.com"
+            placeholder="admin@cryptonow.io"
             disabled={isLoading}
             autoFocus
           />
@@ -86,13 +81,13 @@ const ForgotPassword = () => {
             <CustomButton
               type="submit"
               className="w-full cursor-pointer"
-              buttonText={isLoading ? "Sending..." : "Send Reset Link"}
+              buttonText={isLoading ? "Sending..." : "Send reset link"}
               disabled={isLoading}
             />
           </div>
         </form>
 
-        {/* Back to Sign In Link */}
+        {/* Back to sign in Link */}
         <div className="mt-6 text-center">
           <Link
             to={ROUTES.LOGIN}

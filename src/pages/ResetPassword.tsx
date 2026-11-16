@@ -42,10 +42,10 @@ const ResetPassword = () => {
         setError(message || 'Failed to reset password. Please try again.')
       }
     } catch (err: any) {
-      if (err.response?.data?.message) {
-        setError(err.response.data.message)
-      } else if (err.errors && err.errors[0]) {
+      if (err.errors && err.errors[0]) {
         setError(err.errors[0].message || 'Validation error')
+      } else if (err instanceof Error) {
+        setError(err.message)
       } else {
         setError('An error occurred. Please try again.')
       }

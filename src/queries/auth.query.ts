@@ -46,8 +46,8 @@ export const useToggleTwoFactorAuthenticationMutation = () => {
 export const useVerifyTwoFactorCodeMutation = () => {
   return useMutation({
     mutationKey: [QUERY_KEYS.AUTH.VERIFY_TWO_FACTOR_CODE],
-    mutationFn: async (code: string) => {
-      return await authServiceApi.verifyTwoFactorAuthenticationCode(code);
+    mutationFn: async ({ code, challengeToken }: { code: string; challengeToken: string }) => {
+      return await authServiceApi.verifyTwoFactorAuthenticationCode(code, challengeToken);
     },
     onError: (error: Error) => {
       toast.error(error.message || "Failed to verify your code.");
@@ -58,9 +58,9 @@ export const useVerifyTwoFactorCodeMutation = () => {
 export const useResendTwoFactorCodeMutation = () => {
   return useMutation({
     mutationKey: [QUERY_KEYS.AUTH.RESEND_TWO_FACTOR_CODE],
-    mutationFn: async (email: string) => {
+    mutationFn: async (challengeToken: string) => {
       toast.loading("Resending code...");
-      return await authServiceApi.resendTwoFactorAuthenticationCode(email);
+      return await authServiceApi.resendTwoFactorAuthenticationCode(challengeToken);
     },
     onSuccess: ({ success, message }) => {
       toast.dismiss();

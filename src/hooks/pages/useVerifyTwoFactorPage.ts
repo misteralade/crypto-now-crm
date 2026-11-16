@@ -21,8 +21,11 @@ export const useVerifyTwoFactorPage = () => {
   const handleSubmit = async (code: string) => {
     setError("");
     try {
-      const { success, message } = await verifyCodeMutation.mutateAsync(code);
+      const challengeToken = sessionStorage.getItem("adminVerificationChallenge");
+      if (!challengeToken) { setError("Please sign in again."); return; }
+      const { success, message } = await verifyCodeMutation.mutateAsync({ code, challengeToken });
       if (success) {
+        sessionStorage.removeItem("adminVerificationChallenge");
         navigate({ to: ROUTES.DASHBOARD });
       } else {
         setError(message || "Invalid verification code");
@@ -44,7 +47,7 @@ export const useVerifyTwoFactorPage = () => {
     }
 
     const fullCode = newCode.join("");
-    if (fullCode.length === verificationCode.length && index === verificationCode.length - 1) {
+    if (fullCode.length === verificationCode.length) {
       handleSubmit(fullCode);
     }
   };
@@ -57,7 +60,7 @@ export const useVerifyTwoFactorPage = () => {
 
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
-    const pastedData = e.clipboardData.getData("text").trim().toUpperCase().slice(0, 8);
+    const pastedData = e.clipboardData.getData("text").trim().toUpperCase().slice(0, 6);
     const newCode = [...verificationCode];
 
     for (let i = 0; i < pastedData.length; i++) {
@@ -76,11 +79,16 @@ export const useVerifyTwoFactorPage = () => {
   };
 
   const handleResendCode = async () => {
-    if (!email) {
-      setError("Email not found. Please sign in again.");
-      return;
-    }
-    await resendCodeMutation.mutateAsync(email);
+    const challengeToken = sessionStorage.getItem("adminVerificationChallenge");
+    if (!challengeToken) { setError("Please sign in again."); return; }
+    try {
+      const result = await resendCodeMutation.mutateAsync(challengeToken);
+      if (result.success) {
+        sessionStorage.setItem("adminVerificationChallenge", result.data.challengeToken);
+        setVerificationCode(Array(6).fill(""));
+        setError("");
+      }
+    } catch { /* The mutation displays the error. */ }
   };
 
   return {

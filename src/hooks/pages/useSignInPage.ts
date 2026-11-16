@@ -3,7 +3,7 @@ import { useNavigate, useSearch } from "@tanstack/react-router";
 import { authServiceApi } from "../../api/auth.api";
 import { LOCAL_STORAGE_KEYS, ROUTES } from "../../util/constants.util.ts";
 import type { FormEvent } from "react";
-import type { AuthAPIResponse } from "../../types/response.payload.types";
+
 
 export const useSignInPage = () => {
   const navigate = useNavigate();
@@ -46,24 +46,27 @@ export const useSignInPage = () => {
     }
 
     try {
-      const { success, message, data }: AuthAPIResponse = await authServiceApi.login({
+      const { success, message, data } = await authServiceApi.login({
         email,
         password,
       });
 
       if (!success) {
         setError(message || "Login failed. Please check your credentials.");
-      } else if ((data as any)?.twoFactorRequired) {
+      } else if (data?.passwordResetRequired) {
+        setError(message);
+      } else if (data?.twoFactorRequired && data.challengeToken) {
+        sessionStorage.setItem("adminVerificationChallenge", data.challengeToken);
         navigate({
           to: ROUTES.VERIFY_TWO_FACTOR,
           search: { email },
         });
       } else {
-        navigate({ to: ROUTES.DASHBOARD });
+        setError("Unable to start verification. Please sign in again.");
       }
     } catch (error: any) {
       setError(
-        error.response.data.message ||
+        error.message ||
           "Login failed. Please check your credentials."
       );
     } finally {
