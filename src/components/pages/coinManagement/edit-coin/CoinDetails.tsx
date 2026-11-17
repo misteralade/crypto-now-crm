@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { ROUTES } from "../../../../util/constants.util.ts";
 import { cryptoServiceApi } from "../../../../api/crypto.api";
+import { QUERY_KEYS } from "../../../../queries/querries.keys";
 import type { EditSupportedCryptoAndAdminWalletRequestType } from "../../../../schemas/crypto.schema";
 import type { AdminCryptoWalletResponsePayload } from "../../../../types/response.payload.types";
 import { PillInput } from "../../../ui/input";
@@ -42,7 +44,20 @@ const EditCoinDetails = ({
   const [editedBuyEnabled, setEditedBuyEnabled] = useState<boolean | null>(null);
   const [editedBuyPrecision, setEditedBuyPrecision] = useState<string | null>(null);
   const [editedNetworks, setEditedNetworks] = useState<string[] | null>(null);
-  const selectedNetworks = editedNetworks ?? networks;
+  const activeNetworks = useQuery({
+    queryKey: [QUERY_KEYS.CRYPTO.PUBLIC_SUPPORTED_CRYPTO_NETWORKS, cryptoId],
+    queryFn: async () => {
+      const result = await cryptoServiceApi.getAllSupportedCryptoCurrencies();
+      if (!result.success) throw new Error(result.message);
+      const coin = result.data.find((item) => item.id === cryptoId);
+      if (!coin) throw new Error("Coin not found in active cryptocurrencies");
+      return coin.networks;
+    },
+    enabled: active && !!cryptoId,
+    staleTime: 0,
+    refetchOnMount: "always",
+  });
+  const selectedNetworks = editedNetworks ?? (active ? activeNetworks.data : networks) ?? [];
   const [availableNetworks, setAvailableNetworks] = useState<Array<{ code: string; label: string }>>([]);
   useEffect(() => { void cryptoServiceApi.getNetworks().then((result) => setAvailableNetworks(result.data ?? [])); }, []);
 
@@ -86,7 +101,11 @@ const EditCoinDetails = ({
             Active Networks
           </label>
           <div className="flex flex-wrap gap-4">
-            {availableNetworks.map((opt) => (
+            {active && activeNetworks.isError ? (
+              <p className="text-sm text-red-600">Could not load active networks. Refresh to try again.</p>
+            ) : active && !activeNetworks.isSuccess ? (
+              <p className="text-sm text-gray-500">Loading networks...</p>
+            ) : availableNetworks.map((opt) => (
               <Checkbox
                 key={opt.code}
                 id={`network-${opt.code}`}
