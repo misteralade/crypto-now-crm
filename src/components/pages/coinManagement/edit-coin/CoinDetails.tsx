@@ -58,8 +58,7 @@ const EditCoinDetails = ({
       {/* SECTION 1: SUPPORTED CRYPTO (READ-ONLY) */}
       <div className="bg-white border border-[#E9E7E2] rounded-3xl p-6 shadow-sm space-y-6">
         <div>
-          <h3 className="text-xl font-bold text-[#0E0F0C]">Supported Crypto (Basic Info)</h3>
-          <p className="text-xs text-gray-500 mt-1">This section is read-only and displays basic asset information configured in the system.</p>
+          <h3 className="text-xl font-bold text-[#0E0F0C]">Supported Crypto</h3>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-x-8">

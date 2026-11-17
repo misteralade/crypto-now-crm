@@ -149,8 +149,7 @@ export default function WalletDetails() {
   return (
     <AuthenticatedLayout>
       <PageHeader
-        title="Wallet Details"
-        subtitle="Inspect the wallet, owner context, and sweep outcome from one admin view"
+        title="Custodial Wallet Details"
         onBack={goBack}
       />
 
@@ -178,10 +177,6 @@ export default function WalletDetails() {
                     {env.label}
                   </span>
                 )}
-                <p className="text-pretty text-xs text-[#667085]">
-                  Review the wallet balance, ownership details, and the sweep
-                  row that led here.
-                </p>
               </div>
             </div>
 

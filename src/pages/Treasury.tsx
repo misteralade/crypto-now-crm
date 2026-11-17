@@ -382,24 +382,20 @@ export default function Treasury() {
 
   return (
     <AuthenticatedLayout>
-      <PageHeader
-        title="Treasury Management"
-        subtitle="Move custodial balances into admin treasury wallets"
-      />
+      <PageHeader title="Treasury" />
 
       <div className="p-6 mx-auto space-y-6">
         <section className="relative overflow-hidden rounded-2xl border border-[#DDE0FF] bg-[--color-primary-taint] p-6 md:p-7 shadow-sm">
           <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="max-w-2xl space-y-2">
               <p className="inline-flex items-center rounded-full bg-white/85 border border-[#D6D9FF] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#575AE5]">
-                Treasury Sweep
+                Treasury sweeps
               </p>
               <h2 className="text-[22px] md:text-[28px] leading-tight font-semibold text-gray-900">
-                Sweep user wallet balances with full operational visibility
+                Sweep custodial wallets
               </h2>
               <p className="text-[14px] leading-relaxed text-gray-500">
-                Preview eligible wallets, confirm the transfer scope, and
-                monitor each sweep run from a single control panel.
+                Transfer confirmed custodial deposits into platform treasury wallets.
               </p>
             </div>
             <button
@@ -420,7 +416,7 @@ export default function Treasury() {
                   d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
                 />
               </svg>
-              <span className="hidden sm:inline">Sweep Wallets</span>
+              <span className="hidden sm:inline">Sweep wallets</span>
               <span className="sm:hidden">Sweep</span>
             </button>
           </div>
@@ -496,7 +492,7 @@ export default function Treasury() {
               loading={isLoading}
               onRowClick={handleRowClick}
               emptyTitle="No sweep history yet"
-              emptyMessage="Start your first treasury sweep to populate this table."
+              emptyMessage="No sweeps recorded yet."
               emptyIllustrationSrc="/empty.svg"
             />
           </div>

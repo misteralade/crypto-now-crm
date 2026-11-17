@@ -1,5 +1,3 @@
-// Blockchain Explorer Utility - Comprehensive version for all networks
-
 import type {CryptoNetworkType} from "../schemas/enum.schema.ts";
 import { CRYPTO_NETWORK } from "./enum.ts";
 
@@ -11,7 +9,6 @@ interface ExplorerConfig {
   tokenPath?: string
 }
 
-// Comprehensive explorer configurations for all networks
 const EXPLORER_CONFIGS: Record<CRYPTO_NETWORK, ExplorerConfig> = {
   [CRYPTO_NETWORK.BTC]: {
     name: 'Blockchain.com',

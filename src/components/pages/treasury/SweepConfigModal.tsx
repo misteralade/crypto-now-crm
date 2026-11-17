@@ -502,8 +502,8 @@ export default function SweepConfigModal({
 
   const previewFeeExplanation = previewData
     ? previewData.feeHandling === "deducted_from_swept_asset"
-      ? `Fees are paid in ${previewData.feeAssetSymbol} and reduce the final amount moved when draining the source wallet.`
-      : `Fees are paid in ${previewData.feeAssetSymbol} from the fueling wallet for gas, not from the ${symbol || "asset"} amount being swept.`
+      ? `Fees are paid in ${previewData.feeAssetSymbol} and deducted from the swept amount.`
+      : `Network fees are paid in ${previewData.feeAssetSymbol} from the fueling wallet.`
     : "";
 
   return (
@@ -521,14 +521,9 @@ export default function SweepConfigModal({
         }`}
       >
         <div className="flex items-center justify-between border-b border-[--color-border] px-6 py-4">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#667085]">
-              Step-by-step flow
-            </p>
-            <h2 className="text-lg font-semibold text-[--color-text-primary]">
-              Initiate Treasury Sweep
-            </h2>
-          </div>
+          <h2 className="text-lg font-semibold text-[--color-text-primary]">
+            Initiate Treasury Sweep
+          </h2>
           <button
             type="button"
             onClick={requestClose}
@@ -584,9 +579,6 @@ export default function SweepConfigModal({
                 options={cryptoOptions}
                 disabled={cryptoOptions.length === 0}
               />
-              <p className="text-[12px] leading-5 text-[#667085]">
-                This chooses which asset balances will be collected into the admin sweep wallet.
-              </p>
 
               <LabeledPillSelect
                 label="Select Network"
@@ -598,9 +590,6 @@ export default function SweepConfigModal({
                 options={networkOptions}
                 disabled={!cryptocurrencyId || networkOptions.length === 0}
               />
-              <p className="text-[12px] leading-5 text-[#667085]">
-                This chooses the chain those balances live on. Preview only works after both fields are set.
-              </p>
 
               {!hasFuelingWallet && (
                 <div className="rounded-xl border border-red-200 bg-red-50 p-4 space-y-3">
@@ -677,8 +666,7 @@ export default function SweepConfigModal({
                 )}
                 {!isBtcLimitedSweepUi && !amountTouched && maxAmountInput && (
                   <p className="text-xs text-[#667085]">
-                    Showing the current cached total as a reference — this sweep will not be
-                    capped unless you edit the amount.
+                    Cached balance shown as reference. The sweep is uncapped unless you set an amount.
                   </p>
                 )}
                 {maxAmountInvalid && (
@@ -752,7 +740,7 @@ export default function SweepConfigModal({
                         )}
                       </div>
                       <p className="text-xs text-[#667085]">
-                        Wallets at or below this balance are skipped before fee checks and on-chain execution.
+                        Wallets at or below this balance are skipped.
                       </p>
                       {dustThresholdInvalid && (
                         <p className="text-xs text-red-500">

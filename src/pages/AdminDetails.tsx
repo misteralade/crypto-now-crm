@@ -101,7 +101,7 @@ const AdminDetails = () => {
                     </div>
                     <div>
                       <h4 className="text-lg font-semibold text-[#101828]">Roles</h4>
-                      <p className="text-sm text-[#667085]">Assigned permissions groups for this admin</p>
+                      <p className="text-sm text-[#667085]">Assigned roles</p>
                     </div>
                   </div>
 
@@ -128,7 +128,6 @@ const AdminDetails = () => {
                     </div>
                     <div>
                       <h4 className="text-lg font-semibold text-[#101828]">Activity</h4>
-                      <p className="text-sm text-[#667085]">Lifecycle timestamps for this admin</p>
                     </div>
                   </div>
 
@@ -145,7 +144,6 @@ const AdminDetails = () => {
                     </div>
                     <div>
                       <h4 className="text-lg font-semibold text-[#101828]">Contact</h4>
-                      <p className="text-sm text-[#667085]">Primary login and contact identity</p>
                     </div>
                   </div>
 

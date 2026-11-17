@@ -212,9 +212,9 @@ const FuelingWalletsSection = ({ cryptos }: FuelingWalletsSectionProps) => {
   return (
     <div className="bg-white border border-[#E9E7E2] rounded-3xl p-6 shadow-sm space-y-6">
       <div>
-        <h3 className="text-xl font-bold text-[#03034D]">Gas Funding (Fueling) Wallets</h3>
+        <h3 className="text-xl font-bold text-[#03034D]">Fueling wallets</h3>
         <p className="text-xs text-gray-500 mt-1">
-          System-derived wallets used exclusively to fund transaction fees (gas) for sweeping assets.
+          Wallets used to pay gas fees when sweeping deposits.
         </p>
       </div>
 

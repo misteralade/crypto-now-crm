@@ -72,7 +72,7 @@ const Dashboard = () => {
 
   return (
     <AuthenticatedLayout>
-      <PageHeader title="Overview" subtitle="Admin reports and analytics" />
+      <PageHeader title="Overview" />
 
       <div className="p-6 space-y-6">
         {/* Timeline + heading row */}

@@ -134,12 +134,11 @@ const KycTierLimits = () => {
     <AuthenticatedLayout>
       <PageHeader
         title="KYC Tier Limits"
-        subtitle="Manage transaction limits and configurations for different user verification levels"
         actions={
           <CustomButton
             onClick={() => setIsCreateModalOpen(true)}
             className="flex items-center gap-2"
-            buttonText="Add New Limit"
+            buttonText="Add limit"
           >
             <Plus size={18} />
           </CustomButton>
@@ -156,11 +155,11 @@ const KycTierLimits = () => {
           <div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-gray-200">
             <ShieldCheck className="w-12 h-12 text-gray-200 mb-4" />
             <p className="text-gray-900 font-semibold">No tier limits configured</p>
-            <p className="text-gray-500 text-sm mt-1">Start by adding a limit for one of the KYC tiers.</p>
+            <p className="text-gray-500 text-sm mt-1">Add a limit for one of the KYC tiers.</p>
             <CustomButton
               onClick={() => setIsCreateModalOpen(true)}
               className="mt-6"
-              buttonText="Add First Limit"
+              buttonText="Add limit"
             />
           </div>
         ) : (

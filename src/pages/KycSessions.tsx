@@ -134,10 +134,7 @@ const KycSessions = () => {
 
   return (
     <AuthenticatedLayout>
-      <PageHeader
-        title="KYC Sessions"
-        subtitle="Review and manage user identity verification sessions"
-      />
+      <PageHeader title="KYC Sessions" />
 
       <div className="p-6 space-y-5">
         {/* Filters */}

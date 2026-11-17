@@ -51,11 +51,11 @@ const WalletCardSection = ({ walletType, cryptos, defaultCryptoId: _defaultCrypt
       })),
   );
 
-  const heading = walletType === "SENDING" ? "Buy Payout (Sending) Wallets" : "Sweep Target (Receiving) Wallets";
+  const heading = walletType === "SENDING" ? "Buy payout wallets" : "Sweep destination wallets";
   const description = walletType === "SENDING"
-    ? "Funds used by the platform to complete user Buy Orders."
-    : "External target addresses where swept user deposits are transferred.";
-  const addLabel = walletType === "SENDING" ? "Add Sending Wallet" : "Add Receiving Wallet";
+    ? "Wallets used to send crypto for customer buy orders."
+    : "Destination wallets for swept deposits.";
+  const addLabel = walletType === "SENDING" ? "Add sending wallet" : "Add receiving wallet";
   const emptyLabel = walletType === "SENDING" ? "No sending wallets configured yet." : "No receiving wallets configured yet.";
 
   const handleConfirmDelete = () => {

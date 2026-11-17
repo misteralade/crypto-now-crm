@@ -43,7 +43,7 @@ const UserDetails = () => {
     <AuthenticatedLayout>
       <PageHeader 
         title="User Details" 
-        subtitle={userProfile ? `${userProfile.profile?.firstName} ${userProfile.profile?.lastName}` : 'Review user profile and activity'}
+        subtitle={userProfile ? `${userProfile.profile?.firstName ?? ''} ${userProfile.profile?.lastName ?? ''}`.trim() || undefined : undefined}
         onBack={goBack} 
       />
       <div className="p-6 mx-auto">

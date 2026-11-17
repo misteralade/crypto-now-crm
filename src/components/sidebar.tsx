@@ -46,7 +46,7 @@ const navItems = [
   },
   {
     path: ROUTES.TRANSACTIONS,
-    label: "Manage Transactions",
+    label: "Transactions",
     icon: (props: { className?: string }) => (
       <img
         src="/icons/transaction.svg"

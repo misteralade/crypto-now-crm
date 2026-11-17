@@ -15,7 +15,7 @@ const AdminWalletsPage = () => {
   return (
     <AuthenticatedLayout>
       <div className="p-6 mx-auto">
-        <PageHeader title="Admin Wallets" subtitle="Manage sending, receiving, and fueling wallets across all supported coins." />
+        <PageHeader title="Admin Wallets" />
 
         {loadingAllSupportedCrypto ? (
           <div className="flex items-center justify-center min-h-[50vh]">

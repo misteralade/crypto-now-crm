@@ -69,10 +69,7 @@ const Users = () => {
 
   return (
     <AuthenticatedLayout>
-      <PageHeader
-        title="User Management"
-        subtitle="Search, view, and manage all platform users"
-      />
+      <PageHeader title="Users" />
 
       <div className="p-6 mx-auto">
         {/* Controls */}

@@ -384,17 +384,12 @@ const TransactionDetailsDrawer = ({
                       <h2 className="text-xl font-semibold text-gray-900 mb-4">
                         Custodial Deposit Address
                       </h2>
-                      <div className="space-y-2">
-                        <p className="text-sm text-gray-500">
-                          Send and monitor funds against this deposit address.
-                        </p>
-                        <CopyDetails
-                          text={transaction.depositAddress}
-                          className="!max-w-[700px]"
-                          iconClassName="!w-8 !h-8"
-                          wrap={true}
-                        />
-                      </div>
+                      <CopyDetails
+                        text={transaction.depositAddress}
+                        className="!max-w-[700px]"
+                        iconClassName="!w-8 !h-8"
+                        wrap={true}
+                      />
                     </div>
                   )}
 
@@ -404,17 +399,12 @@ const TransactionDetailsDrawer = ({
                         <h2 className="text-xl font-semibold text-gray-900 mb-4">
                           Bank Transfer Reference
                         </h2>
-                        <div className="space-y-2">
-                          <p className="text-sm text-gray-500">
-                            Use this reference to match the customer payment.
-                          </p>
-                          <CopyDetails
-                            text={transaction.bankTransferReference}
-                            className="!max-w-[700px]"
-                            iconClassName="!w-8 !h-8"
-                            wrap={true}
-                          />
-                        </div>
+                        <CopyDetails
+                          text={transaction.bankTransferReference}
+                          className="!max-w-[700px]"
+                          iconClassName="!w-8 !h-8"
+                          wrap={true}
+                        />
                       </div>
                     )}
                 </section>

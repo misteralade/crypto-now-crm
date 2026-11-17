@@ -87,7 +87,7 @@ const ManageAdmins = () => {
   return (
     <AuthenticatedLayout>
       <div className="p-6 mx-auto">
-        <PageHeader title="Admin Management" />
+        <PageHeader title="Admins" />
         
         <AdminsControls
           searchValue={searchQuery || ''}

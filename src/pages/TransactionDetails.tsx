@@ -173,29 +173,21 @@ const TransactionDetails = () => {
                 {transaction.type === "SELL" && transaction.depositAddress ? (
                   <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
                     <h2 className="text-xl font-semibold text-gray-900 mb-4">Deposit Address</h2>
-                    <div>
-                      <p className="text-sm text-gray-500 mb-2">User deposit address (custodial)</p>
-                      <div className="flex items-center gap-2">
-                        <CopyDetails
-                          text={transaction.depositAddress}
-                          className="!max-w-[700px]"
-                          iconClassName="!w-8 !h-8"
-                        />
-                      </div>
-                    </div>
+                    <CopyDetails
+                      text={transaction.depositAddress}
+                      className="!max-w-[700px]"
+                      iconClassName="!w-8 !h-8"
+                    />
                   </div>
                 ) : null}
                 
                 {/* Bank Transfer Reference */}
                 {transaction.bankTransferReference && (
                   <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Bank Transfer</h2>
-                    <div>
-                      <p className="text-sm text-gray-500 mb-2">Transfer Reference</p>
-                      <div className="flex items-center gap-2">
-                        <p className="text-base font-medium text-gray-900">{transaction.bankTransferReference}</p>
-                        <CopyDetails text={transaction.bankTransferReference} className="!max-w-[400px]" iconClassName="!w-8 !h-8" />
-                      </div>
+                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Bank Transfer Reference</h2>
+                    <div className="flex items-center gap-2">
+                      <p className="text-base font-medium text-gray-900">{transaction.bankTransferReference}</p>
+                      <CopyDetails text={transaction.bankTransferReference} className="!max-w-[400px]" iconClassName="!w-8 !h-8" />
                     </div>
                   </div>
                 )}

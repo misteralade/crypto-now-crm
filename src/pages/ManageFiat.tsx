@@ -36,7 +36,7 @@ const ManageFiat = () => {
   return (
     <AuthenticatedLayout>
       <div className="p-6 min-h-screen container">
-        <PageHeader title="ManageFiat" />
+        <PageHeader title="Manage Fiat" />
 
         <section className="mt-6 rounded-3xl border border-[#E9E7E2] bg-gradient-to-br from-[#FFF8EC] via-white to-[#F7FAFF] p-5 shadow-sm">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -45,11 +45,10 @@ const ManageFiat = () => {
                 Payout controls
               </div>
               <h2 className="mt-2 text-[24px] font-semibold text-[#0E0F0C]">
-                Automated sell payouts stop above the configured NGN limit
+                Payout review threshold
               </h2>
               <p className="mt-2 max-w-2xl text-[14px] leading-6 text-[#5C6370]">
-                Payouts above this ceiling move into manual review instead of
-                calling Nomba automatically.
+                Sell payouts above this amount require manual review.
               </p>
             </div>
 

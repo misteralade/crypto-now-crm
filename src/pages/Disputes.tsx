@@ -38,7 +38,7 @@ const Disputes = () => {
   return (
     <AuthenticatedLayout>
       <div className="p-6 mx-auto">
-        <PageHeader title="Dispute Quote" />
+        <PageHeader title="Disputes" />
         
         {/*/!* Controls *!/*/}
         {/*<DisputesControls*/}

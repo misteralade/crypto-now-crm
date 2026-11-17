@@ -198,7 +198,6 @@ export default function SweepDetail() {
     <AuthenticatedLayout>
       <PageHeader 
         title="Sweep Run Details" 
-        subtitle="Real-time execution monitoring and wallet outcomes"
         onBack={handleBack}
         actions={headerActions}
       />

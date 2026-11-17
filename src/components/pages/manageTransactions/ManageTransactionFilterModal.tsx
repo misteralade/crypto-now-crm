@@ -47,33 +47,21 @@ const formatMoneyLabel = (amount: number | undefined) => {
 
 const SectionCard = ({
   icon,
-  eyebrow,
   title,
-  description,
   children,
 }: {
   icon: ReactNode;
-  eyebrow: string;
   title: string;
-  description: string;
   children: ReactNode;
 }) => (
-  <section className="rounded-[26px] border border-[#E7EAF4] bg-[#FBFCFF] p-4 shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
-    <div className="flex items-start gap-3">
-      <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#EEF1FF] text-[#03034D]">
+  <section className="rounded-2xl border border-[#E7EAF4] bg-[#FBFCFF] p-4 shadow-sm">
+    <div className="flex items-center gap-3">
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#EEF1FF] text-[#03034D]">
         {icon}
       </div>
-      <div className="min-w-0">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-[#8A91A8]">
-          {eyebrow}
-        </p>
-        <h3 className="mt-1 text-[16px] font-semibold text-[#0B1027]">
-          {title}
-        </h3>
-        <p className="mt-1 text-[13px] leading-5 text-[#667085]">
-          {description}
-        </p>
-      </div>
+      <h3 className="text-[15px] font-semibold text-[#0B1027]">
+        {title}
+      </h3>
     </div>
     <div className="mt-4">{children}</div>
   </section>
@@ -243,9 +231,7 @@ const ManageTransactionFilterModal = ({
               <div className="mt-6 grid gap-4">
                 <SectionCard
                   icon={<CalendarRange className="h-5 w-5" />}
-                  eyebrow="Temporal range"
-                  title="Date window"
-                  description="Pin the exact period you want to inspect. This applies before pagination, so the table stays focused."
+                  title="Date range"
                 >
                   <div className="grid gap-4 sm:grid-cols-2">
                     <DateInput
@@ -265,9 +251,7 @@ const ManageTransactionFilterModal = ({
 
                 <SectionCard
                   icon={<SlidersHorizontal className="h-5 w-5" />}
-                  eyebrow="Value band"
-                  title="Amount range"
-                  description="Use a minimum and maximum fiat band to collapse noisy outliers out of the view."
+                  title="Amount range (NGN)"
                 >
                   <div className="grid gap-4 sm:grid-cols-2">
                     <Input
@@ -301,9 +285,7 @@ const ManageTransactionFilterModal = ({
 
                 <SectionCard
                   icon={<Layers3 className="h-5 w-5" />}
-                  eyebrow="Market scope"
                   title="Asset and status"
-                  description="Choose the exact instrument and state to isolate a slice of the ledger."
                 >
                   <div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
                     <LabeledSelect

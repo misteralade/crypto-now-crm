@@ -111,7 +111,7 @@ const EditTradeLimits = ({ cryptoId, symbol, buyAt, sellAt, minAmount, maxAmount
           placeholder="e.g. 1500 NGN per USD"
           value={buyRate}
           onChange={(e) => { setBuyRate(e.target.value); onChangeInputField("buyRate", e.target.value) }}
-          label="Rate to Sell to User (NGN per USD) : Sell Rate"
+          label="Sell rate to user (NGN/USD)"
           type="text"
           inputMode="decimal"
         />
@@ -120,7 +120,7 @@ const EditTradeLimits = ({ cryptoId, symbol, buyAt, sellAt, minAmount, maxAmount
           placeholder="e.g. 1400 NGN per USD"
           value={sellRate}
           onChange={(e) => { setSellRate(e.target.value); onChangeInputField("sellRate", e.target.value) }}
-          label="Rate to Buy from User (NGN per USD) : Buy Rate"
+          label="Buy rate from user (NGN/USD)"
           type="text"
           inputMode="decimal"
         />
@@ -163,7 +163,6 @@ const EditTradeLimits = ({ cryptoId, symbol, buyAt, sellAt, minAmount, maxAmount
           <div className="grid gap-4 lg:grid-cols-2">
             <div className="rounded-[22px] bg-[#F7F7FE] border border-[#E2E1F8] p-4">
               <p className="text-sm font-semibold text-[#03034D]">Rate to Sell to User</p>
-              <p className="text-xs text-[#6A6B89] mt-1">Uses the Sell Rate field.</p>
               <div className="mt-4 space-y-2 text-sm text-[#0E0F0C]">
                 <p>
                   {formatForDisplayLocalized(normalizedPreviewCryptoUnits, symbol)} {symbol} × ${formatForDisplayLocalized(coinGeckoRate, "USD")} USD × ₦{formatForDisplayLocalized(sellToUserRate, "NGN")}/USD
@@ -176,7 +175,6 @@ const EditTradeLimits = ({ cryptoId, symbol, buyAt, sellAt, minAmount, maxAmount
 
             <div className="rounded-[22px] bg-[#F7F7FE] border border-[#E2E1F8] p-4">
               <p className="text-sm font-semibold text-[#03034D]">Rate to Buy from User</p>
-              <p className="text-xs text-[#6A6B89] mt-1">Uses the Buy Rate field.</p>
               <div className="mt-4 space-y-2 text-sm text-[#0E0F0C]">
                 <p>
                   {formatForDisplayLocalized(normalizedPreviewCryptoUnits, symbol)} {symbol} × ${formatForDisplayLocalized(coinGeckoRate, "USD")} USD × ₦{formatForDisplayLocalized(buyFromUserRate, "NGN")}/USD
@@ -221,7 +219,7 @@ const EditTradeLimits = ({ cryptoId, symbol, buyAt, sellAt, minAmount, maxAmount
           placeholder="e.g. 100"
           value={minTradeAmountForAnonymous}
           onChange={(e) => { setMinTradeAmountForAnonymous(e.target.value); onChangeInputField("minTradeAmountForAnonymous", e.target.value) }}
-          label="Min Transaction Amount : Anonymous (token)"
+          label="Guest min amount (token)"
           type="text"
           inputMode="decimal"
           step="0.1"
@@ -231,7 +229,7 @@ const EditTradeLimits = ({ cryptoId, symbol, buyAt, sellAt, minAmount, maxAmount
           placeholder="e.g. 1000000"
           value={maxTradeAmountForAnonymous}
           onChange={(e) => { setMaxTradeAmountForAnonymous(e.target.value); onChangeInputField("maxTradeAmountForAnonymous", e.target.value) }}
-          label="Max Transaction Amount : Anonymous (token)"
+          label="Guest max amount (token)"
           type="text"
           inputMode="decimal"
         />

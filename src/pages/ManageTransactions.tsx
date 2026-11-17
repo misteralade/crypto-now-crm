@@ -99,10 +99,7 @@ const ManageTransactions = () => {
 
   return (
     <AuthenticatedLayout>
-      <PageHeader
-        title="Transaction Management"
-        subtitle="Monitor and manage all system transactions"
-      />
+      <PageHeader title="Transactions" />
       <div className="p-3 sm:p-6 mx-auto space-y-5">
         {filteredUserId && (
           <div className="flex items-center justify-between gap-3 rounded-xl border border-[#ECECEC] bg-[#F9FAFB] px-4 py-2.5">

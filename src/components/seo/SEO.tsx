@@ -21,9 +21,9 @@ export interface SEOProps {
 }
 
 const defaultSEO: Required<Omit<SEOProps, 'ogTitle' | 'ogDescription' | 'ogImage' | 'ogUrl' | 'ogType' | 'twitterCard' | 'twitterTitle' | 'twitterDescription' | 'twitterImage' | 'canonicalUrl' | 'robots' | 'noindex' | 'nofollow'>> & Pick<SEOProps, 'ogTitle' | 'ogDescription' | 'ogImage' | 'ogUrl' | 'ogType' | 'twitterCard' | 'twitterTitle' | 'twitterDescription' | 'twitterImage' | 'canonicalUrl' | 'robots' | 'noindex' | 'nofollow'> = {
-  title: 'CryptoNow CRM - Cryptocurrency Transaction Management System',
-  description: 'Manage cryptocurrency transactions, users, disputes, and more with CryptoNow CRM. A comprehensive admin dashboard for crypto transaction management.',
-  keywords: 'cryptocurrency, CRM, transaction management, crypto admin, blockchain, crypto dashboard',
+  title: 'CryptoNow CRM',
+  description: 'CryptoNow CRM admin dashboard.',
+  keywords: 'cryptocurrency, CRM, crypto admin',
   author: 'CryptoNow',
 }
 

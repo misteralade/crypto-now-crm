@@ -75,7 +75,6 @@ const CoinDetails = ({ onChangeInputField }: CoinDetailsProps) => {
       <div className="bg-white border border-[#E9E7E2] rounded-3xl p-6 shadow-sm space-y-6">
         <div>
           <h3 className="text-xl font-bold text-[#0E0F0C]">Supported Crypto</h3>
-          <p className="text-xs text-gray-500 mt-1">Configure basic metadata and active networks for the new cryptocurrency.</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-x-8">
@@ -125,11 +124,9 @@ const CoinDetails = ({ onChangeInputField }: CoinDetailsProps) => {
       </div>
 
       {selectedNetworks.length > 0 && (
-        <div className="rounded-3xl border border-indigo-100 bg-indigo-50/60 p-6 text-sm text-indigo-900">
-          Wallets for this coin (sending, receiving, and fueling) are configured separately after
-          creation. Once this coin is saved, go to{" "}
-          <span className="font-semibold">Admin Wallets</span> in the sidebar to add and manage
-          its wallets.
+        <div className="rounded-2xl border border-indigo-100 bg-indigo-50/60 p-4 text-sm text-indigo-900">
+          Configure sending, receiving, and fueling wallets under{" "}
+          <span className="font-semibold">Admin Wallets</span> after saving.
         </div>
       )}
 
@@ -138,9 +135,9 @@ const CoinDetails = ({ onChangeInputField }: CoinDetailsProps) => {
         <Switch id="buyEnabled" label="Buy enabled" defaultChecked onCheckedChange={(checked) => onChangeInputField("buyEnabled", checked)} />
         <div>
           <PillInput label="Buy decimal places" id="buyPrecision" type="number" min={0} max={8} onChange={(event) => onChangeInputField("buyPrecision", Number.isFinite(event.target.valueAsNumber) ? event.target.valueAsNumber : -1)} />
-          <p className="text-sm text-gray-600">Use the smallest number of decimal places supported across the selected networks.</p>
+          <p className="text-xs text-gray-500 mt-1">Use the lowest decimal places across selected networks.</p>
         </div>
-        <p>New networks can be used for buys. Sell support and address validation require separate setup.</p>
+        <p className="text-xs text-gray-500">Sell support and address validation require separate backend configuration.</p>
         <div>
           <label className="block text-[13px] font-semibold text-[#454745] mb-3">
             Active Status

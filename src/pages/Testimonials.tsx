@@ -69,7 +69,7 @@ const Testimonials = () => {
   return (
     <AuthenticatedLayout>
       <div className="p-6 min-h-screen container">
-        <PageHeader title="Testimonial Management" />
+        <PageHeader title="Testimonials" />
         
         {/* Controls */}
         <div className="flex mt-8 w-full flex-col md:flex-row items-center justify-end gap-4 mb-6">

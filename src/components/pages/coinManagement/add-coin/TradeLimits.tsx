@@ -14,7 +14,7 @@ const TradeLimits = ({ onChangeInputField }: TradeLimitsProps) => {
         <PillInput
           id="buyRate"
           onChange={(e) => onChangeInputField("buyRate", e.target.value)}
-          label="Rate to Sell to User (NGN per USD) : Sell Rate"
+          label="Sell rate to user (NGN/USD)"
           type="text"
           inputMode="decimal"
           placeholder="1575 NGN per USD"
@@ -22,7 +22,7 @@ const TradeLimits = ({ onChangeInputField }: TradeLimitsProps) => {
         <PillInput
           id="sellRate"
           onChange={(e) => onChangeInputField("sellRate", e.target.value)}
-          label="Rate to Buy from User (NGN per USD) : Buy Rate"
+          label="Buy rate from user (NGN/USD)"
           type="text"
           inputMode="decimal"
           placeholder="1545 NGN per USD"
@@ -52,7 +52,7 @@ const TradeLimits = ({ onChangeInputField }: TradeLimitsProps) => {
         <PillInput
           id="minTransactionAmountForAnonymousUsers"
           onChange={(e) => onChangeInputField("minTradeAmountForAnonymous", e.target.value)}
-          label="Min Transaction Amount : Anonymous (token)"
+          label="Guest min amount (token)"
           type="text"
           inputMode="decimal"
           placeholder="e.g. 0.5"
@@ -61,7 +61,7 @@ const TradeLimits = ({ onChangeInputField }: TradeLimitsProps) => {
         <PillInput
           id="maxTransactionAmountForAnonymousUsers"
           onChange={(e) => onChangeInputField("maxTradeAmountForAnonymous", e.target.value)}
-          label="Max Transaction Amount : Anonymous (token)"
+          label="Guest max amount (token)"
           type="text"
           inputMode="decimal"
           placeholder="e.g. 30"

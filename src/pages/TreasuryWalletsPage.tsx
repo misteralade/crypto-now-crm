@@ -223,7 +223,6 @@ export default function TreasuryWalletsPage() {
       <div className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6">
         <PageHeader
           title={`${symbol} Custodial Wallets`}
-          subtitle={`Viewing all generated custodial wallets for ${name} on ${network} network.`}
           onBack={() => navigate({ to: "/dashboard/treasury" })}
         />
 
