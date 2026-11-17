@@ -77,6 +77,10 @@ export const CreateSupportedCryptoAndAdminWalletRequestSchema = z.object({
   networks: z.array(z.string()).min(1, "Select at least one network"),
   wallets: z.array(WalletEntrySchema).optional(),
   isActive: z.boolean().default(true).optional(),
+  buyEnabled: z.boolean().default(true),
+  sellEnabled: z.boolean().default(false),
+  coinGeckoId: z.string().min(1, "Select a coin"),
+  buyPrecision: z.number().int().min(0).max(8),
   blockchainEnvironment: BlockchainEnvironmentType.default("testnet").optional(),
 });
 
@@ -98,6 +102,9 @@ export const EditSupportedCryptoAndAdminWalletRequestSchema = z.object({
   networks: z.array(z.string()).optional(),
   wallets: z.array(WalletEntrySchema).optional(),
   isActive: z.boolean().optional(),
+  buyEnabled: z.boolean().optional(),
+  sellEnabled: z.boolean().optional(),
+  buyPrecision: z.number().int().min(0).max(8).optional(),
   blockchainEnvironment: BlockchainEnvironmentType.default("testnet").optional(),
 });
 

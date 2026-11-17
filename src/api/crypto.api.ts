@@ -37,6 +37,18 @@ class CryptoServiceApi {
     return await axiosPostRequestHandler("/crypto/admin/search", body) as SearchSupportedCryptoAPIResponse;
   }
 
+  async searchCoins(query: string) {
+    return await axiosGetRequestHandler(`/crypto/admin/coin-search?query=${encodeURIComponent(query)}`) as BaseApiResponse<Array<{ id: string; name: string; symbol: string }>>;
+  }
+
+  async getNetworks() {
+    return await axiosGetRequestHandler("/crypto/admin/networks") as BaseApiResponse<Array<{ code: string; label: string }>>;
+  }
+
+  async createNetwork(code: string, label: string) {
+    return await axiosPostRequestHandler("/crypto/admin/networks", { code, label }) as BaseApiResponse<{ code: string; label: string }>;
+  }
+
   async uploadCoinLogo(formData: FormData) {
     return await axiosPostRequestHandler("/upload/admin/wallet-logo/upload", formData, {
       headers: {

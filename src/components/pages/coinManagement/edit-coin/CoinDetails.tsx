@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { CRYPTO_NETWORK_OPTIONS, ROUTES } from "../../../../util/constants.util.ts";
+import { ROUTES } from "../../../../util/constants.util.ts";
+import { cryptoServiceApi } from "../../../../api/crypto.api";
 import type { EditSupportedCryptoAndAdminWalletRequestType } from "../../../../schemas/crypto.schema";
 import type { AdminCryptoWalletResponsePayload } from "../../../../types/response.payload.types";
 import { PillInput } from "../../../ui/input";
@@ -8,16 +9,15 @@ import { Switch } from "../../../ui/switch";
 import { Checkbox } from "../../../ui/checkbox";
 import { ArrowRight } from "lucide-react";
 
-const ACTIVE_NETWORKS = CRYPTO_NETWORK_OPTIONS.filter(
-  (opt) => opt.value !== undefined,
-) as Array<{ value: string; label: string }>;
-
 interface EditCoinDetailsProps {
   cryptoId: string;
   name: string;
   symbol: string;
   networks?: string[];
   active: boolean;
+  buyEnabled: boolean;
+  sellEnabled: boolean;
+  buyPrecision: number | null;
   blockchainEnvironment: "testnet" | "mainnet";
   adminCryptoWallets?: AdminCryptoWalletResponsePayload[];
   onChangeInputField: (
@@ -32,11 +32,16 @@ const EditCoinDetails = ({
   symbol,
   networks = [],
   active,
+  buyEnabled,
+  sellEnabled,
+  buyPrecision,
   adminCryptoWallets = [],
   onChangeInputField,
 }: EditCoinDetailsProps) => {
   const [isActive, setIsActive] = useState(active);
-  const selectedNetworks = networks; // readonly
+  const [selectedNetworks, setSelectedNetworks] = useState(networks);
+  const [availableNetworks, setAvailableNetworks] = useState<Array<{ code: string; label: string }>>([]);
+  useEffect(() => { void cryptoServiceApi.getNetworks().then((result) => setAvailableNetworks(result.data ?? [])); }, []);
 
   const walletCounts = adminCryptoWallets.reduce(
     (acc, w) => {
@@ -79,14 +84,17 @@ const EditCoinDetails = ({
             Active Networks
           </label>
           <div className="flex flex-wrap gap-4">
-            {ACTIVE_NETWORKS.map((opt) => (
+            {availableNetworks.map((opt) => (
               <Checkbox
-                key={opt.value}
-                id={`network-${opt.value}`}
-                label={`${opt.value} (${opt.label})`}
-                checked={selectedNetworks.includes(opt.value)}
-                disabled
-                onCheckedChange={() => {}}
+                key={opt.code}
+                id={`network-${opt.code}`}
+                label={opt.label}
+                checked={selectedNetworks.includes(opt.code)}
+                onCheckedChange={() => {
+                  const updated = selectedNetworks.includes(opt.code) ? selectedNetworks.filter((network) => network !== opt.code) : [...selectedNetworks, opt.code];
+                  setSelectedNetworks(updated);
+                  onChangeInputField("networks", updated);
+                }}
               />
             ))}
           </div>
@@ -130,6 +138,9 @@ const EditCoinDetails = ({
 
       {/* SECTION 3: COIN STATUS */}
       <div className="bg-white border border-[#E9E7E2] rounded-3xl p-6 shadow-sm">
+        <Switch id="buyEnabled" label="Buy enabled" defaultChecked={buyEnabled} onCheckedChange={(checked) => onChangeInputField("buyEnabled", checked)} />
+        <Switch id="sellEnabled" label="Sell enabled" defaultChecked={sellEnabled} onCheckedChange={(checked) => onChangeInputField("sellEnabled", checked)} />
+        <PillInput label="Buy decimal places" id="buyPrecision" type="number" min={0} max={8} defaultValue={buyPrecision ?? undefined} onChange={(event) => onChangeInputField("buyPrecision", event.target.valueAsNumber)} />
         <div>
           <label className="block text-[13px] font-semibold text-[#454745] mb-3">
             Coin Status

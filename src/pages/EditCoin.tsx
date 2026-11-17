@@ -47,12 +47,16 @@ const EditCoin = () => {
               />
 
               <EditCoinDetails
+                key={adminCryptoDetails?.id}
                 cryptoId={adminCryptoDetails?.id || ''}
                 onChangeInputField={handleEditCoinInputChange}
                 name={adminCryptoDetails?.name || ''}
                 symbol={adminCryptoDetails?.symbol || ''}
                 networks={adminCryptoDetails?.networks ?? []}
                 active={adminCryptoDetails?.isActive || false}
+                buyEnabled={adminCryptoDetails?.buyEnabled ?? false}
+                sellEnabled={adminCryptoDetails?.sellEnabled ?? false}
+                buyPrecision={adminCryptoDetails?.buyPrecision ?? null}
                 adminCryptoWallets={adminCryptoDetails?.adminCryptoWallets ?? []}
                 blockchainEnvironment={adminCryptoDetails?.blockchainEnvironment as "testnet" | "mainnet"}
               />

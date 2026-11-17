@@ -335,6 +335,9 @@ export type SearchSupportedCryptoData = {
   buyRate: string;
   sellRate: string;
   isActive: boolean;
+  buyEnabled: boolean;
+  sellEnabled: boolean;
+  buyPrecision: number | null;
   websiteUrl: string;
   whitepaperUrl: string;
   networks: string[];

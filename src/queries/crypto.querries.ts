@@ -99,6 +99,11 @@ export const useCryptoQuery = () => {
 
        
       if (!payload) throw new Error("Missing payload to create new coin.")
+      if (!payload.coinGeckoId) throw new Error("Search for and select a coin.");
+      if (!payload.networks.length) throw new Error("Select at least one network.");
+      if (!Number.isInteger(payload.buyPrecision) || payload.buyPrecision < 0 || payload.buyPrecision > 8) {
+        throw new Error("Enter the buy decimal places, from 0 to 8.");
+      }
 
       // Clean invalid URL fields before sending
       const cleanedPayload = sanitizeOptionalNumberFields(
@@ -115,13 +120,14 @@ export const useCryptoQuery = () => {
     },
     onSuccess: ({ message, success }) => {
       toast.dismiss();
+      void queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CRYPTO.ALL_SUPPORTED_CRYPTO_CURRENCIES] });
+      void queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CRYPTO.SEARCH_SUPPORTED_CRYPTO_CURRENCIES] });
       toast.success(message || "Create new coin successfully.");
       return success;
     },
-    onError: (error: AxiosServerError) => {
+    onError: (error: Error) => {
       toast.dismiss()
-      const { data } = error.response as { data: { error: { message: string } } };
-      toast.error(`Failed to create new coin: ${data.error.message}`)
+      toast.error(`Failed to create coin: ${error.message}`)
     },
   });
 
@@ -150,6 +156,8 @@ export const useCryptoQuery = () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.CRYPTO.SEARCH_SUPPORTED_CRYPTO_CURRENCIES]
       });
+      void queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CRYPTO.ALL_SUPPORTED_CRYPTO_CURRENCIES] });
+      void queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CRYPTO.ADMIN_GET_SUPPORTED_CRYPTO_CURRENCY] });
       return { message, success };
     },
     onSuccess: ({ message, success }) => {
@@ -158,10 +166,9 @@ export const useCryptoQuery = () => {
       
       return success;
     },
-    onError: (error: AxiosServerError) => {
-      const { data } = error.response as { data: { error: { message: string } } };
+    onError: (error: Error) => {
       toast.dismiss()
-      toast.error(`Failed to update coin: ${data.error.message}`)
+      toast.error(`Failed to update coin: ${error.message}`)
     },
   });
   

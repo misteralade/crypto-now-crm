@@ -61,6 +61,10 @@ export const createSupportedCryptoAndWalletInitialState: CreateSupportedCryptoAn
     // Common
     isActive: true,
     blockchainEnvironment: "testnet",
+    buyEnabled: true,
+    sellEnabled: false,
+    coinGeckoId: "",
+    buyPrecision: -1,
   };
 
 export const editSupportedCryptoInitialState: EditSupportedCryptoAndAdminWalletRequestType =
