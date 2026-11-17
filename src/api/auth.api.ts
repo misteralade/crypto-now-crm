@@ -15,7 +15,7 @@ class AuthServiceApi {
     return AuthServiceApi.instance;
   }
 
-  async login(payload: Record<string, any>): Promise<BaseApiResponse<{ twoFactorRequired?: boolean; passwordResetRequired?: boolean; challengeToken?: string } | null>> {
+  async login(payload: Record<string, any>): Promise<BaseApiResponse<{ twoFactorRequired?: boolean; mustChangePassword?: boolean; challengeToken?: string } | null>> {
     return await axiosPostRequestHandler("/admin/auth/sign-in", payload);
   }
   

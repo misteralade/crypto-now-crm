@@ -53,7 +53,7 @@ export const useSignInPage = () => {
 
       if (!success) {
         setError(message || "Login failed. Please check your credentials.");
-      } else if (data?.passwordResetRequired) {
+      } else if (data?.mustChangePassword) {
         setError(message);
       } else if (data?.twoFactorRequired && data.challengeToken) {
         sessionStorage.setItem("adminVerificationChallenge", data.challengeToken);
