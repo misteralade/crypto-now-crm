@@ -38,8 +38,11 @@ const EditCoinDetails = ({
   adminCryptoWallets = [],
   onChangeInputField,
 }: EditCoinDetailsProps) => {
-  const [isActive, setIsActive] = useState(active);
-  const [selectedNetworks, setSelectedNetworks] = useState(networks);
+  const [editedActive, setEditedActive] = useState<boolean | null>(null);
+  const [editedBuyEnabled, setEditedBuyEnabled] = useState<boolean | null>(null);
+  const [editedBuyPrecision, setEditedBuyPrecision] = useState<string | null>(null);
+  const [editedNetworks, setEditedNetworks] = useState<string[] | null>(null);
+  const selectedNetworks = editedNetworks ?? networks;
   const [availableNetworks, setAvailableNetworks] = useState<Array<{ code: string; label: string }>>([]);
   useEffect(() => { void cryptoServiceApi.getNetworks().then((result) => setAvailableNetworks(result.data ?? [])); }, []);
 
@@ -91,7 +94,7 @@ const EditCoinDetails = ({
                 checked={selectedNetworks.includes(opt.code)}
                 onCheckedChange={() => {
                   const updated = selectedNetworks.includes(opt.code) ? selectedNetworks.filter((network) => network !== opt.code) : [...selectedNetworks, opt.code];
-                  setSelectedNetworks(updated);
+                  setEditedNetworks(updated);
                   onChangeInputField("networks", updated);
                 }}
               />
@@ -136,10 +139,12 @@ const EditCoinDetails = ({
       </div>
 
       {/* SECTION 3: COIN STATUS */}
-      <div className="bg-white border border-[#E9E7E2] rounded-3xl p-6 shadow-sm">
-        <Switch id="buyEnabled" label="Buy enabled" defaultChecked={buyEnabled} onCheckedChange={(checked) => onChangeInputField("buyEnabled", checked)} />
-        <Switch id="sellEnabled" label="Sell enabled" defaultChecked={sellEnabled} onCheckedChange={(checked) => onChangeInputField("sellEnabled", checked)} />
-        <PillInput label="Buy decimal places" id="buyPrecision" type="number" min={0} max={8} defaultValue={buyPrecision ?? undefined} onChange={(event) => onChangeInputField("buyPrecision", event.target.valueAsNumber)} />
+      <div className="bg-white border border-[#E9E7E2] rounded-3xl p-6 shadow-sm grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className="flex flex-col gap-4">
+          <Switch id="buyEnabled" label="Buy enabled" checked={editedBuyEnabled ?? buyEnabled} onCheckedChange={(checked) => { setEditedBuyEnabled(checked); onChangeInputField("buyEnabled", checked); }} />
+          <Switch id="sellEnabled" label="Sell enabled" checked={sellEnabled} disabled />
+        </div>
+        <PillInput label="Buy decimal places" id="buyPrecision" type="number" min={0} max={8} value={editedBuyPrecision ?? (buyPrecision == null ? "" : String(buyPrecision))} onChange={(event) => { setEditedBuyPrecision(event.target.value); onChangeInputField("buyPrecision", event.target.valueAsNumber); }} />
         <div>
           <label className="block text-[13px] font-semibold text-[#454745] mb-3">
             Coin Status
@@ -147,9 +152,9 @@ const EditCoinDetails = ({
           <Switch
             id="isActive"
             label="Active"
-            checked={isActive}
+            checked={editedActive ?? active}
             onCheckedChange={(checked) => {
-              setIsActive(checked);
+              setEditedActive(checked);
               onChangeInputField("isActive", checked);
             }}
           />

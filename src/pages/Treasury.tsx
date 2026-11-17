@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import AuthenticatedLayout from "../layout/AuthenticatedLayout.tsx";
 import PageHeader from "../components/global/pageHeader.tsx";
+import BlockchainEnvironmentBadge from "../components/global/BlockchainEnvironmentBadge.tsx";
 import { useCryptoQuery } from "../queries/crypto.querries.ts";
 import { useSweepQuery } from "../queries/sweep.querries.ts";
 import type {
@@ -382,7 +383,7 @@ export default function Treasury() {
 
   return (
     <AuthenticatedLayout>
-      <PageHeader title="Treasury" />
+      <PageHeader title="Treasury" badge={<BlockchainEnvironmentBadge />} />
 
       <div className="p-6 mx-auto space-y-6">
         <section className="relative overflow-hidden rounded-2xl border border-[#DDE0FF] bg-[--color-primary-taint] p-6 md:p-7 shadow-sm">

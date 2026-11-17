@@ -2,7 +2,8 @@ import {
   axiosDeleteRequestHandler,
   axiosGetRequestHandler,
   axiosPatchRequestHandler,
-  axiosPostRequestHandler
+  axiosPostRequestHandler,
+  API_KIT,
 } from './index.js'
 import type {
   CreateSupportedCryptoAndAdminWalletRequestType, EditSupportedCryptoAndAdminWalletRequestType,
@@ -37,8 +38,11 @@ class CryptoServiceApi {
     return await axiosPostRequestHandler("/crypto/admin/search", body) as SearchSupportedCryptoAPIResponse;
   }
 
-  async searchCoins(query: string) {
-    return await axiosGetRequestHandler(`/crypto/admin/coin-search?query=${encodeURIComponent(query)}`) as BaseApiResponse<Array<{ id: string; name: string; symbol: string }>>;
+  async searchCoins(query: string, signal?: AbortSignal) {
+    const response = await API_KIT.get<BaseApiResponse<Array<{ id: string; name: string; symbol: string }>>>(
+      "/crypto/admin/coin-search", { params: { query }, signal },
+    );
+    return response.data;
   }
 
   async getNetworks() {

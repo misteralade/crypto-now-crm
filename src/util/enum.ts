@@ -49,3 +49,8 @@ export enum TRANSACTION_STATUS {
   PAYOUT_FAILED = "PAYOUT_FAILED",
   PENDING_PAYOUT = "PENDING_PAYOUT",
 }
+
+export enum BLOCKCHAIN_ENVIRONMENT {
+  TESTNET = "testnet",
+  MAINNET = "mainnet",
+}

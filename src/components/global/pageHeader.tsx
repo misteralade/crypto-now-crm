@@ -7,6 +7,7 @@ import { useSidebarToggle } from '../../layout/sidebar-toggle-context.tsx'
 interface PageHeaderProps {
   title: string
   subtitle?: string
+  badge?: ReactNode
   actions?: ReactNode
   className?: string
   onBack?: () => void
@@ -43,7 +44,7 @@ function decodeAdminName(): string {
   }
 }
 
-const PageHeader = ({ title, subtitle, actions, className, onBack }: PageHeaderProps) => {
+const PageHeader = ({ title, subtitle, badge, actions, className, onBack }: PageHeaderProps) => {
   const adminName = useMemo(() => decodeAdminName(), [])
   const sidebarToggle = useSidebarToggle()
 
@@ -71,9 +72,12 @@ const PageHeader = ({ title, subtitle, actions, className, onBack }: PageHeaderP
               </button>
             )}
             <div className="min-w-0">
-              <h2 className="text-balance text-[17px] font-semibold leading-tight text-gray-900 sm:text-xl">
-                {title}
-              </h2>
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <h2 className="text-balance text-[17px] font-semibold leading-tight text-gray-900 sm:text-xl">
+                  {title}
+                </h2>
+                {badge}
+              </div>
               {subtitle && (
                 <p className="mt-1 hidden text-pretty text-sm leading-5 text-gray-500 sm:block">
                   {subtitle}

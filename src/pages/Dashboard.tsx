@@ -5,6 +5,7 @@ import { UsersWithTopTransactionColumn, UsersWithTopTransactionDataRow } from '.
 import type {TransactionTypeByPercentage, WeeklyTransactionVolumeTrend } from '../types/response.payload.types';
 import type {TimelineFilter} from "../types/global.types";
 import PageHeader from '../components/global/pageHeader';
+import BlockchainEnvironmentBadge from '../components/global/BlockchainEnvironmentBadge';
 import ShortSummaryCard from '../components/global/ShortSummaryCard';
 import {PieGraph, VolumeTrend} from '../components/pages/dashboard/graphComponents';
 import Table from "../components/table.tsx";
@@ -72,7 +73,7 @@ const Dashboard = () => {
 
   return (
     <AuthenticatedLayout>
-      <PageHeader title="Overview" />
+      <PageHeader title="Overview" badge={<BlockchainEnvironmentBadge />} />
 
       <div className="p-6 space-y-6">
         {/* Timeline + heading row */}

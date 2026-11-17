@@ -14,6 +14,7 @@ import type { EditSupportedCryptoAndAdminWalletRequestType } from "../../schemas
 export const useEditCoinPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate()
+  const { coinId } = useParams({ from: '/dashboard/coin-management/$coinId' })
   const {
     // 🧩 Values
     adminCryptoDetails,
@@ -22,9 +23,7 @@ export const useEditCoinPage = () => {
     // ⚙️ Mutation Functions
     uploadCryptoLogoIconMutation,
     updateCryptoCurrencyMutation,
-  } = useCryptoQuery();
-  
-  const { coinId } = useParams({ from: '/dashboard/coin-management/$coinId' })
+  } = useCryptoQuery(coinId);
   
   useEffect(() => {
     if (coinId) {

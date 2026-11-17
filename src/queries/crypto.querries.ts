@@ -21,7 +21,7 @@ const OPTIONAL_CRYPTO_NUMBER_FIELDS = [
   "minTradeAmountForAnonymous",
 ] as const;
 
-export const useCryptoQuery = () => {
+export const useCryptoQuery = (editCoinId?: string) => {
   const queryClient = useQueryClient();
   const matchRoute = useMatchRoute();
   const search = useSelector((state: RootState) => state.coinManagement.search.supportedCrypto);
@@ -59,13 +59,11 @@ export const useCryptoQuery = () => {
   });
 
   const { data: adminCryptoDetails, isLoading: loadingAdminCryptoDetails } = useQuery({
-    queryKey: [QUERY_KEYS.CRYPTO.ADMIN_GET_SUPPORTED_CRYPTO_CURRENCY, (store.getState() as RootState).coinManagement.edit.coinId],
+    queryKey: [QUERY_KEYS.CRYPTO.ADMIN_GET_SUPPORTED_CRYPTO_CURRENCY, editCoinId],
     queryFn: async () => {
-      const cryptoId = (store.getState() as RootState).coinManagement.edit.coinId;
-       
-      if (!cryptoId) return null;
+      if (!editCoinId) return null;
 
-      const { data, success } = await cryptoServiceApi.adminGetSupportedCrypto(cryptoId);
+      const { data, success } = await cryptoServiceApi.adminGetSupportedCrypto(editCoinId);
 
       if (success) {
         return data;
@@ -73,7 +71,7 @@ export const useCryptoQuery = () => {
 
       return null;
     },
-    enabled: !!(matchRoute({ to: ROUTES.EDIT_COIN })) && !!(store.getState() as RootState).coinManagement.edit.coinId,
+    enabled: !!(matchRoute({ to: ROUTES.EDIT_COIN })) && !!editCoinId,
   });
 
   const uploadCryptoLogoIconMutation = useMutation({
