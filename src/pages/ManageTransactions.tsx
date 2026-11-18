@@ -19,6 +19,7 @@ const ManageTransactions = () => {
   const {
     // 🧩 Values
     searchTransactions,
+    sortModel,
     loadingSearchTransactions,
     allSupportedCrypto,
     loadingAllSupportedCrypto,
@@ -36,6 +37,7 @@ const ManageTransactions = () => {
     handleForceTriggerPayout,
     retryingConfirmation,
     forcingPayout,
+    updatingTransactionStatus,
     handlePageSizeChange: updatePageSize,
     isFetchingTransactions,
     filteredUserId,
@@ -93,11 +95,13 @@ const ManageTransactions = () => {
         handleSortBy,
         handleShowTransactionDetails,
         handleViewTransactionDetails,
+        sortModel,
       ),
     [
       handleSortBy,
       handleShowTransactionDetails,
       handleViewTransactionDetails,
+      sortModel,
     ],
   );
 
@@ -215,6 +219,7 @@ const ManageTransactions = () => {
           handleForceTriggerPayout={handleForceTriggerPayout}
           retryingConfirmation={retryingConfirmation}
           forcingPayout={forcingPayout}
+          isSavingStatus={updatingTransactionStatus}
         />
       </div>
     </AuthenticatedLayout>

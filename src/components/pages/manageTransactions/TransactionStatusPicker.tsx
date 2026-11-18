@@ -1,149 +1,94 @@
+import { Check, ChevronDown, Save, Search } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { TransactionAction, TransactionStatusType } from "../../../schemas/enum.schema";
-import {
-  TRANSACTION_STATUS_UPDATE_OPTIONS,
-  transactionStatusStyles,
-} from "../../../util/constants.util.ts";
+import { TRANSACTION_STATUS_SCOPE, TRANSACTION_STATUS_UPDATE_OPTIONS } from "../../../util/constants.util.ts";
 
 interface TransactionStatusPickerProps {
   transactionType: TransactionAction;
-  currentStatus: string;
+  currentStatus: TransactionStatusType;
   selectedStatus?: TransactionStatusType;
-  onSelectStatus: (status: TransactionStatusType) => void;
+  onSelectStatus: (status: TransactionStatusType | undefined) => void;
+  onSave: () => void;
+  isSaving?: boolean;
+  canSave?: boolean;
 }
-
-const STATUS_GROUP_ORDER: Record<TransactionAction, Array<"BUY" | "BOTH" | "SELL">> =
-  {
-    BUY: ["BUY", "SELL", "BOTH"],
-    SELL: ["SELL", "BUY", "BOTH"],
-  };
-
-const STATUS_GROUP_META: Record<
-  "BUY" | "SELL" | "BOTH",
-  { title: string }
-> = {
-  BUY: {
-    title: "Buy-only statuses",
-  },
-  SELL: {
-    title: "Sell-only statuses",
-  },
-  BOTH: {
-    title: "Shared statuses",
-  },
-};
-
-const STATUS_DISPLAY_ORDER: Record<
-  "BUY" | "SELL" | "BOTH",
-  Array<TransactionStatusType>
-> = {
-  BUY: [
-    "AWAITING_PAYMENT",
-    "IN_REVIEW",
-    "COMPLETED",
-    "FAILED",
-    "EXPIRED",
-    "CANCELLED",
-    "DISPUTED",
-    "REFUNDED",
-  ],
-  SELL: [
-    "INITIATED",
-    "AWAITING_CRYPTO",
-    "DEPOSIT_DETECTED",
-    "PENDING_CONFIRMATION",
-    "DEPOSIT_PENDING_MINIMUM",
-    "DEPOSIT_CONFIRMED",
-    "PAYOUT_INITIATED",
-    "PROCESSING",
-    "PENDING_PAYOUT",
-    "PAYOUT_FAILED",
-  ],
-  BOTH: [
-    "COMPLETED",
-    "FAILED",
-    "CANCELLED",
-    "DISPUTED",
-  ],
-};
 
 const TransactionStatusPicker = ({
   transactionType,
   currentStatus,
   selectedStatus,
   onSelectStatus,
+  onSave,
+  isSaving = false,
+  canSave = true,
 }: TransactionStatusPickerProps) => {
-  const renderStatusCard = (
-    option: (typeof TRANSACTION_STATUS_UPDATE_OPTIONS)[number]
-  ) => {
-    const isCurrent = currentStatus === option.value;
-    const isSelected = selectedStatus === option.value;
-    const colorObj = transactionStatusStyles[option.value] ?? {
-      text: option.label,
-      bg: "bg-gray-50",
-      dot: "bg-gray-400",
-      textColor: "text-gray-700",
-    };
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const pickerRef = useRef<HTMLDivElement>(null);
+  const availableStatuses = TRANSACTION_STATUS_UPDATE_OPTIONS.filter(
+    ({ scope }) => scope === transactionType || scope === TRANSACTION_STATUS_SCOPE.SHARED,
+  );
+  const selectedOption = availableStatuses.find(({ value }) => value === (selectedStatus ?? currentStatus));
+  const filteredStatuses = useMemo(() => {
+    const query = search.trim().toLocaleLowerCase();
+    if (!query) return availableStatuses;
+    return availableStatuses.filter(({ label, value }) => `${label} ${value}`.toLocaleLowerCase().includes(query));
+  }, [availableStatuses, search]);
 
-    return (
-      <button
-        key={option.value}
-        className={`min-h-[84px] rounded-xl border px-3 py-2 text-left transition-all duration-200 ${
-          isCurrent
-            ? "opacity-55 cursor-not-allowed border-transparent"
-            : "hover:shadow-sm cursor-pointer active:scale-[0.99]"
-        } ${
-          isSelected
-            ? `ring-2 ring-[#03034D] ring-offset-1 border-transparent ${colorObj.bg} ${colorObj.textColor}`
-            : `border-transparent ${colorObj.bg} ${colorObj.textColor}`
-        }`}
-        type="button"
-        aria-pressed={isSelected}
-        onClick={
-          !isCurrent ? () => onSelectStatus(option.value) : undefined
-        }
-        disabled={isCurrent}
-      >
-        <div className="flex items-start justify-between gap-2">
-          <div className="text-[12px] font-semibold leading-tight md:text-[13px]">
-            {option.label}
-          </div>
-          <span className="shrink-0 rounded-full bg-white/70 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-current md:text-[10px]">
-            {option.scope}
-          </span>
-        </div>
-      </button>
-    );
-  };
+  useEffect(() => {
+    const closeOnOutsideClick = (event: MouseEvent) => {
+      if (event.target instanceof Node && !pickerRef.current?.contains(event.target)) setIsOpen(false);
+    };
+    document.addEventListener("mousedown", closeOnOutsideClick);
+    return () => document.removeEventListener("mousedown", closeOnOutsideClick);
+  }, []);
 
   return (
-    <div className="space-y-5">
-      {STATUS_GROUP_ORDER[transactionType].map((scope) => {
-        const items = TRANSACTION_STATUS_UPDATE_OPTIONS.filter(
-          (option) => option.scope === scope
-        ).sort(
-          (left, right) =>
-            STATUS_DISPLAY_ORDER[scope].indexOf(left.value) -
-            STATUS_DISPLAY_ORDER[scope].indexOf(right.value)
-        );
-
-        if (items.length === 0) return null;
-
-        const group = STATUS_GROUP_META[scope];
-
-        return (
-          <section key={scope}>
-            <div className="mb-2">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#828282]">
-                {group.title}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              {items.map(renderStatusCard)}
-            </div>
-          </section>
-        );
-      })}
+    <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+      <div ref={pickerRef} className="relative block min-w-0 space-y-1.5">
+        <span className="text-xs font-medium text-slate-600">Transaction status</span>
+        <div className="relative">
+          <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            role="combobox"
+            aria-expanded={isOpen}
+            aria-controls="transaction-status-options"
+            aria-autocomplete="list"
+            value={isOpen ? search : selectedOption?.label ?? currentStatus}
+            onFocus={() => { setSearch(""); setIsOpen(true); }}
+            onChange={(event) => { setSearch(event.target.value); setIsOpen(true); }}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") setIsOpen(false);
+              if (event.key === "Enter" && filteredStatuses.length > 0) {
+                event.preventDefault();
+                onSelectStatus(filteredStatuses[0].value);
+                setIsOpen(false);
+              }
+            }}
+            className="h-10 w-full rounded-lg border border-slate-300 bg-white pl-9 pr-9 text-sm text-slate-800 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-600/15"
+          />
+          <ChevronDown size={15} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          {isOpen && <ul id="transaction-status-options" role="listbox" className="absolute z-20 mt-1 max-h-60 w-full overflow-y-auto rounded-lg border border-slate-200 bg-white p-1 shadow-lg">
+            {filteredStatuses.map((option) => <li key={option.value} role="option" aria-selected={option.value === (selectedStatus ?? currentStatus)}>
+              <button type="button" onClick={() => { onSelectStatus(option.value); setSearch(""); setIsOpen(false); }} className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-700">
+                <span><span className="block font-medium">{option.label}</span><span className="mt-0.5 block text-xs text-slate-500">{option.description}</span></span>
+                {option.value === (selectedStatus ?? currentStatus) && <Check size={15} className="shrink-0 text-blue-600" />}
+              </button>
+            </li>)}
+            {filteredStatuses.length === 0 && <li className="px-3 py-2 text-sm text-slate-500">No matching statuses</li>}
+          </ul>}
+        </div>
+      </div>
+      <button
+        type="button"
+        onClick={onSave}
+        disabled={!canSave || !selectedStatus || selectedStatus === currentStatus || isSaving}
+        className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500"
+      >
+        <Save size={15} />
+        {isSaving ? "Saving..." : "Save status"}
+      </button>
     </div>
   );
 };

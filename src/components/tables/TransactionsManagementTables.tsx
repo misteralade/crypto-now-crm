@@ -1,4 +1,4 @@
-import { ArrowUpRight, ChevronDown } from 'lucide-react'
+import { ArrowUpRight, ChevronDown, ChevronUp } from 'lucide-react'
 import momentClient from '../../util/moment'
 import {
   TableDate,
@@ -10,6 +10,7 @@ import type {
   SearchTransactionsResponse,
   UsersWithTopTransactionVolume,
 } from '../../types/response.payload.types'
+import type { SearchTransactionsRequestType } from '../../schemas/transaction.schema'
 
 const formatCryptoAmountUpTo4Decimals = (amount: number | string | undefined, symbol?: string) => {
   if (amount === undefined || amount === null || amount === "") return "0"
@@ -155,6 +156,7 @@ export const TransactionsManagementColumn = (
   handleSortBy: (columnKey: string) => void,
   _handleShowTransactionDetails: (sessionId: string) => void,
   handleViewTransactionDetails: (sessionId: string) => void,
+  sortModel: SearchTransactionsRequestType['sortModel'],
 ): Array<TableColumn<TransactionManagementRow>> => [
   {
     key: 'id',
@@ -179,13 +181,15 @@ export const TransactionsManagementColumn = (
   {
     key: 'type',
     header: (
-      <div
+      <button
+        type="button"
         onClick={() => handleSortBy('type')}
+        aria-pressed={sortModel?.colId === 'type'}
         className="py-2.5 text-left text-xs font-semibold text-slate-600 hover:cursor-pointer inline-flex items-center gap-1"
       >
         <span>Type</span>
-        <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-      </div>
+        {sortModel?.colId === 'type' && sortModel.orderBy === 'ASC' ? <ChevronUp className="w-3.5 h-3.5 text-blue-600" /> : <ChevronDown className={`w-3.5 h-3.5 ${sortModel?.colId === 'type' ? 'text-blue-600' : 'text-slate-400'}`} />}
+      </button>
     ),
     render: (value) => {
       const isBuy = String(value).toUpperCase().startsWith('BUY')
@@ -216,13 +220,15 @@ export const TransactionsManagementColumn = (
   {
     key: 'date',
     header: (
-      <div
+      <button
+        type="button"
+        aria-pressed={sortModel?.colId === 'createdAt'}
         className="py-2.5 text-left text-xs font-semibold text-slate-600 hover:cursor-pointer inline-flex items-center gap-1"
         onClick={() => handleSortBy('createdAt')}
       >
         <span>Date</span>
-        <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-      </div>
+        {sortModel?.colId === 'createdAt' && sortModel.orderBy === 'ASC' ? <ChevronUp className="w-3.5 h-3.5 text-blue-600" /> : <ChevronDown className={`w-3.5 h-3.5 ${sortModel?.colId === 'createdAt' ? 'text-blue-600' : 'text-slate-400'}`} />}
+      </button>
     ),
     render: (value) => (
       <span className="py-2 text-xs text-slate-500 whitespace-nowrap tabular-nums">
@@ -233,13 +239,15 @@ export const TransactionsManagementColumn = (
   {
     key: 'status',
     header: (
-      <div
+      <button
+        type="button"
+        aria-pressed={sortModel?.colId === 'status'}
         className="py-2.5 text-left text-xs font-semibold text-slate-600 hover:cursor-pointer inline-flex items-center gap-1"
         onClick={() => handleSortBy('status')}
       >
         <span>Status</span>
-        <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-      </div>
+        {sortModel?.colId === 'status' && sortModel.orderBy === 'ASC' ? <ChevronUp className="w-3.5 h-3.5 text-blue-600" /> : <ChevronDown className={`w-3.5 h-3.5 ${sortModel?.colId === 'status' ? 'text-blue-600' : 'text-slate-400'}`} />}
+      </button>
     ),
     render: (value) => {
       const { displayText, variant } = mapTransactionStatus(value)

@@ -9,9 +9,11 @@ import BankDetailsSection from "../components/pages/users/details/BankDetailsSec
 import TransactionSummarySection from "../components/pages/users/details/TransactionSummarySection.tsx";
 import CustodialWalletsSection from "../components/pages/users/details/CustodialWalletsSection.tsx";
 import { useCryptoQuery } from "../queries/crypto.querries.ts";
+import { useBankQuery } from "../queries/bank.querries.ts";
 
 const UserDetails = () => {
   const { allSupportedCrypto } = useCryptoQuery();
+  const { platformSupportedBanks } = useBankQuery();
   const {
     // 🧩 Values
     userId,
@@ -27,6 +29,7 @@ const UserDetails = () => {
     openEditModal,
     closeEditModal,
     handleUpdateUserProfile,
+    handleUpdateUserBankAccount,
     isEditModalOpen,
     isUpdatingProfile,
     editModalInitialValues,
@@ -58,6 +61,8 @@ const UserDetails = () => {
             <BankDetailsSection
               bankDetails={userProfileSummary?.bankDetails}
               loading={loadingUserProfileSummary}
+              banks={platformSupportedBanks ?? []}
+              onUpdateAccount={handleUpdateUserBankAccount}
             />
 
             {/* Custodial Wallets Section */}

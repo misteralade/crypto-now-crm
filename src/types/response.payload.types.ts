@@ -501,6 +501,7 @@ export type SupportedPlatformBankAccountResponse = {
   id: string;
   name: string;
   logoUrl: string;
+  bankCode: string;
 }
 
 export type AdminBankAccountResponsePayload = {

@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Search, Menu, X } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { LOCAL_STORAGE_KEYS, ROUTES } from '../../util/constants.util'
@@ -41,6 +41,7 @@ function decodeAdminToken(): DecodedAdmin {
 export default function GlobalTopBar() {
   const sidebarToggle = useSidebarToggle()
   const searchConfig = useNavbarSearchState()
+  const [searchInput, setSearchInput] = useState(searchConfig?.value ?? '')
   const { data: profile } = useOwnAdminProfileQuery()
   const decodedToken = useMemo(() => decodeAdminToken(), [])
   const fallbackAdminId = useMemo(() => getLoggedInAdminId(), [])
@@ -68,6 +69,16 @@ export default function GlobalTopBar() {
   const displayEmail = profile?.email || decodedToken.email || ''
   const initial = displayName.charAt(0).toUpperCase() || 'A'
 
+  useEffect(() => {
+    setSearchInput(searchConfig?.value ?? '')
+  }, [searchConfig?.value])
+
+  useEffect(() => {
+    if (!searchConfig || searchInput === (searchConfig.value ?? '')) return
+    const timeout = window.setTimeout(() => searchConfig.onChange(searchInput), 350)
+    return () => window.clearTimeout(timeout)
+  }, [searchConfig, searchInput])
+
   const profileLink = adminId
     ? ROUTES.ADMIN_DETAILS.replace('$adminId', adminId)
     : ROUTES.MANAGE_ADMINS
@@ -75,7 +86,7 @@ export default function GlobalTopBar() {
   return (
     <header className="sticky top-0 z-40 h-16 w-full bg-white border-b border-slate-200/80 px-4 sm:px-6 flex items-center justify-between shadow-xs">
       {/* Left: Mobile hamburger menu & Contextual search bar */}
-      <div className="flex items-center gap-3 flex-1 max-w-lg min-w-0">
+      <div className="flex items-center gap-3 flex-1 max-w-2xl min-w-0">
         {sidebarToggle && (
           <button
             onClick={sidebarToggle.toggleSidebar}
@@ -91,22 +102,23 @@ export default function GlobalTopBar() {
           <form
             onSubmit={(e) => {
               e.preventDefault()
+              if (searchInput !== (searchConfig.value ?? '')) searchConfig.onChange(searchInput)
               searchConfig.onSubmit?.(e)
             }}
-            className="relative w-full max-w-sm"
+            className="relative w-full max-w-lg"
           >
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
             <input
               type="text"
-              value={searchConfig.value ?? ''}
-              onChange={(e) => searchConfig.onChange(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               placeholder={searchConfig.placeholder || 'Search...'}
               className="w-full h-9.5 pl-9 pr-9 bg-slate-50/90 hover:bg-slate-50 border border-slate-200/80 rounded-lg text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/15 transition-all"
             />
-            {searchConfig.value ? (
+            {searchInput ? (
               <button
                 type="button"
-                onClick={() => searchConfig.onChange('')}
+                onClick={() => setSearchInput('')}
                 className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer p-0.5 rounded-full"
                 aria-label="Clear search"
               >

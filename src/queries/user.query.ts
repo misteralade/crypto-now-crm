@@ -7,6 +7,7 @@ import { userServiceApi } from '../api/user.api'
 import {  store } from '../store'
 import { QUERY_KEYS } from './querries.keys'
 import type {RootState} from '../store';
+import { bankServiceApi } from '../api/bank.api';
 
 export const useUserQuery = () => {
   const queryClient = useQueryClient()
@@ -194,6 +195,27 @@ export const useUserQuery = () => {
     },
   })
 
+  const adminUpdateUserBankAccountMutation = useMutation({
+    mutationKey: [QUERY_KEYS.BANK.UPDATE_USER_BANK_ACCOUNT],
+    mutationFn: async ({ userId, accountId, payload }: { userId: string; accountId: string; payload: { bankId: string; accountNumber: string } }) => {
+      return bankServiceApi.adminUpdateUserBankAccount(userId, accountId, payload)
+    },
+    onSuccess: (res, variables) => {
+      if (res?.success) {
+        toast.success('Bank account updated successfully.')
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.USER.GET_USER_PROFILE_SUMMARY, variables.userId],
+        })
+      } else if (res?.message) {
+        toast.error(res.message)
+      }
+      return res
+    },
+    onError: () => {
+      toast.error('Could not update this bank account. Check the details and try again.')
+    },
+  })
+
   return {
     // 🧩 Values
     weeklyUserSummary,
@@ -209,5 +231,6 @@ export const useUserQuery = () => {
     patchUserStatusMutation,
     adminResetPasswordMutation,
     adminUpdateUserProfileMutation,
+    adminUpdateUserBankAccountMutation,
   }
 }

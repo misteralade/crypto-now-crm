@@ -8,6 +8,7 @@ import { store  } from '../store'
 import { QUERY_KEYS } from './querries.keys'
 import type {RootState} from '../store';
 import type { TimelineFilter } from '../types/global.types';
+import type { UpdateTransactionStatusRequestType } from '../schemas/transaction.schema';
 import type {
   AxiosServerError,
   AdminRetryPendingPayoutsResponse,
@@ -210,22 +211,24 @@ export const useTransactionQuery = (options?: UseTransactionQueryOptions) => {
   })
 
   const adminUpdateTransactionMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (override?: { sessionId: string; payload: UpdateTransactionStatusRequestType }) => {
       toast.loading('Updating transaction status...')
       const sessionId = (store.getState() as RootState).transactionManagement
         .details.transactionSessionId
       const updatePayload = (store.getState() as RootState)
         .transactionManagement.details.update
 
-      if (!sessionId || !updatePayload) {
+      const transactionSessionId = override?.sessionId || sessionId
+      const transactionUpdatePayload = override?.payload || updatePayload
+      if (!transactionSessionId || !transactionUpdatePayload) {
         toast.dismiss()
         return null
       }
 
       const { success, message } =
         await transactionServiceApi.adminUpdateTransactionStatusAndAdminNotes(
-          sessionId,
-          updatePayload,
+          transactionSessionId,
+          transactionUpdatePayload,
         )
 
       return { success, message }
@@ -242,6 +245,12 @@ export const useTransactionQuery = (options?: UseTransactionQueryOptions) => {
         toast.success(response.message)
         queryClient.invalidateQueries({
           queryKey: [QUERY_KEYS.TRANSACTION.SEARCH_TRANSACTIONS],
+        })
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.TRANSACTION.GET_TRANSACTION_DETAILS],
+        })
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.TRANSACTION.GET_TRANSACTION_DETAILS_PAGE],
         })
       } else {
         toast.error(message)

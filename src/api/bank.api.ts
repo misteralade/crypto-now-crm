@@ -52,6 +52,10 @@ class BankServiceApi {
   async lookupAccountName(accountNumber: string, bankId: string) {
     return await axiosPostRequestHandler("/bank/bank/lookup", { accountNumber, bankId }) as BaseApiResponse<{ accountName: string }>;
   }
+
+  async adminUpdateUserBankAccount(userId: string, accountId: string, payload: { bankId: string; accountNumber: string }) {
+    return await axiosPatchRequestHandler(`/user/admin/${userId}/bank-accounts/${accountId}/update`, payload) as BaseApiResponse<null>;
+  }
 }
 
 export const bankServiceApi = BankServiceApi.getInstance();

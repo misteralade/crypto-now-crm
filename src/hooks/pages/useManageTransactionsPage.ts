@@ -1,5 +1,5 @@
 import {useState, useEffect} from "react";
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useQuery } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import { useNavigate, useSearch } from '@tanstack/react-router'
@@ -15,7 +15,6 @@ import {
   setTransactionDetailUpdateField
 } from '../../redux/transaction-management.slice'
 import {useCryptoQuery} from "../../queries/crypto.querries";
-import { store} from "../../store";
 import {searchTransactionsInitialState} from "../../redux/states/initial-transaction-management.states";
 import type {
   SearchTransactionsRequestType,
@@ -27,6 +26,7 @@ import type {AxiosServerError} from "../../types/response.payload.types";
 
 export const useManageTransactionsPage = () => {
   const dispatch = useDispatch()
+  const sortModel = useSelector((state: RootState) => state.transactionManagement.search.transactions.sortModel)
   const navigate = useNavigate()
   const [selectedStatsTimeline, setSelectedStatsTimeline] =
     useState<TimelineFilter>('all')
@@ -108,7 +108,6 @@ export const useManageTransactionsPage = () => {
   }
   
   const handleSortBy = (columnKey: string) => {
-    const sortModel = (store.getState() as RootState).transactionManagement.search.transactions.sortModel;
     handleSearchTransactionFieldUpdate("sortModel", {
       colId: columnKey,
       orderBy: sortModel && sortModel.colId === columnKey && sortModel.orderBy === 'ASC' ? 'DESC' : 'ASC',
@@ -145,10 +144,12 @@ export const useManageTransactionsPage = () => {
   }
 
   const handleTransactionUpdate = async () => {
-    await adminUpdateTransactionMutation.mutateAsync();
-    setShowTransactionDetails(false);
-    dispatch(clearTransactionDetailSessionId())
-    dispatch(clearTransactionDetailUpdateField());
+    const response = await adminUpdateTransactionMutation.mutateAsync(undefined);
+    if (response?.success) {
+      await Promise.all([refetchTransactionDetail(), refetchSearchTransactions()]);
+      dispatch(clearTransactionDetailUpdateField());
+    }
+    return response;
   }
 
   const handleRetryDepositConfirmation = async (sessionId?: string) => {
@@ -209,6 +210,7 @@ export const useManageTransactionsPage = () => {
     // 🧩 Values
     searchTransactions,
     loadingSearchTransactions,
+    sortModel,
     allSupportedCrypto,
     loadingAllSupportedCrypto,
     transactionDetail,
@@ -230,6 +232,7 @@ export const useManageTransactionsPage = () => {
     handleForceTriggerPayout,
     retryingConfirmation: adminRetryDepositConfirmationMutation.isPending,
     forcingPayout: adminForceTriggerPayoutMutation.isPending,
+    updatingTransactionStatus: adminUpdateTransactionMutation.isPending,
     handlePageSizeChange,
     handleSelectedStatsTimelineChange,
     handleRefreshTransactions: refetchSearchTransactions,

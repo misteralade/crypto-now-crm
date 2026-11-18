@@ -24,6 +24,21 @@ export const LOCAL_STORAGE_KEYS = {
   ACCESS_TOKEN: 'accessToken',
 }
 
+export const TRANSACTION_STATUS_SCOPE = {
+  BUY: 'BUY',
+  SELL: 'SELL',
+  SHARED: 'BOTH',
+} as const;
+
+export const TRANSACTION_ACTIVITY_ACTIONS = {
+  ADMIN_LOCK_TRANSACTION: 'ADMIN_LOCK_TRANSACTION',
+  ADMIN_VIEW_TRANSACTION: 'ADMIN_VIEW_TRANSACTION',
+  UPDATE_TRANSACTION_STATUS: 'UPDATE_TRANSACTION_STATUS',
+  FORCE_TRIGGER_PAYOUT: 'FORCE_TRIGGER_PAYOUT',
+  ADMIN_RETRY_PENDING_PAYOUT: 'ADMIN_RETRY_PENDING_PAYOUT',
+  RETRY_DEPOSIT_CONFIRMATION: 'RETRY_DEPOSIT_CONFIRMATION',
+} as const;
+
 export const ROUTES = {
   LOGIN: '/',
   FORGOT_PASSWORD: '/forgot-password',
@@ -119,109 +134,109 @@ export const TRANSACTION_STATUS_UPDATE_OPTIONS = [
     value: TRANSACTION_STATUS.PENDING_PAYOUT,
     label: 'Awaiting Payout',
     description: 'Payout is paused until funds or review clear.',
-    scope: 'SELL',
+    scope: TRANSACTION_STATUS_SCOPE.SELL,
   },
   {
     value: TRANSACTION_STATUS.PROCESSING,
     label: 'Processing',
     description: 'The transaction is being handled now.',
-    scope: 'SELL',
+    scope: TRANSACTION_STATUS_SCOPE.SELL,
   },
   {
     value: TRANSACTION_STATUS.AWAITING_PAYMENT,
     label: 'Awaiting Payment',
     description: 'Waiting for the customer to send fiat.',
-    scope: 'BUY',
+    scope: TRANSACTION_STATUS_SCOPE.BUY,
   },
   {
     value: TRANSACTION_STATUS.IN_REVIEW,
     label: 'In Review',
     description: 'Receipt is uploaded and waiting for review.',
-    scope: 'BUY',
+    scope: TRANSACTION_STATUS_SCOPE.BUY,
   },
   {
     value: TRANSACTION_STATUS.AWAITING_CRYPTO,
     label: 'Awaiting Bank Details',
     description: 'Waiting for the customer bank details.',
-    scope: 'SELL',
+    scope: TRANSACTION_STATUS_SCOPE.SELL,
   },
   {
     value: TRANSACTION_STATUS.DEPOSIT_DETECTED,
     label: 'Deposit Detected',
     description: 'Deposit is visible and waiting for confirmations.',
-    scope: 'SELL',
+    scope: TRANSACTION_STATUS_SCOPE.SELL,
   },
   {
     value: TRANSACTION_STATUS.PENDING_CONFIRMATION,
     label: 'Pending Confirmation',
     description: 'Deposit was detected but is still awaiting blockchain confirmation.',
-    scope: 'SELL',
+    scope: TRANSACTION_STATUS_SCOPE.SELL,
   },
   {
     value: TRANSACTION_STATUS.DEPOSIT_PENDING_MINIMUM,
     label: 'Deposit Pending Minimum',
     description: 'Deposit is confirmed but still below minimum.',
-    scope: 'SELL',
+    scope: TRANSACTION_STATUS_SCOPE.SELL,
   },
   {
     value: TRANSACTION_STATUS.DEPOSIT_CONFIRMED,
     label: 'Deposit Confirmed',
     description: 'Deposit confirmations are complete.',
-    scope: 'SELL',
+    scope: TRANSACTION_STATUS_SCOPE.SELL,
   },
   {
     value: TRANSACTION_STATUS.PAYOUT_INITIATED,
     label: 'Payout Initiated',
     description: 'Fiat payout has been sent to the rail.',
-    scope: 'SELL',
+    scope: TRANSACTION_STATUS_SCOPE.SELL,
   },
   {
     value: TRANSACTION_STATUS.COMPLETED,
     label: 'Completed',
     description: 'Transaction finished successfully.',
-    scope: 'BOTH',
+    scope: TRANSACTION_STATUS_SCOPE.SHARED,
   },
   {
     value: TRANSACTION_STATUS.INITIATED,
     label: 'Initiated',
     description: 'The transaction has just been created.',
-    scope: 'SELL',
+    scope: TRANSACTION_STATUS_SCOPE.SELL,
   },
   {
     value: TRANSACTION_STATUS.FAILED,
     label: 'Failed',
     description: 'The transaction stopped because of an error.',
-    scope: 'BOTH',
+    scope: TRANSACTION_STATUS_SCOPE.SHARED,
   },
   {
     value: TRANSACTION_STATUS.PAYOUT_FAILED,
     label: 'Payout Failed',
     description: 'The fiat payout failed and may need a retry.',
-    scope: 'SELL',
+    scope: TRANSACTION_STATUS_SCOPE.SELL,
   },
   {
     value: TRANSACTION_STATUS.EXPIRED,
     label: 'Expired',
     description: 'The payment window timed out.',
-    scope: 'BUY',
+    scope: TRANSACTION_STATUS_SCOPE.BUY,
   },
   {
     value: TRANSACTION_STATUS.CANCELLED,
     label: 'Cancelled',
     description: 'The transaction was stopped.',
-    scope: 'BOTH',
+    scope: TRANSACTION_STATUS_SCOPE.SHARED,
   },
   {
     value: TRANSACTION_STATUS.DISPUTED,
     label: 'Disputed',
     description: 'The transaction is under dispute.',
-    scope: 'BOTH',
+    scope: TRANSACTION_STATUS_SCOPE.SHARED,
   },
   {
     value: TRANSACTION_STATUS.REFUNDED,
     label: 'Refunded',
     description: 'The refund has been completed.',
-    scope: 'BUY',
+    scope: TRANSACTION_STATUS_SCOPE.BUY,
   },
 ] as const
 

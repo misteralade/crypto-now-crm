@@ -1,337 +1,184 @@
-import { Fragment, useState } from "react";
+import { Fragment, useState, type ReactNode } from "react";
 import AuthenticatedLayout from "../layout/AuthenticatedLayout.tsx";
-import {useTransactionDetailsPage} from "../hooks/pages/useTransactionDetailsPage.ts";
+import { useTransactionDetailsPage } from "../hooks/pages/useTransactionDetailsPage.ts";
 import PageHeader from "../components/global/pageHeader.tsx";
-import {LoadingSpinner} from "../components/global/LoadingSpinner.tsx";
+import { LoadingSpinner } from "../components/global/LoadingSpinner.tsx";
 import TransactionOverview from "../components/pages/manageTransactions/details/TransactionOverview.tsx";
 import CryptoCurrencyInfo from "../components/pages/manageTransactions/details/CryptoCurrencyInfo.tsx";
 import PaymentAccountDetails from "../components/pages/manageTransactions/details/PaymentAccountDetails.tsx";
 import AdminPaymentAccountDetails from "../components/pages/manageTransactions/details/AdminPaymentAccountDetails.tsx";
 import TransactionHash from "../components/pages/manageTransactions/details/TransactionHash.tsx";
-import type {CryptoNetworkType} from "../schemas/enum.schema.ts";
+import type { CryptoNetworkType, TransactionStatusType } from "../schemas/enum.schema.ts";
 import TransactionReceipts from "../components/pages/manageTransactions/details/TransactionReceipts.tsx";
 import CopyDetails from "../components/global/CopyDetails.tsx";
-import TransactionDetailsUserProfile
-  from "../components/pages/manageTransactions/details/TransactionDetailsUserProfile.tsx";
+import TransactionDetailsUserProfile from "../components/pages/manageTransactions/details/TransactionDetailsUserProfile.tsx";
 import TransactionDetailsPipeline from "../components/pages/manageTransactions/details/TransactionDetailsPipeline.tsx";
 import TransactionContext from "../components/pages/manageTransactions/details/TransactionContext.tsx";
 import { formatCompact } from "../util/asset-precision";
-import { RefreshCw, Play, QrCode, FileText, AlertCircle, Fingerprint } from "lucide-react";
+import { RefreshCw, Play, QrCode, FileText, AlertCircle, Fingerprint, Upload } from "lucide-react";
 import LedgerEntriesSection from "../components/pages/manageTransactions/details/LedgerEntriesSection.tsx";
 import ConfirmModal from "../components/global/ConfirmModal.tsx";
 import IdentifierCard from "../components/pages/manageTransactions/details/IdentifierCard.tsx";
+import TransactionStatusPicker from "../components/pages/manageTransactions/TransactionStatusPicker.tsx";
+import TransactionActivityLog from "../components/pages/manageTransactions/details/TransactionActivityLog.tsx";
+import ReceiptViewer from "../components/global/ReceiptViewer.tsx";
+import type { UpdateTransactionStatusRequestType } from "../schemas/transaction.schema.ts";
+import { TRANSACTION_STATUS } from "../util/enum.ts";
+import { TRANSACTION_STATUS_SCOPE } from "../util/constants.util.ts";
 
 const TransactionDetails = () => {
   const {
-    // 🧩 Values
     transactionInfo: transaction,
     loadingTransactionInfo,
     ledgerEntries,
     retryingConfirmation,
     forcingPayout,
-    
-    // ⚙️ Functions
+    updatingStatus,
+    lockingTransaction,
+    transactionLocked,
     handleRetryDepositConfirmation,
     handleForceTriggerPayout,
+    handleUpdateTransaction,
+    handleUploadReceipt,
   } = useTransactionDetailsPage();
-
   const [showForcePayoutConfirmModal, setShowForcePayoutConfirmModal] = useState(false);
-  const canRetryConfirmation =
-    transaction?.type === "SELL" &&
-    ["DEPOSIT_DETECTED", "PENDING_CONFIRMATION"].includes(
-      transaction?.status ?? ""
-    );
-  const canForcePayout =
-    transaction?.type === "SELL" &&
-    transaction?.status !== "COMPLETED" &&
-    !!transaction?.userBankAccount;
-  
+  const [selectedStatus, setSelectedStatus] = useState<TransactionStatusType>();
+  const [adminNotes, setAdminNotes] = useState("");
+  const [receiptUrl, setReceiptUrl] = useState<string>();
+  const [receiptPreviewUrl, setReceiptPreviewUrl] = useState<string>();
+  const [receiptName, setReceiptName] = useState<string>();
+
+  const canRetryConfirmation = transaction?.type === TRANSACTION_STATUS_SCOPE.SELL && (transaction.status === TRANSACTION_STATUS.DEPOSIT_DETECTED || transaction.status === TRANSACTION_STATUS.PENDING_CONFIRMATION);
+  const canForcePayout = transaction?.type === TRANSACTION_STATUS_SCOPE.SELL && transaction.status !== TRANSACTION_STATUS.COMPLETED && !!transaction.userBankAccount;
+
+  const uploadReceipt = async (file?: File) => {
+    if (!file || file.size > 5 * 1024 * 1024) return;
+    const validTypes = ["image/png", "image/jpeg", "application/pdf"];
+    if (!validTypes.includes(file.type)) return;
+    const uploaded = await handleUploadReceipt(file);
+    if (uploaded) {
+      setReceiptUrl(uploaded.url);
+      setReceiptPreviewUrl(uploaded.signedUrl);
+      setReceiptName(file.name);
+    }
+  };
+
+  const saveStatus = async () => {
+    if (!selectedStatus || !transaction) return;
+    const payload: UpdateTransactionStatusRequestType = { status: selectedStatus };
+    if (adminNotes.trim()) payload.adminNotes = adminNotes.trim();
+    if (receiptUrl) payload.adminPaymentReceiptUrl = receiptUrl;
+    const response = await handleUpdateTransaction(transaction.sessionId, payload);
+    if (response?.success) {
+      setSelectedStatus(undefined);
+      setAdminNotes("");
+      setReceiptUrl(undefined);
+      setReceiptPreviewUrl(undefined);
+      setReceiptName(undefined);
+    }
+  };
+
   return (
     <AuthenticatedLayout>
-      <PageHeader
-        title="Transaction Details"
-        subtitle={transaction?.sessionId ? `Order: ${transaction.sessionId.slice(0, 16)}...` : 'Comprehensive order breakdown'}
-        mobileActionsRight
-        actions={
-          <div className="flex flex-wrap items-center gap-2">
-            {canRetryConfirmation && (
-              <button
-                type="button"
-                onClick={() => handleRetryDepositConfirmation(transaction?.sessionId)}
-                disabled={retryingConfirmation}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-amber-600 px-3.5 h-8.5 text-xs font-semibold text-white shadow-2xs hover:bg-amber-700 active:scale-98 transition-all disabled:opacity-50 cursor-pointer"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${retryingConfirmation ? 'animate-spin' : ''}`} />
-                <span>{retryingConfirmation ? "Retrying..." : "Retry Confirmation"}</span>
-              </button>
-            )}
-            {canForcePayout && (
-              <button
-                type="button"
-                onClick={() => setShowForcePayoutConfirmModal(true)}
-                disabled={forcingPayout}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-3.5 h-8.5 text-xs font-semibold text-white shadow-2xs hover:bg-rose-700 active:scale-98 transition-all disabled:opacity-50 cursor-pointer"
-              >
-                <Play className="w-3.5 h-3.5" />
-                <span>{forcingPayout ? "Triggering..." : "Trigger Payout"}</span>
-              </button>
-            )}
-          </div>
-        }
-      />
-      <div className="p-4 sm:p-6 mx-auto">
-        {loadingTransactionInfo ? (
-          <LoadingSpinner size={"lg"} fullScreen={true} message={"Loading transaction details..."} />
-        ) : transaction ? (
+      <PageHeader title="Transaction Details" subtitle="Review transaction information, activity and controls" />
+      <div className="mx-auto p-4 sm:p-6">
+        {loadingTransactionInfo ? <LoadingSpinner size="lg" fullScreen message="Loading transaction details..." /> : transaction ? (
           <Fragment>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-              {/* Main Content - Left Side */}
-              <div className="lg:col-span-2 space-y-5">
-                {/* Transaction Overview */}
-                <TransactionOverview
-                  type={transaction.type}
-                  amountCrypto={Number(transaction.amountCrypto)}
-                  symbol={transaction.cryptocurrency?.symbol || 'CRYPTO'}
-                  currency={transaction.currency}
-                  amountFiat={Number(transaction.amountFiat || 0)}
-                  amountFiatNGN={Number(transaction.amountFiatNGN || 0)}
-                  exchangeRateDisplay={
-                    transaction.exchangeRate && Number(transaction.amountCrypto) > 0
-                      ? transaction.currency === 'USD'
-                        ? `1 ${transaction.cryptocurrency?.symbol || 'CRYPTO'} = $ ${formatCompact(Number(transaction.exchangeRate.rate), "USD", 2)}`
-                        : `1 ${transaction.cryptocurrency?.symbol || 'CRYPTO'} = ₦ ${formatCompact(Number(transaction.exchangeRate.rate) * Number(transaction.exchangeRate.platformRate), "NGN", 2)}`
-                      : Number(transaction.amountCrypto) > 0
-                        ? transaction.currency === 'USD'
-                          ? `1 ${transaction.cryptocurrency?.symbol || 'CRYPTO'} = $ ${formatCompact(Number(transaction.amountFiat) / Number(transaction.amountCrypto), "USD", 2)}`
-                          : `1 ${transaction.cryptocurrency?.symbol || 'CRYPTO'} = ₦ ${formatCompact(Number(transaction.amountFiatNGN || 0) / Number(transaction.amountCrypto), "NGN", 2)}`
-                        : '-'
-                  }
-                  status={transaction.status}
-                  confirmationCount={transaction.confirmationCount}
-                />
+            <div className="space-y-5">
+              <TransactionOverview
+                type={transaction.type}
+                amountCrypto={Number(transaction.amountCrypto)}
+                symbol={transaction.cryptocurrency?.symbol || "CRYPTO"}
+                currency={transaction.currency}
+                amountFiat={Number(transaction.amountFiat || 0)}
+                amountFiatNGN={Number(transaction.amountFiatNGN || 0)}
+                exchangeRateDisplay={transaction.exchangeRate && Number(transaction.amountCrypto) > 0
+                  ? transaction.currency === "USD"
+                    ? `1 ${transaction.cryptocurrency?.symbol || "CRYPTO"} = $ ${formatCompact(Number(transaction.exchangeRate.rate), "USD", 2)}`
+                    : `1 ${transaction.cryptocurrency?.symbol || "CRYPTO"} = ₦ ${formatCompact(Number(transaction.exchangeRate.rate) * Number(transaction.exchangeRate.platformRate), "NGN", 2)}`
+                  : Number(transaction.amountCrypto) > 0
+                    ? transaction.currency === "USD"
+                      ? `1 ${transaction.cryptocurrency?.symbol || "CRYPTO"} = $ ${formatCompact(Number(transaction.amountFiat) / Number(transaction.amountCrypto), "USD", 2)}`
+                      : `1 ${transaction.cryptocurrency?.symbol || "CRYPTO"} = ₦ ${formatCompact(Number(transaction.amountFiatNGN || 0) / Number(transaction.amountCrypto), "NGN", 2)}`
+                    : "-"}
+                status={transaction.status}
+                confirmationCount={transaction.confirmationCount}
+              />
 
-                {/* Transaction Context Flow */}
-                <TransactionContext transaction={transaction} />
-
-                {/* Cryptocurrency Info */}
-                {transaction.cryptocurrency && (
-                  <CryptoCurrencyInfo
-                    logoUrl={transaction.cryptocurrency.logoUrl || ''}
-                    symbol={transaction.cryptocurrency.symbol}
-                    name={transaction.cryptocurrency.name}
-                  />
-                )}
-                
-                {/* User Bank Account And/Or Crypto Wallet Details */}
-                <PaymentAccountDetails
-                  type={transaction.type}
-                  hasBankAccount={transaction.userBankAccount ? true : false}
-                  accountName={transaction.userBankAccount?.accountName}
-                  accountNumber={transaction.userBankAccount?.accountNumber}
-                  bankName={transaction.userBankAccount?.bank?.name}
-                  isDeleted={transaction.userBankAccount?.isDeleted}
-                  hasCryptoWallet={transaction?.userCryptoWallet ? true : false}
-                  walletAddress={transaction.userCryptoWallet?.walletAddress}
-                  network={transaction.userCryptoWallet?.network}
-                  cryptoName={transaction.cryptocurrency?.name}
-                  cryptoSymbol={transaction.cryptocurrency?.symbol}
-                />
-                
-                {/* Admin Bank Account And/Or Crypto Wallet Details */}
-                <AdminPaymentAccountDetails
-                  type={transaction.type}
-                  hasBankAccount={transaction?.adminBankAccount ? true : false}
-                  accountName={transaction.adminBankAccount?.accountHolderName}
-                  accountNumber={transaction.adminBankAccount?.accountNumber}
-                  bankName={transaction.adminBankAccount?.bank?.name}
-                  hasCryptoWallet={transaction?.adminCryptoWallet ? true : false}
-                  walletAddress={transaction.adminCryptoWallet?.walletAddress}
-                  network={transaction.adminCryptoWallet?.network}
-                  cryptoName={transaction.cryptocurrency?.name}
-                  cryptoSymbol={transaction.cryptocurrency?.symbol}
-                />
-                
-                {/* Transaction Hash */}
-                {transaction.cryptoTxHash && (
-                  <TransactionHash
-                    cryptoTxHash={transaction.cryptoTxHash}
-                    network={transaction.adminCryptoWallet?.network as CryptoNetworkType}
-                    walletAddress={transaction?.adminCryptoWallet?.walletAddress || ''}
-                  />
-                )}
-
-                {/* Custodial Deposit Address (Sell) */}
-                {transaction.type === "SELL" && transaction.depositAddress ? (
-                  <div className="bg-white rounded-xl border border-slate-200/80 shadow-xs p-5">
-                    <div className="flex items-center gap-2.5 pb-3.5 mb-3.5 border-b border-slate-100">
-                      <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                        <QrCode className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <h2 className="text-sm font-bold text-slate-900 tracking-tight">Custodial Deposit Address</h2>
-                        <p className="text-2xs text-slate-500">Inbound crypto deposit target</p>
-                      </div>
-                    </div>
-                    <div className="p-3 rounded-lg bg-slate-50 border border-slate-100/80">
-                      <CopyDetails
-                        text={transaction.depositAddress}
-                        wrap={true}
-                        className="!max-w-full font-mono text-xs font-semibold text-slate-900"
-                        iconClassName="!w-4 !h-4"
-                      />
-                    </div>
-                  </div>
-                ) : null}
-                
-                {/* Bank Transfer Reference */}
-                {transaction.bankTransferReference && (
-                  <div className="bg-white rounded-xl border border-slate-200/80 shadow-xs p-5">
-                    <div className="flex items-center gap-2.5 pb-3.5 mb-3.5 border-b border-slate-100">
-                      <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                        <FileText className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <h2 className="text-sm font-bold text-slate-900 tracking-tight">Bank Transfer Reference</h2>
-                        <p className="text-2xs text-slate-500">Payment matching identifier</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 p-3 rounded-lg bg-slate-50 border border-slate-100/80">
-                      <p className="font-mono text-xs font-bold text-slate-900">{transaction.bankTransferReference}</p>
-                      <CopyDetails text={transaction.bankTransferReference} className="!max-w-[400px]" iconClassName="!w-4 !h-4" />
-                    </div>
-                  </div>
-                )}
-                
-                {/* Payment Receipts */}
-                {transaction.type === "BUY" && (
-                  <TransactionReceipts
-                    receiptImageUrl={transaction.receiptImageUrl}
-                    adminPaymentReceiptUrl={transaction.adminPaymentReceiptUrl}
-                  />
-                )}
-                
-                {/* Notes */}
-                {(transaction.userNotes || transaction.adminNotes || transaction.internalNotes) && (
-                  <div className="bg-white rounded-xl border border-slate-200/80 shadow-xs p-5">
-                    <div className="flex items-center gap-2.5 pb-3.5 mb-3.5 border-b border-slate-100">
-                      <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                        <FileText className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <h2 className="text-sm font-bold text-slate-900 tracking-tight">Audit & Session Notes</h2>
-                        <p className="text-2xs text-slate-500">Customer remarks and internal compliance memos</p>
-                      </div>
-                    </div>
-                    <div className="space-y-3">
-                      {transaction.userNotes && (
-                        <div className="p-3.5 bg-blue-50/70 border border-blue-100/80 rounded-lg">
-                          <p className="text-2xs font-bold uppercase tracking-wider text-blue-900 mb-1">User Notes</p>
-                          <p className="text-xs text-blue-800">{transaction.userNotes}</p>
-                        </div>
-                      )}
-                      {transaction.adminNotes && (
-                        <div className="p-3.5 bg-purple-50/70 border border-purple-100/80 rounded-lg">
-                          <p className="text-2xs font-bold uppercase tracking-wider text-purple-900 mb-1">Admin Notes</p>
-                          <p className="text-xs text-purple-800">{transaction.adminNotes}</p>
-                        </div>
-                      )}
-                      {transaction.internalNotes && (
-                        <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-lg">
-                          <p className="text-2xs font-bold uppercase tracking-wider text-slate-700 mb-1">Internal Notes</p>
-                          <p className="text-xs text-slate-600">{transaction.internalNotes}</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-                
-                {/* Failure Reason */}
-                {transaction.failureReason && (
-                  <div className="bg-white rounded-xl border border-rose-200 shadow-xs p-5">
-                    <div className="flex items-center gap-2.5 pb-3.5 mb-3.5 border-b border-rose-100">
-                      <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
-                        <AlertCircle className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <h2 className="text-sm font-bold text-rose-900 tracking-tight">Exception Reason</h2>
-                        <p className="text-2xs text-rose-500">Reason reported by automated settlement gateway</p>
-                      </div>
-                    </div>
-                    <div className="p-3.5 bg-rose-50/60 border border-rose-100 rounded-lg">
-                      <p className="text-xs font-medium text-rose-800">{transaction.failureReason}</p>
-                    </div>
-                  </div>
-                )}
+              <div className="grid gap-5 xl:grid-cols-2">
+                {transaction.user && <TransactionDetailsUserProfile userId={transaction.userId} firstName={transaction.profile?.firstName || ""} lastName={transaction.profile?.lastName || ""} email={transaction.user.email || ""} phone={transaction.profile?.phoneNumber || ""} profileImageUrl={transaction.profile?.profileImg || ""} />}
+                <TransactionDetailsPipeline createdAt={transaction.createdAt} updatedAt={transaction.updatedAt} processedAt={transaction.processedAt || undefined} processedByFirstName={transaction.processor?.firstName || undefined} processedByLastName={transaction.processor?.lastName || undefined} />
               </div>
-              
-              <div className="space-y-5">
-                {/* User Profile */}
-                {transaction.user && (
-                  <TransactionDetailsUserProfile
-                    userId={transaction.userId}
-                    firstName={transaction.profile?.firstName || ''}
-                    lastName={transaction.profile?.lastName || ''}
-                    email={transaction.user?.email || ''}
-                    phone={transaction?.profile?.phoneNumber || ''}
-                    profileImageUrl={transaction.profile?.profileImg || ''}
-                  />
-                )}
-                
-                {/* Timeline */}
-                <TransactionDetailsPipeline
-                  createdAt={transaction.createdAt}
-                  updatedAt={transaction.updatedAt}
-                  processedAt={transaction.processedAt || undefined}
-                  processedByFirstName={transaction.processor?.firstName || undefined}
-                  processedByLastName={transaction.processor?.lastName || undefined}
-                />
-                
-                {/* Session Info & Identifiers */}
-                <div className="bg-white rounded-xl border border-slate-200/80 shadow-xs p-5">
-                  <div className="flex items-center gap-2.5 pb-3.5 mb-3.5 border-b border-slate-100">
-                    <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                      <Fingerprint className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <h2 className="text-sm font-bold text-slate-900 tracking-tight">Identifiers & Metadata</h2>
-                      <p className="text-2xs text-slate-500">System reference keys</p>
-                    </div>
-                  </div>
 
-                  <div className="space-y-3">
-                    <IdentifierCard label="Session ID" value={transaction.sessionId} />
-                    <IdentifierCard label="Transaction ID" value={transaction.id} />
-                    {transaction.rateSnapshot && (
-                      <IdentifierCard label="Rate Snapshot" value={JSON.stringify(transaction.rateSnapshot, null, 2)} formatted />
-                    )}
+              <TransactionContext transaction={transaction} />
+              {transaction.cryptocurrency && <CryptoCurrencyInfo logoUrl={transaction.cryptocurrency.logoUrl || ""} symbol={transaction.cryptocurrency.symbol} name={transaction.cryptocurrency.name} />}
+
+              <div className="grid gap-5 xl:grid-cols-2">
+                <PaymentAccountDetails type={transaction.type} hasBankAccount={!!transaction.userBankAccount} accountName={transaction.userBankAccount?.accountName} accountNumber={transaction.userBankAccount?.accountNumber} bankName={transaction.userBankAccount?.bank?.name} isDeleted={transaction.userBankAccount?.isDeleted} hasCryptoWallet={!!transaction.userCryptoWallet} walletAddress={transaction.userCryptoWallet?.walletAddress} network={transaction.userCryptoWallet?.network} cryptoName={transaction.cryptocurrency?.name} cryptoSymbol={transaction.cryptocurrency?.symbol} />
+                <AdminPaymentAccountDetails type={transaction.type} hasBankAccount={!!transaction.adminBankAccount} accountName={transaction.adminBankAccount?.accountHolderName} accountNumber={transaction.adminBankAccount?.accountNumber} bankName={transaction.adminBankAccount?.bank?.name} hasCryptoWallet={!!transaction.adminCryptoWallet} walletAddress={transaction.adminCryptoWallet?.walletAddress} network={transaction.adminCryptoWallet?.network} cryptoName={transaction.cryptocurrency?.name} cryptoSymbol={transaction.cryptocurrency?.symbol} />
+              </div>
+
+              {(transaction.cryptoTxHash || transaction.depositAddress || transaction.bankTransferReference) && <div className="grid gap-5 xl:grid-cols-2">
+                {transaction.cryptoTxHash && <TransactionHash cryptoTxHash={transaction.cryptoTxHash} network={transaction.adminCryptoWallet?.network as CryptoNetworkType} walletAddress={transaction.adminCryptoWallet?.walletAddress || ""} />}
+                {transaction.type === "SELL" && transaction.depositAddress && <DetailCard title="Custodial Deposit Address" subtitle="Inbound crypto deposit target" icon={<QrCode size={16} />}><CopyDetails text={transaction.depositAddress} wrap className="!max-w-full font-mono text-xs" /></DetailCard>}
+                {transaction.type === "BUY" && transaction.bankTransferReference && <DetailCard title="Bank Transfer Reference" subtitle="Payment matching identifier" icon={<FileText size={16} />}><CopyDetails text={transaction.bankTransferReference} wrap className="!max-w-full font-mono text-xs" /></DetailCard>}
+              </div>}
+
+                {transaction.type === TRANSACTION_STATUS_SCOPE.BUY && <TransactionReceipts receiptImageUrl={transaction.receiptImageUrl} adminPaymentReceiptUrl={transaction.adminPaymentReceiptUrl} />}
+
+              <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
+                <header className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                  <div><h2 className="text-sm font-semibold text-slate-900">Transaction controls</h2><p className="mt-1 text-xs text-slate-500">Update status and perform available actions</p></div>
+                  <div className="flex flex-wrap justify-end gap-2">
+                    {canRetryConfirmation && <button type="button" onClick={() => handleRetryDepositConfirmation(transaction.sessionId)} disabled={retryingConfirmation} className="inline-flex h-9 items-center gap-2 rounded-lg bg-amber-600 px-3 text-xs font-semibold text-white disabled:opacity-50"><RefreshCw size={14} className={retryingConfirmation ? "animate-spin" : ""} />{retryingConfirmation ? "Retrying..." : "Retry confirmation"}</button>}
+                    {canForcePayout && <button type="button" onClick={() => setShowForcePayoutConfirmModal(true)} disabled={forcingPayout} className="inline-flex h-9 items-center gap-2 rounded-lg bg-rose-600 px-3 text-xs font-semibold text-white disabled:opacity-50"><Play size={14} />{forcingPayout ? "Triggering..." : "Trigger payout"}</button>}
                   </div>
+                </header>
+                <div className="grid gap-4 lg:grid-cols-2">
+                  <TransactionStatusPicker transactionType={transaction.type} currentStatus={transaction.status} selectedStatus={selectedStatus} onSelectStatus={setSelectedStatus} onSave={saveStatus} isSaving={updatingStatus} canSave={transactionLocked && !lockingTransaction} />
+                  <label className="block space-y-1.5"><span className="text-xs font-medium text-slate-600">Admin note (optional)</span><textarea value={adminNotes} onChange={(event) => setAdminNotes(event.target.value)} maxLength={500} rows={3} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-600" placeholder="Add a note with this status update" /></label>
                 </div>
-              </div>
-            </div>
+                {transaction.type === TRANSACTION_STATUS_SCOPE.BUY && <div className="mt-4 grid gap-4 border-t border-slate-100 pt-4 md:grid-cols-2 md:items-center">
+                  <label className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-blue-700"><Upload size={16} />Upload admin payment receipt<input type="file" accept="image/png,image/jpeg,application/pdf" className="sr-only" onChange={(event) => { void uploadReceipt(event.target.files?.[0]); event.currentTarget.value = ""; }} /></label>
+                  {receiptPreviewUrl ? <ReceiptViewer url={receiptPreviewUrl} label={receiptName || "New payment receipt"} /> : transaction.adminPaymentReceiptUrl ? <ReceiptViewer url={transaction.adminPaymentReceiptUrl} label="Admin payment receipt" /> : null}
+                </div>}
+                {lockingTransaction && <p className="mt-3 text-xs text-slate-500">Preparing transaction controls…</p>}
+              </section>
 
-            <div className="mt-5">
+              {(transaction.userNotes || transaction.adminNotes || transaction.internalNotes || transaction.failureReason) && <div className="grid gap-5 xl:grid-cols-2">
+                {(transaction.userNotes || transaction.adminNotes || transaction.internalNotes) && <DetailCard title="Transaction notes" subtitle="Customer remarks and internal notes" icon={<FileText size={16} />}><div className="space-y-3">{transaction.userNotes && <p className="text-sm text-slate-700"><span className="font-medium">Customer:</span> {transaction.userNotes}</p>}{transaction.adminNotes && <p className="text-sm text-slate-700"><span className="font-medium">Admin:</span> {transaction.adminNotes}</p>}{transaction.internalNotes && <p className="text-sm text-slate-700"><span className="font-medium">Internal:</span> {transaction.internalNotes}</p>}</div></DetailCard>}
+                {transaction.failureReason && <DetailCard title="Exception reason" subtitle="Reason reported by the settlement process" icon={<AlertCircle size={16} />}><p className="text-sm text-rose-800">{transaction.failureReason}</p></DetailCard>}
+              </div>}
+
+              <TransactionActivityLog activities={transaction.transactionActivities || []} />
               <LedgerEntriesSection ledgerEntries={ledgerEntries} />
+
+              <details className="group rounded-xl border border-slate-200 bg-white shadow-xs">
+                <summary className="flex cursor-pointer list-none items-center gap-3 p-5 [&::-webkit-details-marker]:hidden">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600"><Fingerprint size={16} /></span>
+                  <span><span className="block text-sm font-semibold text-slate-900">Identifiers &amp; Metadata</span><span className="mt-0.5 block text-xs text-slate-500">System reference keys, collapsed by default</span></span>
+                  <span className="ml-auto text-xs text-blue-600 group-open:hidden">Show</span><span className="ml-auto hidden text-xs text-blue-600 group-open:inline">Hide</span>
+                </summary>
+                <div className="grid gap-3 border-t border-slate-100 p-5 md:grid-cols-2">
+                  <IdentifierCard label="Session ID" value={transaction.sessionId} />
+                  <IdentifierCard label="Transaction ID" value={transaction.id} />
+                  {transaction.rateSnapshot && <div className="md:col-span-2"><IdentifierCard label="Rate Snapshot" value={JSON.stringify(transaction.rateSnapshot, null, 2)} formatted /></div>}
+                </div>
+              </details>
             </div>
           </Fragment>
-        ) : (
-          <div className="bg-white rounded-xl border border-slate-200/80 p-12 text-center text-slate-400 text-sm">
-            No transaction details available.
-          </div>
-        )}
+        ) : <div className="rounded-xl border border-slate-200 bg-white p-12 text-center text-sm text-slate-400">No transaction details available.</div>}
       </div>
-      <ConfirmModal
-        open={showForcePayoutConfirmModal}
-        actionType="proceed"
-        onClose={() => setShowForcePayoutConfirmModal(false)}
-        onConfirm={async () => {
-          setShowForcePayoutConfirmModal(false);
-          await handleForceTriggerPayout(transaction?.sessionId);
-        }}
-        message="This will force the payout pipeline to run even if the transaction is not in the normal payout state. Confirm only if you intend to proceed."
-        confirmText={forcingPayout ? "Triggering..." : "Force payout"}
-      />
+      <ConfirmModal open={showForcePayoutConfirmModal} actionType="proceed" onClose={() => setShowForcePayoutConfirmModal(false)} onConfirm={async () => { setShowForcePayoutConfirmModal(false); await handleForceTriggerPayout(transaction?.sessionId); }} message="This will force the payout pipeline to run even if the transaction is not in the normal payout state. Confirm only if you intend to proceed." confirmText={forcingPayout ? "Triggering..." : "Force payout"} />
     </AuthenticatedLayout>
-  )
-}
+  );
+};
+
+const DetailCard = ({ title, subtitle, icon, children }: { title: string; subtitle: string; icon: ReactNode; children: ReactNode }) => (
+  <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
+    <header className="mb-4 flex items-center gap-2.5 border-b border-slate-100 pb-3"><span className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600">{icon}</span><div><h2 className="text-sm font-semibold text-slate-900">{title}</h2><p className="text-xs text-slate-500">{subtitle}</p></div></header>
+    {children}
+  </section>
+);
 
 export default TransactionDetails;
