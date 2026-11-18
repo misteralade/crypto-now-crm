@@ -32,7 +32,7 @@ const TransactionDetailsUserProfile = ({
               <User className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-xs sm:text-sm font-bold text-slate-900 tracking-tight">Customer Profile</h2>
+              <h2 className="text-xs sm:crm-section-heading font-bold text-slate-900 tracking-tight">Customer Profile</h2>
             </div>
           </div>
 
@@ -51,7 +51,7 @@ const TransactionDetailsUserProfile = ({
           </div>
 
           <div className="min-w-0 flex-1">
-            <Link to={ROUTES.USERS_DETAILS} params={{ userId }} className="block text-xs sm:text-sm font-bold text-slate-900 tracking-tight truncate hover:text-blue-600">
+            <Link to={ROUTES.USERS_DETAILS} params={{ userId }} className="block text-xs sm:crm-section-heading font-bold text-slate-900 tracking-tight truncate hover:text-blue-600">
               {fullName}
             </Link>
             <div className="flex items-center gap-1.5 mt-0.5 min-w-0">
@@ -86,3 +86,4 @@ const TransactionDetailsUserProfile = ({
 }
 
 export default TransactionDetailsUserProfile
+

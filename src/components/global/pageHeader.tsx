@@ -15,7 +15,7 @@ const PageHeader = ({ title, subtitle, badge, actions, className, mobileActionsR
       <div className={`flex ${mobileActionsRight ? 'flex-row items-start' : 'flex-col'} sm:flex-row sm:items-center justify-between gap-3`}>
         <div className="min-w-0">
           <div className="flex items-center gap-2.5 flex-wrap">
-            <h1 className="text-xl sm:text-2xl font-bold leading-tight text-slate-900 tracking-tight">
+            <h1 className="crm-page-title font-bold leading-tight text-slate-900 tracking-tight">
               {title}
             </h1>
             {badge}

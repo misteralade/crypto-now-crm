@@ -1,4 +1,4 @@
-﻿import {Fragment} from "react";
+import {Fragment} from "react";
 import momentClient from "../../../../util/moment.ts";
 import { GitCommit, Clock, CheckCircle } from "lucide-react";
 
@@ -80,4 +80,5 @@ const TransactionDetailsPipeline = ({
 }
 
 export default TransactionDetailsPipeline;
+
 

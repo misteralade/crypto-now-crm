@@ -95,11 +95,11 @@ const TransactionDetails = () => {
                 exchangeRateDisplay={transaction.exchangeRate && Number(transaction.amountCrypto) > 0
                   ? transaction.currency === "USD"
                     ? `1 ${transaction.cryptocurrency?.symbol || "CRYPTO"} = $ ${formatCompact(Number(transaction.exchangeRate.rate), "USD", 2)}`
-                    : `1 ${transaction.cryptocurrency?.symbol || "CRYPTO"} = â‚¦ ${formatCompact(Number(transaction.exchangeRate.rate) * Number(transaction.exchangeRate.platformRate), "NGN", 2)}`
+                    : `1 ${transaction.cryptocurrency?.symbol || "CRYPTO"} = ₦ ${formatCompact(Number(transaction.exchangeRate.rate) * Number(transaction.exchangeRate.platformRate), "NGN", 2)}`
                   : Number(transaction.amountCrypto) > 0
                     ? transaction.currency === "USD"
                       ? `1 ${transaction.cryptocurrency?.symbol || "CRYPTO"} = $ ${formatCompact(Number(transaction.amountFiat) / Number(transaction.amountCrypto), "USD", 2)}`
-                      : `1 ${transaction.cryptocurrency?.symbol || "CRYPTO"} = â‚¦ ${formatCompact(Number(transaction.amountFiatNGN || 0) / Number(transaction.amountCrypto), "NGN", 2)}`
+                      : `1 ${transaction.cryptocurrency?.symbol || "CRYPTO"} = ₦ ${formatCompact(Number(transaction.amountFiatNGN || 0) / Number(transaction.amountCrypto), "NGN", 2)}`
                     : "-"}
                 status={transaction.status}
                 confirmationCount={transaction.confirmationCount}

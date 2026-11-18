@@ -1,7 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
 @import 'tailwindcss';
 
+/* Shared type scale. Tailwind text utilities use these values throughout the CRM. */
+@theme {
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1rem;
+}
+
 :root {
+  --crm-page-title: 1.25rem;
+  --crm-section-title: 0.8125rem;
+  --crm-body: 0.8125rem;
+  --crm-label: 0.6875rem;
   --color-primary: #03034D;
   --color-primary-taint: #F0F1FF;
   --color-primary-hover: #050568;
@@ -20,6 +30,24 @@
   --color-text-secondary: #454745;
   --color-text-muted: #9A9A9A;
   --color-text-placeholder: #98A2B3;
+}
+
+@media (max-width: 639px) {
+  :root {
+    --text-sm: 0.8125rem;
+    --text-base: 0.875rem;
+    --text-lg: 1rem;
+    --text-xl: 1.125rem;
+  }
+}
+
+@media (min-width: 640px) {
+  :root {
+    --crm-page-title: 1.5rem;
+    --crm-section-title: 0.875rem;
+    --crm-body: 0.875rem;
+    --crm-label: 0.75rem;
+  }
 }
 
 @layer base {
@@ -107,6 +135,10 @@
 }
 
 @layer utilities {
+  .crm-page-title { font-size: var(--crm-page-title); line-height: 1.25; }
+  .crm-section-heading { font-size: var(--crm-section-title); line-height: 1.35; }
+  .crm-body { font-size: var(--crm-body); line-height: 1.45; }
+  .crm-label { font-size: var(--crm-label); line-height: 1.35; }
   @keyframes fadeIn {
     from {
       opacity: 0;

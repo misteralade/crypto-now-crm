@@ -1,4 +1,4 @@
-﻿import { Fragment } from "react";
+import { Fragment } from "react";
 import CopyDetails, { CopyButton } from "../../../global/CopyDetails.tsx";
 import { Landmark, ShieldCheck } from "lucide-react";
 
@@ -36,25 +36,25 @@ const AdminPaymentAccountDetails = ({
               <ShieldCheck className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-slate-900 tracking-tight">Platform Custody Wallet</h2>
+              <h2 className="crm-section-heading font-bold text-slate-900 tracking-tight">Platform Custody Wallet</h2>
 
             </div>
           </div>
           
           <div className="space-y-3">
             <div className="p-3 rounded-lg bg-slate-50 border border-slate-100/80">
-              <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Wallet Address</p>
+              <p className="crm-label font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Wallet Address</p>
               <div className="flex items-center gap-2">
                 <CopyDetails text={walletAddress || ''} wrap={true} className="!max-w-full font-mono text-xs font-semibold text-slate-900" iconClassName="!w-4 !h-4" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="p-3 rounded-lg bg-slate-50 border border-slate-100/80">
-                <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Network</p>
+                <p className="crm-label font-semibold text-slate-500 uppercase tracking-wider mb-1">Network</p>
                 <p className="text-xs font-bold text-slate-900">{network || '-'}</p>
               </div>
               <div className="p-3 rounded-lg bg-slate-50 border border-slate-100/80">
-                <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Coin</p>
+                <p className="crm-label font-semibold text-slate-500 uppercase tracking-wider mb-1">Coin</p>
                 <p className="text-xs font-bold text-slate-900">
                   {cryptoName} ({cryptoSymbol})
                 </p>
@@ -69,26 +69,26 @@ const AdminPaymentAccountDetails = ({
               <Landmark className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-slate-900 tracking-tight">Platform Bank Account</h2>
+              <h2 className="crm-section-heading font-bold text-slate-900 tracking-tight">Platform Bank Account</h2>
 
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div className="p-3 rounded-lg bg-slate-50 border border-slate-100/80">
-              <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Bank Name</p>
-              <p className="text-sm font-bold text-slate-900 truncate">{bankName || '-'}</p>
+              <p className="crm-label font-semibold text-slate-500 uppercase tracking-wider mb-1">Bank Name</p>
+              <p className="crm-body font-bold text-slate-900 truncate">{bankName || '-'}</p>
             </div>
             <div className="p-3 rounded-lg bg-slate-50 border border-slate-100/80">
               <div className="mb-1 flex items-center gap-1">
-                <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Account Number</p>
+                <p className="crm-label font-semibold text-slate-500 uppercase tracking-wider">Account Number</p>
                 {accountNumber && <CopyButton text={accountNumber} iconClassName="w-3.5 h-3.5" ariaLabel="Copy account number" />}
               </div>
-              <p className="text-sm font-mono text-slate-700">{accountNumber || '-'}</p>
+              <p className="crm-body font-mono text-slate-700">{accountNumber || '-'}</p>
             </div>
             <div className="col-span-1 sm:col-span-2 p-3 rounded-lg bg-slate-50 border border-slate-100/80">
-              <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Account Name</p>
-              <p className="text-sm font-bold text-slate-900 truncate">{accountName || '-'}</p>
+              <p className="crm-label font-semibold text-slate-500 uppercase tracking-wider mb-1">Account Name</p>
+              <p className="crm-body font-bold text-slate-900 truncate">{accountName || '-'}</p>
             </div>
           </div>
         </div>
@@ -98,4 +98,5 @@ const AdminPaymentAccountDetails = ({
 };
 
 export default AdminPaymentAccountDetails;
+
 

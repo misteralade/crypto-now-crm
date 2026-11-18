@@ -7,3 +7,4 @@ export default function TransactionReceipts({ receiptImageUrl, adminPaymentRecei
     {adminPaymentReceiptUrl && <ReceiptViewer url={adminPaymentReceiptUrl} label="Admin receipt" />}
   </div></div>;
 }
+

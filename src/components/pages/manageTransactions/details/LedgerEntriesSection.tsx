@@ -1,4 +1,4 @@
-﻿import { Fragment } from "react";
+import { Fragment } from "react";
 import CopyDetails from "../../../global/CopyDetails";
 import { formatNumber } from "../../../../util/index.util";
 import type { LedgerEntryResponsePayload } from "../../../../types/response.payload.types";
@@ -76,7 +76,7 @@ const LedgerEntriesSection = ({
           <BookOpen className="w-4 h-4" />
         </div>
         <div>
-          <h2 className="text-sm font-bold text-slate-900 tracking-tight">Ledger Journal Entries</h2>
+          <h2 className="crm-section-heading font-bold text-slate-900 tracking-tight">Ledger Journal Entries</h2>
 
         </div>
       </div>
@@ -171,4 +171,5 @@ const LedgerEntriesSection = ({
 };
 
 export default LedgerEntriesSection;
+
 

@@ -1,4 +1,4 @@
-﻿import {Fragment, useEffect, useState} from "react";
+import {Fragment, useEffect, useState} from "react";
 import {ExternalLink, Link2} from "lucide-react";
 import CopyDetails from "../../../global/CopyDetails.tsx";
 import type {CryptoNetworkType} from "../../../../schemas/enum.schema.ts";
@@ -27,7 +27,7 @@ const TransactionHash = ({ cryptoTxHash, network, walletAddress }: TransactionHa
               <Link2 className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-slate-900 tracking-tight">On-Chain Transaction</h2>
+              <h2 className="crm-section-heading font-bold text-slate-900 tracking-tight">On-Chain Transaction</h2>
 
             </div>
           </div>
@@ -45,7 +45,7 @@ const TransactionHash = ({ cryptoTxHash, network, walletAddress }: TransactionHa
         </div>
 
         <div className="p-3 rounded-lg bg-slate-50 border border-slate-100/80 space-y-1.5">
-          <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Transaction Hash</p>
+          <p className="crm-label font-semibold text-slate-500 uppercase tracking-wider">Transaction Hash</p>
           <div className="flex items-center gap-2 w-full">
             <CopyDetails
               text={cryptoTxHash}
@@ -61,4 +61,5 @@ const TransactionHash = ({ cryptoTxHash, network, walletAddress }: TransactionHa
 }
 
 export default TransactionHash;
+
 

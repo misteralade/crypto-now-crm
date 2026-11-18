@@ -21,3 +21,4 @@ const IdentifierCard = ({ label, value, formatted = false }: IdentifierCardProps
 );
 
 export default IdentifierCard;
+

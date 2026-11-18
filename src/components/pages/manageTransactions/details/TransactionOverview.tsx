@@ -1,4 +1,4 @@
-﻿import { Fragment } from 'react'
+import { Fragment } from 'react'
 import { formatNumber } from '../../../../util/index.util.ts'
 import { formatCompact } from '../../../../util/asset-precision'
 import { StatusBadge } from '../../../global/StatusBadge.tsx'
@@ -36,7 +36,7 @@ const TransactionOverview = ({
               {logoUrl ? <img src={logoUrl} alt={`${symbol} logo`} className="h-7 w-7 object-contain" /> : <Coins className="w-4 h-4" />}
             </div>
             <div>
-              <h2 className="text-xs sm:text-sm font-bold text-slate-900 tracking-tight">Transaction Overview</h2>
+              <h2 className="text-xs sm:crm-section-heading font-bold text-slate-900 tracking-tight">Transaction Overview</h2>
 
             </div>
           </div>
@@ -52,7 +52,7 @@ const TransactionOverview = ({
               Fiat Settlement
             </p>
             <p className="text-base sm:text-lg font-bold text-slate-900 tabular-nums truncate">
-              â‚¦{formatCompact(amountFiatNGN, 'NGN', 2)}
+              ₦{formatCompact(amountFiatNGN, 'NGN', 2)}
             </p>
             <p className="text-[10px] text-slate-400 mt-1">NGN Equivalent</p>
           </div>
@@ -74,7 +74,7 @@ const TransactionOverview = ({
               <ArrowLeftRight className="w-3 h-3 text-slate-400 shrink-0" />
               <span className="truncate">Rate</span>
             </div>
-            <p className="text-xs sm:text-sm font-bold text-slate-900 truncate" title={exchangeRateDisplay}>
+            <p className="text-xs sm:crm-body font-bold text-slate-900 truncate" title={exchangeRateDisplay}>
               {exchangeRateDisplay || 'N/A'}
             </p>
             <p className="text-[10px] text-slate-400 mt-1">Locked Rate</p>
@@ -111,4 +111,5 @@ const TransactionOverview = ({
 }
 
 export default TransactionOverview
+
 

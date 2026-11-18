@@ -75,3 +75,4 @@ const TransactionActivityLog = ({ activities }: TransactionActivityLogProps) => 
 };
 
 export default TransactionActivityLog;
+

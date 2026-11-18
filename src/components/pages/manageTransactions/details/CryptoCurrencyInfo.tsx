@@ -25,3 +25,4 @@ const CryptoCurrencyInfo = ({ logoUrl, symbol, name }: CryptoCurrencyInfoProps) 
 }
 
 export default CryptoCurrencyInfo;
+
