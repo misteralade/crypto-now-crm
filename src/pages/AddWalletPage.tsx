@@ -19,9 +19,10 @@ const AddWalletPage = () => {
     network: "",
     walletAddress: "",
     walletLabel: "",
-    blockchainEnvironment: "testnet" as "testnet" | "mainnet",
     isActive: true,
   });
+
+  const currentEnvironment = allSupportedCrypto?.[0]?.blockchainEnvironment;
 
   const [supportedNetworks, setSupportedNetworks] = useState<string[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -62,13 +63,6 @@ const AddWalletPage = () => {
     setErrors((prev) => ({ ...prev, network: "" }));
   };
 
-  const handleEnvironmentChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setFormData((prev) => ({
-      ...prev,
-      blockchainEnvironment: e.target.value as "testnet" | "mainnet",
-    }));
-  };
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -100,7 +94,7 @@ const AddWalletPage = () => {
   };
 
   const handleSave = () => {
-    if (!validateForm()) return;
+    if (!currentEnvironment || !validateForm()) return;
 
     createWalletMutation.mutate(
       {
@@ -108,7 +102,7 @@ const AddWalletPage = () => {
         network: formData.network as any,
         walletAddress: formData.walletAddress,
         walletLabel: formData.walletLabel || undefined,
-        blockchainEnvironment: formData.blockchainEnvironment,
+        blockchainEnvironment: currentEnvironment,
         walletType,
         isActive: formData.isActive,
       },
@@ -172,16 +166,12 @@ const AddWalletPage = () => {
                     ))}
                   </SelectField>
 
-                  {/* Environment Dropdown */}
-                  <SelectField
-                    id="environment"
-                    label="Blockchain Environment"
-                    value={formData.blockchainEnvironment}
-                    onChange={handleEnvironmentChange}
-                  >
-                    <option value="testnet">Testnet</option>
-                    <option value="mainnet">Mainnet</option>
-                  </SelectField>
+                  <div>
+                    <span className="block text-xs font-semibold text-gray-600 mb-2 uppercase">Blockchain Environment</span>
+                    <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-xl">
+                      <span className="text-sm font-medium capitalize">{currentEnvironment}</span>
+                    </div>
+                  </div>
 
                   {/* Wallet Type (Read-only) */}
                   <div>
@@ -278,7 +268,7 @@ const AddWalletPage = () => {
               <button
                 type="button"
                 onClick={handleSave}
-                disabled={createWalletMutation.isPending}
+                disabled={createWalletMutation.isPending || !currentEnvironment}
                 className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 text-white rounded-xl font-semibold transition-colors"
               >
                 {createWalletMutation.isPending ? "Creating..." : "Save Wallet"}

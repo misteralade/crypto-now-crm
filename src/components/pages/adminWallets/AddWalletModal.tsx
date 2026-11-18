@@ -38,18 +38,14 @@ const AddWalletModal = ({
   const [network, setNetwork] = useState("");
   const [walletAddress, setWalletAddress] = useState("");
   const [walletLabel, setWalletLabel] = useState("");
-  const [blockchainEnvironment, setBlockchainEnvironment] = useState<"testnet" | "mainnet">("mainnet");
+  const blockchainEnvironment = cryptos[0]?.blockchainEnvironment;
 
   const cryptoOptions = cryptos.map((c) => ({ value: c.id, label: `${c.symbol} (${c.name})` }));
-  const environmentOptions = [
-    { value: "mainnet", label: "Mainnet" },
-    { value: "testnet", label: "Testnet" },
-  ];
 
-  const isValid = cryptoId.length > 0 && network.length > 0 && walletAddress.trim().length > 0;
+  const isValid = !!blockchainEnvironment && cryptoId.length > 0 && network.length > 0 && walletAddress.trim().length > 0;
 
   const handleSubmit = () => {
-    if (!isValid) return;
+    if (!isValid || !blockchainEnvironment) return;
     onSubmit({
       cryptoId,
       network,
@@ -93,12 +89,7 @@ const AddWalletModal = ({
           value={walletLabel}
           onChange={(e) => setWalletLabel(e.target.value)}
         />
-        <PillSelect
-          label="Blockchain Environment"
-          value={blockchainEnvironment}
-          onValueChange={(v) => setBlockchainEnvironment(v as "testnet" | "mainnet")}
-          options={environmentOptions}
-        />
+        <div className="text-sm">Blockchain Environment: <span className="capitalize">{blockchainEnvironment}</span></div>
       </div>
 
       <div className="flex justify-end gap-3 mt-2">
