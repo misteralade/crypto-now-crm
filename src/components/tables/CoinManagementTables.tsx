@@ -6,34 +6,6 @@ import {StatusColumn} from "./global";
 import type { SearchSupportedCryptoData } from "../../types/response.payload.types";
 import type { TableColumn } from '../table'
 
-export const IsStableCoinColumn = ({ status }: { status: string }) => {
-  // Renders the Yes/No stable-coin indicator chip for the table.
-  const isActive = status.toLowerCase() === 'true'
-
-  return (
-    <Fragment>
-      <div
-        className={`inline-flex items-center gap-2 ${
-          isActive ? 'bg-[#ECFDF3]' : 'bg-[#F2F4F7]'
-        } rounded-[16px] py-[4px] px-[6px]`}
-      >
-        <div
-          className={`w-2 h-2 rounded-full ${
-            isActive ? 'bg-[#14BA6D]' : 'bg-[#6C778B]'
-          }`}
-        />
-        <span
-          className={`text-[12px] font-medium ${
-            isActive ? 'text-[#037847]' : 'text-[#364254]'
-          }`}
-        >
-        {isActive ? 'Yes' : 'No'}
-      </span>
-      </div>
-    </Fragment>
-  )
-}
-
 const NetworkTags = ({ networks }: { networks: string[] }) => {
   // Renders the networks as compact tag chips inside the table cell.
   if (!networks || networks.length === 0) return <span className="text-[11px] text-[#9A9A9A]">—</span>
@@ -149,12 +121,12 @@ export const SearchSupportedCryptoColumn = (
     ),
   },
   {
-    key: 'isStableCoin',
-    header: 'Stable Coin',
+    key: 'operations',
+    header: 'Operations',
     className: 'font-medium text-gray-900',
     render: (value) => (
       <Fragment>
-        <IsStableCoinColumn status={String(value)} />
+        <span className="font-medium text-[12px] text-[#667085]">{value}</span>
       </Fragment>
     ),
   },
@@ -229,8 +201,8 @@ export const SearchSupportedCryptoDataRow = (data: Array<SearchSupportedCryptoDa
     rowItems.push({
       id: item.id,
       coin: item.symbol,
-      isStableCoin: item.isStableCoin,
-      networks: item.networks ?? [],
+      operations: item.buyEnabled ? (item.sellEnabled ? 'Buy & Sell' : 'Buy') : (item.sellEnabled ? 'Sell' : 'None'),
+      networks: item.networks,
       tradeLimit: `${formatCompact(Number(item.minTransactionLimit), item.symbol)} ${item.symbol} - ${formatCompact(Number(item.maxTransactionLimit), item.symbol)} ${item.symbol}`,
       tradeLimitAnonymous: `${formatCompact(Number(item.minTradeAmountForAnonymous), item.symbol)} ${item.symbol} - ${formatCompact(Number(item.maxTradeAmountForAnonymous), item.symbol)} ${item.symbol}`,
       logoUrl: item.logoUrl,
