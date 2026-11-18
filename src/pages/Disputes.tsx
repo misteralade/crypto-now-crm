@@ -1,11 +1,11 @@
 import { useMemo } from 'react'
-// import DisputesControls from "../components/pages/disputes/DisputesControls.tsx";
 import AuthenticatedLayout from "../layout/AuthenticatedLayout.tsx";
-import {useDisputesPage} from "../hooks/pages/useDisputesPage.ts";
-import {DisputeManagementColumn, DisputeManagementDataRow} from "../components/tables/DisputesTable.tsx";
+import { useDisputesPage } from "../hooks/pages/useDisputesPage.ts";
+import { DisputeManagementColumn, DisputeManagementDataRow } from "../components/tables/DisputesTable.tsx";
 import Table from "../components/table.tsx";
 import TableFooter from "../components/tables/TableFooter.tsx";
 import PageHeader from "../components/global/pageHeader.tsx";
+import { useNavbarSearch } from "../layout/navbar-search-context.tsx";
 
 const Disputes = () => {
   const {
@@ -13,7 +13,7 @@ const Disputes = () => {
     searchDispute,
     loadingSearchDispute,
     pageSize,
-    // searchQuery,
+    searchQuery,
     
     // ⚙️ Functions
     handleViewDisputeDetails,
@@ -22,7 +22,7 @@ const Disputes = () => {
     handleNavigateToEditDisputePage,
     handlePageSizeChange,
     handlePageChange,
-    // handleSearchChange,
+    handleSearchChange,
   } = useDisputesPage();
   
   const columns = useMemo(() => DisputeManagementColumn(handleViewDisputeDetails, handleSortByField, handleNavigateToTransactionPage, handleNavigateToEditDisputePage),
@@ -34,20 +34,24 @@ const Disputes = () => {
     ]
   );
   const data = useMemo(() => DisputeManagementDataRow(searchDispute?.disputes || []), [searchDispute, loadingSearchDispute]);
+
+  useNavbarSearch(
+    useMemo(
+      () => ({
+        placeholder: "Search disputes...",
+        value: searchQuery,
+        onChange: handleSearchChange,
+      }),
+      [searchQuery, handleSearchChange]
+    )
+  );
   
   return (
     <AuthenticatedLayout>
-      <div className="p-6 mx-auto">
-        <PageHeader title="Disputes" />
-        
-        {/*/!* Controls *!/*/}
-        {/*<DisputesControls*/}
-        {/*  onOpenFilter={() => {}}*/}
-        {/*  searchValue={searchQuery}*/}
-        {/*  onSearchChange={handleSearchChange}*/}
-        {/*/>*/}
-        
-        <div className="mt-10">
+      <PageHeader title="Disputes" />
+
+      <div className="px-4 sm:px-6 pb-6 space-y-4">
+        <div className="bg-white rounded-xl border border-slate-200/80 shadow-xs overflow-hidden">
           <Table data={data} columns={columns} loading={loadingSearchDispute} />
           
           <TableFooter

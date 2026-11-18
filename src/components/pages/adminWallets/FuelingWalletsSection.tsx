@@ -145,7 +145,7 @@ const FuelingWalletCard = ({
             <div>
               <span className="text-gray-500 font-medium block">Native Gas Balance</span>
               <span className="font-bold text-[#03034D] text-sm mt-0.5 block">
-                {balanceData !== null ? `${Number(balanceData.balance).toFixed(8).replace(/\.?0+$/, '')} ${balanceData.symbol}` : "—"}
+                {balanceData !== null ? `${Number(balanceData.balance).toFixed(8).replace(/\.?0+$/, '')} ${balanceData.symbol}` : "-"}
               </span>
               {balanceData?.updatedAt && (
                 <span className="text-[10px] text-gray-400 block mt-0.5">
@@ -210,11 +210,11 @@ const FuelingWalletsSection = ({ cryptos }: FuelingWalletsSectionProps) => {
   });
 
   return (
-    <div className="bg-white border border-[#E9E7E2] rounded-3xl p-6 shadow-sm space-y-6">
+    <div className="bg-white border border-slate-200/80 rounded-xl p-5 shadow-xs space-y-4">
       <div>
-        <h3 className="text-xl font-bold text-[#03034D]">Fueling wallets</h3>
-        <p className="text-xs text-gray-500 mt-1">
-          Wallets used to pay gas fees when sweeping deposits.
+        <h3 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight">Fueling Wallets</h3>
+        <p className="text-xs text-slate-500 mt-0.5">
+          Gas wallets utilized to fund automated on-chain sweep operations
         </p>
       </div>
 

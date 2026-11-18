@@ -1,12 +1,13 @@
 import { useMemo } from 'react'
+import { Filter } from 'lucide-react'
 import { useNotificationsPage } from "../hooks/pages/useNotificationsPage";
 import { NotificationsDataColumn, NotificationsDataRow } from "../components/tables/NotificationsTables";
 import Table from "../components/table";
 import TableFooter from "../components/tables/TableFooter";
-import NotificationControls from "../components/pages/notifications/NotificationControls.tsx";
+import PageHeader from "../components/global/pageHeader";
 import NotificationFilterModal from "../components/pages/notifications/NotificationFilterModal.tsx";
 import AuthenticatedLayout from "../layout/AuthenticatedLayout.tsx";
-import AvatarIcon from '../assets/img/avatar.webp'
+import { useNavbarSearch } from "../layout/navbar-search-context.tsx";
 
 const NotificationsPage = () => {
   const {
@@ -38,45 +39,49 @@ const NotificationsPage = () => {
     [searchNotification?.notifications, loadingSearchNotification],
   )
 
+  useNavbarSearch(
+    useMemo(
+      () => ({
+        placeholder: "Search notifications...",
+        value: searchQuery || "",
+        onChange: handleSearchChange,
+      }),
+      [searchQuery, handleSearchChange]
+    )
+  )
+
   return (
     <AuthenticatedLayout>
-      <div className="p-6">
-        {/* Header */}
-        <div className="mb-6 flex justify-between items-center">
-          <h2 className="text-lg font-semibold">Notifications</h2>
-          <div className="flex items-center space-x-3">
-            <span className="text-red-500 font-medium">Admin</span>
-            <div className="rounded-full h-8 w-8 overflow-hidden">
-              <img
-                src={AvatarIcon}
-                alt="Admin avatar"
-                className="h-8 w-8 object-cover"
-              />
-            </div>
-          </div>
+      <PageHeader
+        title="Notifications"
+        actions={
+          <button
+            onClick={toggleShowFilterModal}
+            className="inline-flex cursor-pointer hover:bg-slate-50 items-center justify-center gap-1.5 h-8.5 px-3 border border-slate-200 rounded-lg transition-colors bg-white shadow-2xs text-xs font-semibold text-slate-700 shrink-0 active:scale-98"
+          >
+            <Filter className="w-3.5 h-3.5 text-slate-500" />
+            <span>Filter</span>
+          </button>
+        }
+      />
+
+      <div className="px-4 sm:px-6 pb-6">
+        <div className="bg-white rounded-xl border border-slate-200/80 shadow-xs overflow-hidden">
+          <Table
+            data={data}
+            columns={columns}
+            loading={loadingSearchNotification}
+          />
+          
+          <TableFooter
+            currentPage={searchNotification?.page || 1}
+            totalPages={searchNotification?.totalPages || 1}
+            pageSize={pageSize}
+            totalItems={searchNotification?.count || 100}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+          />
         </div>
-        
-        {/* Controls */}
-        <NotificationControls
-          onOpenFilter={toggleShowFilterModal}
-          searchValue={searchQuery || ""}
-          onSearchChange={handleSearchChange}
-        />
-        
-        <Table
-          data={data}
-          columns={columns}
-          loading={loadingSearchNotification}
-        />
-        
-        <TableFooter
-          currentPage={searchNotification?.page || 1}
-          totalPages={searchNotification?.totalPages || 1}
-          pageSize={pageSize}
-          totalItems={searchNotification?.count || 100}
-          onPageChange={handlePageChange}
-          onPageSizeChange={handlePageSizeChange}
-        />
         
         <NotificationFilterModal
           isOpen={showFilterModal}

@@ -193,11 +193,11 @@ const EditDisputes = () => {
                             currency={transactionDetails.currency}
                             exchangeRateDisplay={(() => {
                               const tx = transactionDetails;
-                              if (!tx?.cryptocurrency?.symbol) return '—';
+                              if (!tx?.cryptocurrency?.symbol) return '-';
                               const symbol = tx.cryptocurrency.symbol;
                               const amountCrypto = Number(tx.amountCrypto);
                               const currency = tx.currency;
-                              if (amountCrypto <= 0) return '—';
+                              if (amountCrypto <= 0) return '-';
                               if (tx.exchangeRate) {
                                 const rate = Number(tx.exchangeRate.rate);
                                 const platformRate = Number(tx.exchangeRate.platformRate);

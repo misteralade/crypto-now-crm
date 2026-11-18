@@ -13,7 +13,7 @@ interface TreasuryWalletsModalProps {
 }
 
 function formatDate(value: string | Date | null | undefined) {
-  if (!value) return "—";
+  if (!value) return "-";
   return new Date(value).toLocaleString();
 }
 
@@ -23,7 +23,7 @@ function formatAmount(value: string | number | null | undefined) {
 }
 
 function shortAddress(address: string) {
-  if (!address) return "—";
+  if (!address) return "-";
   return `${address.slice(0, 10)}...${address.slice(-8)}`;
 }
 
@@ -181,23 +181,23 @@ export default function TreasuryWalletsModal({
       aria-modal="true"
       aria-label="Treasury wallets"
     >
-      <div className="flex max-h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-[1.5rem] border border-[#DDE0FF] bg-white shadow-[0_24px_80px_-30px_rgba(3,3,77,0.45)]">
-        <div className="flex items-start justify-between gap-4 border-b border-[#EEF1FF] bg-[linear-gradient(180deg,#F8F9FF_0%,#FFFFFF_100%)] px-6 py-5">
+      <div className="flex max-h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-2xl">
+        <div className="flex items-start justify-between gap-4 border-b border-slate-100 bg-slate-50/50 px-5 py-4">
           <div className="space-y-1">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#575AE5]">
-              Treasury wallets
-            </p>
-            <h2 className="text-2xl font-semibold text-[#03034D]">
-              {scope.symbol} wallets
+            <span className="inline-flex items-center rounded-md bg-blue-50 border border-blue-200/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-blue-700">
+              Treasury Wallets
+            </span>
+            <h2 className="text-lg font-bold text-slate-900">
+              {scope.symbol} Wallets
             </h2>
-            <p className="text-sm text-gray-500">
+            <p className="text-xs text-slate-500">
               {scope.name} on {scope.network} · {walletCount} wallet{walletCount === 1 ? "" : "s"}
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#E4E7EC] bg-white text-[#475467] transition hover:bg-[#F8F9FF] hover:text-[#03034D]"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
             aria-label="Close wallet list"
           >
             <X className="h-4 w-4" />

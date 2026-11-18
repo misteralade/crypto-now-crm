@@ -14,21 +14,21 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const inputId = id || label?.toLowerCase().replace(/\s+/g, '-')
 
     return (
-      <div className="flex flex-col gap-2 w-full mb-5">
+      <div className="flex flex-col gap-1.5 w-full mb-3.5">
         {label && (
           <label
             htmlFor={inputId}
             className={cn(
-              "ml-1 text-[13px] font-medium leading-none text-[#454745]",
-              error && "text-red-500",
+              "text-xs font-semibold text-slate-700 tracking-tight",
+              error && "text-rose-600",
             )}
           >
             {label}
           </label>
         )}
-        <div className="relative">
+        <div className="relative flex items-center">
           {icon && (
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+            <span className="absolute left-3 text-slate-400 pointer-events-none flex items-center justify-center">
               {icon}
             </span>
           )}
@@ -40,18 +40,18 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             autoCorrect="off"
             autoCapitalize="off"
             className={cn(
-              'flex h-14 w-full rounded-full border border-gray-300 bg-white px-8 py-3 text-base text-gray-900 transition-all duration-200',
-              'placeholder:text-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/10',
-              'disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-50',
-              error && 'border-red-500 focus:border-red-500 focus:ring-red-500/10',
-              icon && 'pl-11',
-              iconRight && 'pr-11',
+              'flex h-10 w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm text-slate-900 transition-all duration-150',
+              'placeholder:text-slate-400 hover:border-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/15',
+              'disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-slate-50',
+              error && 'border-rose-500 focus:border-rose-600 focus:ring-rose-600/15',
+              icon && 'pl-9.5',
+              iconRight && 'pr-9.5',
               className,
             )}
             {...props}
           />
           {iconRight && (
-            <span className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400">
+            <span className="absolute right-3 text-slate-400 flex items-center justify-center">
               {iconRight}
             </span>
           )}
@@ -59,10 +59,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         <AnimatePresence>
           {error && (
             <motion.p
-              initial={{ opacity: 0, y: -5 }}
+              initial={{ opacity: 0, y: -3 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -5 }}
-              className="text-[12px] text-red-500 ml-1 font-medium"
+              exit={{ opacity: 0, y: -3 }}
+              className="text-[11px] text-rose-600 font-medium"
             >
               {error}
             </motion.p>
@@ -74,7 +74,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 )
 Input.displayName = 'Input'
 
-/** Floating-label pill variant — Refined version with improved vertical spacing */
+/** Refined compact input for forms and dialogs */
 export interface PillInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string
   error?: string
@@ -86,17 +86,17 @@ const PillInput = React.forwardRef<HTMLInputElement, PillInputProps>(
     const inputId = id || label.toLowerCase().replace(/\s+/g, '-')
 
     return (
-      <div className="flex flex-col gap-2 w-full mb-5">
+      <div className="flex flex-col gap-1.5 w-full mb-3.5">
         <label
           htmlFor={inputId}
           className={cn(
-            "ml-1 text-[13px] font-medium leading-none text-[#454745]",
-            error && "text-red-500",
+            "text-xs font-semibold text-slate-700 tracking-tight",
+            error && "text-rose-600",
           )}
         >
           {label}
         </label>
-        <div className="relative">
+        <div className="relative flex items-center">
           <input
             id={inputId}
             ref={ref}
@@ -110,18 +110,18 @@ const PillInput = React.forwardRef<HTMLInputElement, PillInputProps>(
               props.onBlur?.(e)
             }}
             className={cn(
-              'w-full h-14 bg-white border border-gray-300 rounded-full px-8 transition-all duration-200 text-gray-900 text-base outline-none',
-              'focus:border-blue-500 focus:ring-1 focus:ring-blue-500/10',
-              'placeholder:text-gray-400',
-              error && 'border-red-500 focus:border-red-500 focus:ring-red-500/10',
-              props.disabled && 'opacity-50 bg-gray-50',
-              iconRight && 'pr-12',
+              'w-full h-10 bg-white border border-slate-300 rounded-lg px-3.5 text-sm text-slate-900 transition-all duration-150 outline-none',
+              'hover:border-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/15',
+              'placeholder:text-slate-400',
+              error && 'border-rose-500 focus:border-rose-600 focus:ring-rose-600/15',
+              props.disabled && 'opacity-50 bg-slate-50',
+              iconRight && 'pr-9.5',
               className,
             )}
             {...props}
           />
           {iconRight && (
-            <span className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400">
+            <span className="absolute right-3 text-slate-400 flex items-center justify-center">
               {iconRight}
             </span>
           )}
@@ -129,10 +129,10 @@ const PillInput = React.forwardRef<HTMLInputElement, PillInputProps>(
         <AnimatePresence>
           {error && (
             <motion.p
-              initial={{ opacity: 0, y: -5 }}
+              initial={{ opacity: 0, y: -3 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -5 }}
-              className="text-[12px] text-red-500 ml-1 font-medium"
+              exit={{ opacity: 0, y: -3 }}
+              className="text-[11px] text-rose-600 font-medium"
             >
               {error}
             </motion.p>

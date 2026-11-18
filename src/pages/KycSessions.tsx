@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, ShieldCheck } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import AuthenticatedLayout from "../layout/AuthenticatedLayout";
 import PageHeader from "../components/global/pageHeader";
+import TableFooter from "../components/tables/TableFooter";
+import { useNavbarSearch } from "../layout/navbar-search-context";
 import { useKycSessionQuery } from "../queries/kyc-session.querries";
 import {
+  setKycSessionLimit,
   setKycSessionPage,
   setKycSessionStatusFilter,
   setKycSessionUserIdFilter,
@@ -29,53 +32,67 @@ const STEP_LABELS: Record<KycSessionStep, string> = {
 
 const STEP_STYLES: Record<
   KycSessionStep,
-  { bg: string; dot: string; textColor: string }
+  { bg: string; dot: string; textColor: string; border: string }
 > = {
   "Not Started": {
-    bg: "bg-gray-100",
-    dot: "bg-gray-400",
-    textColor: "text-gray-600",
+    bg: "bg-slate-100",
+    dot: "bg-slate-400",
+    textColor: "text-slate-600",
+    border: "border-slate-200",
   },
   submitted: {
-    bg: "bg-yellow-50",
-    dot: "bg-yellow-400",
-    textColor: "text-yellow-600",
+    bg: "bg-amber-50",
+    dot: "bg-amber-500",
+    textColor: "text-amber-700",
+    border: "border-amber-200/60",
   },
   "In Progress": {
-    bg: "bg-yellow-50",
-    dot: "bg-yellow-500",
-    textColor: "text-yellow-600",
+    bg: "bg-blue-50",
+    dot: "bg-blue-500",
+    textColor: "text-blue-700",
+    border: "border-blue-200/60",
   },
   "In Review": {
-    bg: "bg-blue-50",
-    dot: "bg-blue-400",
-    textColor: "text-blue-600",
+    bg: "bg-indigo-50",
+    dot: "bg-indigo-500",
+    textColor: "text-indigo-700",
+    border: "border-indigo-200/60",
   },
   Resubmitted: {
     bg: "bg-blue-50",
-    dot: "bg-blue-400",
-    textColor: "text-blue-600",
+    dot: "bg-blue-500",
+    textColor: "text-blue-700",
+    border: "border-blue-200/60",
   },
   Approved: {
-    bg: "bg-green-50",
-    dot: "bg-green-500",
-    textColor: "text-green-600",
+    bg: "bg-emerald-50",
+    dot: "bg-emerald-500",
+    textColor: "text-emerald-700",
+    border: "border-emerald-200/60",
   },
-  Declined: { bg: "bg-red-50", dot: "bg-red-400", textColor: "text-red-600" },
+  Declined: {
+    bg: "bg-rose-50",
+    dot: "bg-rose-500",
+    textColor: "text-rose-700",
+    border: "border-rose-200/60",
+  },
   Expired: {
-    bg: "bg-gray-100",
-    dot: "bg-gray-400",
-    textColor: "text-gray-500",
+    bg: "bg-slate-100",
+    dot: "bg-slate-400",
+    textColor: "text-slate-600",
+    border: "border-slate-200",
   },
   Abandoned: {
-    bg: "bg-gray-100",
-    dot: "bg-gray-400",
-    textColor: "text-gray-500",
+    bg: "bg-slate-100",
+    dot: "bg-slate-400",
+    textColor: "text-slate-600",
+    border: "border-slate-200",
   },
   archived: {
-    bg: "bg-gray-100",
-    dot: "bg-gray-400",
-    textColor: "text-gray-500",
+    bg: "bg-slate-100",
+    dot: "bg-slate-400",
+    textColor: "text-slate-600",
+    border: "border-slate-200",
   },
 };
 
@@ -96,16 +113,13 @@ function KycStepBadge({ step }: { step: KycSessionStep }) {
   const style = STEP_STYLES[step] ?? STEP_STYLES["Not Started"];
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${style.bg} ${style.textColor}`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${style.bg} ${style.textColor} ${style.border}`}
     >
       <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
       {STEP_LABELS[step]}
     </span>
   );
 }
-
-import { PillSelect } from "../components/ui/select";
-import { SearchInput } from "../components/ui/search-input";
 
 const KycSessions = () => {
   const dispatch = useDispatch();
@@ -122,101 +136,97 @@ const KycSessions = () => {
     userId: userIdFilter || undefined,
   });
 
-  function handleSearch(e: React.FormEvent) {
-    e.preventDefault();
+  function handleSearch(e?: React.FormEvent) {
+    if (e) e.preventDefault();
     dispatch(setKycSessionUserIdFilter(searchInput.trim()));
   }
 
-  const statusOptions = STATUS_FILTER_OPTIONS.map(opt => ({
-    label: opt.label,
-    value: opt.value || '__empty__'
-  }));
+  useNavbarSearch({
+    placeholder: "Search KYC by User ID...",
+    value: searchInput,
+    onChange: (val) => {
+      setSearchInput(val);
+      if (!val.trim()) {
+        dispatch(setKycSessionUserIdFilter(""));
+      }
+    },
+    onSubmit: handleSearch,
+  });
 
   return (
     <AuthenticatedLayout>
-      <PageHeader title="KYC Sessions" />
-
-      <div className="p-6 space-y-5">
-        {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          <form onSubmit={handleSearch} className="flex gap-2 flex-1">
-            <SearchInput
-              placeholder="Search by User ID…"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-            />
-            <button
-              type="submit"
-              className="px-6 py-2.5 bg-[#03034D] text-white text-sm font-medium rounded-full hover:bg-[#03034D]/90 transition-colors shadow-sm active:scale-95"
-            >
-              Search
-            </button>
-          </form>
-
-          <div className="sm:w-[200px]">
-            <PillSelect
-              label="Status"
-              value={statusFilter ?? '__empty__'}
-              onValueChange={(v) =>
+      <PageHeader
+        title="KYC Sessions"
+        actions={
+          <div className="w-[160px]">
+            <select
+              value={statusFilter ?? ""}
+              onChange={(e) =>
                 dispatch(
                   setKycSessionStatusFilter(
-                    (v === '__empty__' ? undefined : v as KycSessionStep)
+                    e.target.value === "" ? undefined : (e.target.value as KycSessionStep)
                   )
                 )
               }
-              options={statusOptions}
-            />
+              className="w-full h-8.5 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-semibold text-slate-700 outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-100 cursor-pointer shadow-2xs"
+            >
+              {STATUS_FILTER_OPTIONS.map((opt) => (
+                <option key={opt.label} value={opt.value ?? ""}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
           </div>
-        </div>
+        }
+      />
 
-        {/* Table */}
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="px-4 sm:px-6 pb-6 space-y-3">
+        {userIdFilter && (
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-blue-100 bg-blue-50/60 px-4 py-2 text-xs text-blue-900">
+            <span>Filtered by: <strong className="font-semibold">{userIdFilter}</strong></span>
+            <button
+              onClick={() => {
+                setSearchInput("");
+                dispatch(setKycSessionUserIdFilter(""));
+              }}
+              className="font-medium text-blue-600 hover:underline cursor-pointer"
+            >
+              Clear
+            </button>
+          </div>
+        )}
+
+        {/* Table Card */}
+        <div className="bg-white rounded-xl border border-slate-200/80 shadow-xs overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-xs">
               <thead>
-                <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                    User
-                  </th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                    Status
-                  </th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                    Doc Result
-                  </th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                    Face Result
-                  </th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                    Retries
-                  </th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                    Created
-                  </th>
-                  <th className="px-4 py-3" />
+                <tr className="bg-[#F0F4FA] border-b border-slate-200 text-slate-600 font-semibold uppercase tracking-wider text-[11px]">
+                  <th className="text-left px-4 py-3">Applicant</th>
+                  <th className="text-left px-4 py-3">Status</th>
+                  <th className="text-left px-4 py-3">Doc Result</th>
+                  <th className="text-left px-4 py-3">Face Result</th>
+                  <th className="text-left px-4 py-3">Retries</th>
+                  <th className="text-left px-4 py-3">Created</th>
+                  <th className="px-4 py-3 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-slate-100">
                 {isLoading && (
                   <tr>
-                    <td
-                      colSpan={7}
-                      className="py-12 text-center text-gray-400 text-sm"
-                    >
-                      Loading…
+                    <td colSpan={7} className="py-12 text-center text-slate-400">
+                      Loading sessions...
                     </td>
                   </tr>
                 )}
                 {!isLoading &&
                   (!data?.sessions || data.sessions.length === 0) && (
                     <tr>
-                      <td
-                        colSpan={7}
-                        className="py-12 text-center text-gray-400 text-sm"
-                      >
+                      <td colSpan={7} className="py-12 text-center text-slate-500">
                         <div className="flex flex-col items-center gap-2">
-                          <ShieldCheck className="w-8 h-8 text-gray-300" />
-                          <p>No KYC sessions found</p>
+                          <ShieldCheck className="w-8 h-8 text-slate-300" />
+                          <p className="font-semibold text-slate-700 text-sm">No KYC sessions found</p>
+                          <p className="text-slate-400 text-xs">Sessions will appear here once users initiate verification.</p>
                         </div>
                       </td>
                     </tr>
@@ -224,16 +234,16 @@ const KycSessions = () => {
                 {data?.sessions?.map((session) => (
                   <tr
                     key={session.id}
-                    className="hover:bg-gray-50 transition-colors"
+                    className="hover:bg-slate-50/80 transition-colors"
                   >
                     <td className="px-4 py-3">
                       <div>
-                        <p className="font-medium text-gray-900 text-xs">
+                        <p className="font-semibold text-slate-900">
                           {session.user?.profile
                             ? `${session.user.profile.firstName} ${session.user.profile.lastName}`
-                            : "—"}
+                            : "User"}
                         </p>
-                        <p className="text-gray-400 text-xs truncate max-w-[160px]">
+                        <p className="text-slate-500 text-[11px] truncate max-w-[180px]">
                           {session.user?.email ?? session.userId}
                         </p>
                       </div>
@@ -243,50 +253,46 @@ const KycSessions = () => {
                     </td>
                     <td className="px-4 py-3">
                       <span
-                        className={`text-xs font-medium capitalize ${
+                        className={`font-semibold capitalize text-[11px] ${
                           session.documentVerificationStatus === "approved"
-                            ? "text-green-600"
+                            ? "text-emerald-700"
                             : session.documentVerificationStatus === "rejected"
-                            ? "text-red-600"
+                            ? "text-rose-600"
                             : session.documentVerificationStatus === "error"
-                            ? "text-orange-600"
-                            : "text-gray-400"
+                            ? "text-amber-600"
+                            : "text-slate-400"
                         }`}
                       >
-                        {session.documentVerificationStatus}
+                        {session.documentVerificationStatus || "Pending"}
                       </span>
                     </td>
                     <td className="px-4 py-3">
                       <span
-                        className={`text-xs font-medium capitalize ${
+                        className={`font-semibold capitalize text-[11px] ${
                           session.faceMatchStatus === "approved"
-                            ? "text-green-600"
+                            ? "text-emerald-700"
                             : session.faceMatchStatus === "rejected"
-                            ? "text-red-600"
+                            ? "text-rose-600"
                             : session.faceMatchStatus === "error"
-                            ? "text-orange-600"
-                            : "text-gray-400"
+                            ? "text-amber-600"
+                            : "text-slate-400"
                         }`}
                       >
-                        {session.faceMatchStatus}
+                        {session.faceMatchStatus || "Pending"}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-gray-500 text-xs">
-                      {session.identityVerificationAttempts} (left{" "}
-                      {session.identityVerificationAttemptsRemaining})
+                    <td className="px-4 py-3 text-slate-600 tabular-nums">
+                      {session.identityVerificationAttempts} / {session.identityVerificationAttemptsRemaining} left
                     </td>
-                    <td className="px-4 py-3 text-gray-400 text-xs">
+                    <td className="px-4 py-3 text-slate-500">
                       {new Date(session.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 text-right">
                       <Link
-                        to={ROUTES.KYC_SESSION_DETAIL.replace(
-                          "$id",
-                          session.id
-                        )}
-                        className="text-xs font-medium text-[#03034D] hover:underline"
+                        to={ROUTES.KYC_SESSION_DETAIL.replace("$id", session.id)}
+                        className="inline-flex items-center h-7 px-2.5 rounded-md text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors"
                       >
-                        View
+                        Review
                       </Link>
                     </td>
                   </tr>
@@ -295,30 +301,15 @@ const KycSessions = () => {
             </table>
           </div>
 
-          {/* Pagination */}
-          {data && data.totalPages > 1 && (
-            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 bg-gray-50">
-              <p className="text-xs text-gray-500">
-                Page {data.page} of {data.totalPages} · {data.count} sessions
-              </p>
-              <div className="flex gap-1">
-                <button
-                  onClick={() => dispatch(setKycSessionPage(page - 1))}
-                  disabled={page <= 1}
-                  className="p-1.5 rounded-lg hover:bg-gray-200 disabled:opacity-40 transition-colors"
-                >
-                  <ChevronLeft className="w-4 h-4 text-gray-600" />
-                </button>
-                <button
-                  onClick={() => dispatch(setKycSessionPage(page + 1))}
-                  disabled={page >= data.totalPages}
-                  className="p-1.5 rounded-lg hover:bg-gray-200 disabled:opacity-40 transition-colors"
-                >
-                  <ChevronRight className="w-4 h-4 text-gray-600" />
-                </button>
-              </div>
-            </div>
-          )}
+          {/* Table Footer Pagination */}
+          <TableFooter
+            currentPage={data?.page || 1}
+            totalPages={data?.totalPages || 1}
+            pageSize={limit}
+            totalItems={data?.count ?? data?.sessions?.length ?? 0}
+            onPageChange={(p) => dispatch(setKycSessionPage(p))}
+            onPageSizeChange={(sz) => dispatch(setKycSessionLimit(sz))}
+          />
         </div>
       </div>
     </AuthenticatedLayout>

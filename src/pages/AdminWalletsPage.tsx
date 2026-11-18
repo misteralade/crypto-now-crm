@@ -14,15 +14,15 @@ const AdminWalletsPage = () => {
 
   return (
     <AuthenticatedLayout>
-      <div className="p-6 mx-auto">
-        <PageHeader title="Admin Wallets" />
+      <PageHeader title="Admin Wallets" />
 
+      <div className="px-4 sm:px-6 pb-6 space-y-6">
         {loadingAllSupportedCrypto ? (
           <div className="flex items-center justify-center min-h-[50vh]">
             <LoadingSpinner size="lg" message="Loading admin wallets..." fullScreen={false} />
           </div>
         ) : (
-          <div className="mt-6 space-y-6">
+          <div className="space-y-6">
             <WalletCardSection walletType="SENDING" cryptos={cryptos} defaultCryptoId={search.cryptoId} />
             <WalletCardSection walletType="RECEIVING" cryptos={cryptos} defaultCryptoId={search.cryptoId} />
             <FuelingWalletsSection cryptos={cryptos} />

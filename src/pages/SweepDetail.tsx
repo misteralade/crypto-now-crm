@@ -35,7 +35,7 @@ const WALLET_STATUS = {
 } as Record<string, { label: string; color: string; dot: string; bg: string }>;
 
 function shortAddress(address: string) {
-  if (!address) return '—';
+  if (!address) return '-';
   return `${address.slice(0, 10)}...${address.slice(-8)}`;
 }
 
@@ -107,7 +107,7 @@ export default function SweepDetail() {
       header: 'Balance',
       render: (val) => (
         <span className="font-mono text-xs font-semibold text-gray-900 tabular-nums">
-          {val !== undefined ? Number(val).toFixed(6).replace(/\.?0+$/, '') : '—'}
+          {val !== undefined ? Number(val).toFixed(6).replace(/\.?0+$/, '') : '-'}
         </span>
       )
     },
@@ -117,7 +117,7 @@ export default function SweepDetail() {
       render: (val, row) => (
         <div className="space-y-1">
           <span className="font-mono text-xs font-bold text-[#575AE5] tabular-nums">
-            {val ? formatSweepAmount(Number(val)) : '—'}
+            {val ? formatSweepAmount(Number(val)) : '-'}
           </span>
           {Number(row.allocatedFeeAmount ?? 0) > 0 && (
             <p className="text-[10px] font-medium text-gray-500">
@@ -186,23 +186,14 @@ export default function SweepDetail() {
     </button>
   ) : null;
 
-  const handleBack = () => {
-    if (window.history.length > 1) {
-      navigate({ to: '/dashboard/treasury' });
-    } else {
-      navigate({ to: '/dashboard/treasury' });
-    }
-  };
-
   return (
     <AuthenticatedLayout>
       <PageHeader 
         title="Sweep Run Details" 
-        onBack={handleBack}
         actions={headerActions}
       />
 
-      <div className="mx-auto max-w-6xl space-y-8 p-6 pb-20">
+      <div className="mx-auto max-w-6xl space-y-6 px-4 sm:px-6 pb-20">
         {/* Main Info Card */}
         <section className="relative overflow-hidden rounded-[2rem] border border-[#DDE0FF] bg-white p-1">
           <div className="rounded-[1.8rem] bg-gradient-to-br from-[#F8F9FF] to-white p-6 md:p-8">
@@ -236,14 +227,14 @@ export default function SweepDetail() {
                   <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-400">
                     <Globe size={12} /> Network
                   </p>
-                  <p className="text-sm font-black text-[#03034D]">{sweep?.network ?? '—'}</p>
+                  <p className="text-sm font-black text-[#03034D]">{sweep?.network ?? '-'}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-400">
                     <Clock size={12} /> Started
                   </p>
                   <p className="text-sm font-bold text-[#03034D]">
-                    {sweep ? new Date(sweep.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '—'}
+                    {sweep ? new Date(sweep.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '-'}
                   </p>
                 </div>
                 <div className="col-span-2 space-y-1 sm:col-span-1">
@@ -365,14 +356,14 @@ export default function SweepDetail() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-5">
-          <StatMiniCard label="Total Found" value={sweep?.totalWalletsFound ?? '—'} icon={<Globe size={14} />} color="blue" />
-          <StatMiniCard label="Swept" value={sweep?.totalWalletsSwept ?? '—'} icon={<CheckCircle2 size={14} />} color="green" />
-          <StatMiniCard label="Failed" value={sweep?.totalWalletsFailed ?? '—'} icon={<AlertCircle size={14} />} color="red" />
-          <StatMiniCard label="Skipped" value={sweep?.totalWalletsSkipped ?? '—'} icon={<Clock size={14} />} color="amber" />
+          <StatMiniCard label="Total Found" value={sweep?.totalWalletsFound ?? '-'} icon={<Globe size={14} />} color="blue" />
+          <StatMiniCard label="Swept" value={sweep?.totalWalletsSwept ?? '-'} icon={<CheckCircle2 size={14} />} color="green" />
+          <StatMiniCard label="Failed" value={sweep?.totalWalletsFailed ?? '-'} icon={<AlertCircle size={14} />} color="red" />
+          <StatMiniCard label="Skipped" value={sweep?.totalWalletsSkipped ?? '-'} icon={<Clock size={14} />} color="amber" />
           <div className="col-span-2 sm:col-span-1 lg:col-span-1">
              <StatMiniCard 
                 label="Amount Swept" 
-                value={sweep ? Number(sweep.actualTotalAmount).toFixed(4).replace(/\.?0+$/, '') : '—'} 
+                value={sweep ? Number(sweep.actualTotalAmount).toFixed(4).replace(/\.?0+$/, '') : '-'} 
                 sub={sweep?.network} 
                 icon={<Wallet size={14} />} 
                 color="indigo" 

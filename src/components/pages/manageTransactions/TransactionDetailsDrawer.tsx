@@ -90,27 +90,27 @@ const TransactionDetailsDrawer = ({
   }, [isOpen]);
 
   const renderSkeletons = () => (
-    <div className="space-y-6">
-      <section className="rounded-lg bg-[#F0F0FF] px-4 py-6 space-y-4">
-        <Skeleton height="h-4" width="w-32" rounded="full" className="mb-6" />
+    <div className="space-y-4">
+      <section className="rounded-xl border border-slate-200/80 bg-white p-5 space-y-4 shadow-xs">
+        <Skeleton height="h-4" width="w-32" rounded="md" className="mb-4" />
         {[1, 2, 3, 4, 5, 6].map((i) => (
           <div key={i} className="flex justify-between items-center">
-            <Skeleton height="h-4" width="w-24" rounded="full" />
-            <Skeleton height="h-4" width="w-40" rounded="full" />
+            <Skeleton height="h-4" width="w-24" rounded="md" />
+            <Skeleton height="h-4" width="w-40" rounded="md" />
           </div>
         ))}
       </section>
-      <Skeleton height="h-12" width="w-48" rounded="full" />
-      <section className="mt-4 space-y-4">
-        <Skeleton height="h-6" width="w-48" rounded="full" />
-        <div className="flex flex-wrap gap-4">
+      <Skeleton height="h-9" width="w-48" rounded="md" />
+      <section className="mt-4 space-y-3">
+        <Skeleton height="h-5" width="w-40" rounded="md" />
+        <div className="flex flex-wrap gap-2.5">
           {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} height="h-10" width="w-32" rounded="full" />
+            <Skeleton key={i} height="h-8" width="w-28" rounded="md" />
           ))}
         </div>
       </section>
-      <Skeleton height="h-32" width="w-full" rounded="lg" />
-      <Skeleton height="h-14" width="w-full" rounded="full" />
+      <Skeleton height="h-24" width="w-full" rounded="lg" />
+      <Skeleton height="h-10" width="w-full" rounded="md" />
     </div>
   );
 
@@ -124,9 +124,9 @@ const TransactionDetailsDrawer = ({
 
   // Explicit rate: 1 crypto = fiat (variable by transaction currency)
   const getExchangeRateDisplay = (): string => {
-    if (!transaction) return "—";
+    if (!transaction) return "-";
     const symbol = transaction.cryptocurrency?.symbol ?? "";
-    if (!symbol) return "—";
+    if (!symbol) return "-";
     const currency = transaction.currency;
     if (transaction.exchangeRate) {
       const rate = Number(transaction.exchangeRate.rate);
@@ -137,7 +137,7 @@ const TransactionDetailsDrawer = ({
       return `1 ${symbol} = ₦ ${formatCompact(platformRate * rate, "NGN", 2)}`;
     }
     const amountCrypto = Number(transaction.amountCrypto);
-    if (amountCrypto <= 0) return "—";
+    if (amountCrypto <= 0) return "-";
     if (currency === "USD") {
       const val = Number(transaction.amountFiat) / amountCrypto;
       return `1 ${symbol} = $ ${formatCompact(val, "USD", 2)}`;
@@ -196,57 +196,57 @@ const TransactionDetailsDrawer = ({
     >
       <div className="absolute inset-0 bg-black/5" onClick={() => onClose()} />
       <aside
-        className={`absolute right-0 top-0 h-full w-full sm:w-[520px] lg:w-[570px] bg-white shadow-sm !p-8 sm:p-6 overflow-y-auto transition-transform duration-300 ease-out ${isOpen ? "translate-x-0" : "translate-x-full"}`}
+        className={`absolute right-0 top-0 h-full w-full sm:w-[520px] lg:w-[570px] bg-slate-50/70 border-l border-slate-200 shadow-xl p-5 sm:p-6 overflow-y-auto transition-transform duration-300 ease-out ${isOpen ? "translate-x-0" : "translate-x-full"}`}
       >
-        <div className="flex items-center justify-between mb-4">
-          <div className="text-[#0E0F0C] font-semibold hover:opacity-80 text-[18px]">
-            Transaction Details
+        <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-slate-200">
+          <div className="text-slate-900 font-bold text-base tracking-tight">
+            Transaction Order Details
           </div>
           <button
             onClick={() => onClose()}
             aria-label="Close"
-            className="cursor-pointer hover:text-gray-700"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-200/60 transition-colors cursor-pointer"
           >
-            <X size={17} />
+            <X size={16} />
           </button>
         </div>
 
         {loading || !transaction ? (
           renderSkeletons()
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* Order Details */}
-            <section className="rounded-lg bg-[#F0F0FF] px-4 py-6">
-              <h3 className="text-[14px] font-semibold text-[#828282] mb-4">
-                ORDER DETAILS
+            <div className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-xs space-y-3">
+              <h3 className="text-2xs font-bold uppercase tracking-wider text-slate-400 pb-2 border-b border-slate-100">
+                Order Summary
               </h3>
-              <div className="flex flex-col gap-x-2 gap-y-4 text-[14px] text-[#0E0F0C]">
+              <div className="flex flex-col gap-y-3 text-xs text-slate-800">
                 {/* Transaction ID */}
-                <section className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 sm:gap-4">
-                  <div className="text-[#828282] text-[16px] shrink-0">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 sm:gap-4">
+                  <div className="text-2xs font-semibold text-slate-500 uppercase tracking-wider shrink-0">
                     Transaction ID
                   </div>
-                  <div className="text-[#0E0F0C] text-[14px] w-full sm:w-auto flex justify-end">
+                  <div className="w-full sm:w-auto flex justify-end font-mono text-2xs">
                     <CopyDetails
                       text={transaction.sessionId}
                       wrap={true}
-                      className="!max-w-full sm:!max-w-[300px]"
+                      className="!max-w-full sm:!max-w-[280px]"
                     />
                   </div>
-                </section>
+                </div>
 
                 {/* Type */}
-                <section className="flex justify-between items-center">
-                  <div className="text-[#828282] text-[16px]">Type</div>
-                  <div className="text-[#0E0F0C] font-medium text-sm md:text-[16px]">
+                <div className="flex justify-between items-center">
+                  <div className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Type</div>
+                  <div className={`px-2 py-0.5 rounded text-2xs font-bold uppercase tracking-wider ${transaction.type === 'BUY' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60' : 'bg-blue-50 text-blue-700 border border-blue-200/60'}`}>
                     {transaction.type}
                   </div>
-                </section>
+                </div>
 
                 {/* Amount */}
-                <section className="flex justify-between items-center">
-                  <div className="text-[#828282] text-[16px]">Amount</div>
-                  <div className="text-[#0E0F0C] font-medium text-sm md:text-[16px]">
+                <div className="flex justify-between items-center">
+                  <div className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Amount</div>
+                  <div className="font-bold text-xs text-slate-900 tabular-nums">
                     {transaction.type === "BUY" ? (
                       <Fragment>
                         ₦ {Number(transaction.amountFiatNGN).toLocaleString()}
@@ -260,36 +260,34 @@ const TransactionDetailsDrawer = ({
                       </Fragment>
                     )}
                   </div>
-                </section>
-
-
+                </div>
 
                 {/* Initiation Date */}
-                <section className="flex justify-between items-center">
-                  <div className="text-[#828282] text-[16px]">Date</div>
-                  <div className="text-[#0E0F0C] font-medium text-sm md:text-[16px]">
+                <div className="flex justify-between items-center">
+                  <div className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Date</div>
+                  <div className="font-semibold text-xs text-slate-700">
                     {momentClient.formatToNormalisedDateAndTime(
                       transaction.createdAt
                     )}
                   </div>
-                </section>
+                </div>
 
                 {/* Exchange Rate */}
-                <section className="flex justify-between items-center">
-                  <div className="text-[#828282] text-[16px]">
+                <div className="flex justify-between items-center">
+                  <div className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">
                     Exchange Rate
                   </div>
-                  <div className="text-[#0E0F0C] font-medium text-sm md:text-[16px]">
+                  <div className="font-semibold text-xs text-slate-900">
                     {getExchangeRateDisplay()}
                   </div>
-                </section>
+                </div>
 
                 {/* User Amount to Receive */}
-                <section className="flex justify-between items-center">
-                  <div className="text-[#828282] text-[16px]">
+                <div className="flex justify-between items-center">
+                  <div className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">
                     User will receive
                   </div>
-                  <div className="text-[#0E0F0C] font-medium text-sm md:text-[16px]">
+                  <div className="font-bold text-xs text-slate-900 tabular-nums">
                     {transaction.type === "BUY" ? (
                       <Fragment>
                         {transaction.amountCrypto}{" "}
@@ -306,37 +304,36 @@ const TransactionDetailsDrawer = ({
                       </Fragment>
                     )}
                   </div>
-                </section>
+                </div>
 
                 {/* Transaction Status */}
-                <section className="flex justify-between items-center">
-                  <div className="text-[#828282] text-[16px]">Status</div>
-
+                <div className="flex justify-between items-center">
+                  <div className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Status</div>
                   <StatusBadge status={transaction.status} />
-                </section>
+                </div>
 
                 {/* Confirmations if SELL order */}
                 {transaction.type === "SELL" && (
-                  <section className="flex justify-between items-center">
-                    <div className="text-[#828282] text-[16px]">Confirmations</div>
-                    <div className="text-[#0E0F0C] font-medium text-sm md:text-[16px]">
+                  <div className="flex justify-between items-center">
+                    <div className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Confirmations</div>
+                    <div className="font-bold text-xs text-slate-900">
                       {transaction.confirmationCount !== undefined ? transaction.confirmationCount : 0}
                     </div>
-                  </section>
+                  </div>
                 )}
 
                 {transaction.failureReason && (
-                  <section className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3">
-                    <div className="text-[#828282] text-[16px]">Reason</div>
-                    <p className="mt-1 text-sm leading-relaxed text-rose-900">
+                  <div className="rounded-lg border border-rose-200 bg-rose-50/70 px-3.5 py-2.5">
+                    <div className="text-2xs font-bold text-rose-700 uppercase tracking-wider">Reason</div>
+                    <p className="mt-1 text-xs leading-relaxed text-rose-900">
                       {transaction.failureReason}
                     </p>
-                  </section>
+                  </div>
                 )}
-
               </div>
+            </div>
 
-              <section className="grid gap-4">
+            <section className="grid gap-4">
                 <TransactionDetailsUserProfile
                   userId={transaction.user?.id ?? transaction.userId}
                   firstName={transaction.profile?.firstName ?? ""}
@@ -411,8 +408,8 @@ const TransactionDetailsDrawer = ({
               ) : null}
 
               {(canRetryConfirmation || canForcePayout) && (
-                <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50/70 p-4">
-                  <div className="flex flex-col gap-3 sm:flex-row">
+                <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50/70 p-4 shadow-2xs">
+                  <div className="flex flex-col gap-2.5 sm:flex-row">
                     {canRetryConfirmation && (
                       <button
                         type="button"
@@ -420,11 +417,11 @@ const TransactionDetailsDrawer = ({
                           handleRetryDepositConfirmation(transaction.sessionId)
                         }
                         disabled={retryingConfirmation}
-                        className="inline-flex flex-1 items-center justify-center rounded-full bg-[#F2994A] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#D98234] disabled:cursor-not-allowed disabled:opacity-60"
+                        className="inline-flex flex-1 items-center justify-center rounded-lg bg-amber-600 px-3.5 h-8.5 text-xs font-semibold text-white shadow-2xs hover:bg-amber-700 disabled:opacity-60 cursor-pointer"
                       >
                         {retryingConfirmation
                           ? "Retrying..."
-                          : "Retry confirmation"}
+                          : "Retry Confirmation"}
                       </button>
                     )}
 
@@ -433,9 +430,9 @@ const TransactionDetailsDrawer = ({
                         type="button"
                         onClick={() => setShowForcePayoutConfirmModal(true)}
                         disabled={forcingPayout}
-                        className="inline-flex flex-1 items-center justify-center rounded-full bg-[#B42318] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#912018] disabled:cursor-not-allowed disabled:opacity-60"
+                        className="inline-flex flex-1 items-center justify-center rounded-lg bg-rose-600 px-3.5 h-8.5 text-xs font-semibold text-white shadow-2xs hover:bg-rose-700 disabled:opacity-60 cursor-pointer"
                       >
-                        {forcingPayout ? "Triggering..." : "Trigger payout"}
+                        {forcingPayout ? "Triggering..." : "Trigger Payout"}
                       </button>
                     )}
                   </div>
@@ -445,7 +442,6 @@ const TransactionDetailsDrawer = ({
               {transaction.type === "BUY" && transaction.receiptImageUrl && (
                 <div className="mt-4"><ReceiptViewer url={transaction.receiptImageUrl} label="Uploaded receipt" /></div>
               )}
-            </section>
 
             {/* Activity Log */}
             {visibleTransactionActivities.length > 0 && (
@@ -695,15 +691,15 @@ const TransactionDetailsDrawer = ({
 
             <section>
               <button
-                className={`w-full py-4 font-semibold text-white rounded-full transition-all duration-200 ${
+                className={`w-full h-10 font-semibold text-xs text-white rounded-lg transition-all duration-200 cursor-pointer touch-manipulation flex items-center justify-center ${
                   !selectedStatus || selectedStatus === transaction.status
-                    ? "bg-[#03034D]/50 cursor-not-allowed"
-                    : "bg-[#03034D] cursor-pointer hover:bg-[#050568] shadow-lg hover:shadow-xl active:scale-[0.98]"
+                    ? "bg-slate-300 text-slate-500 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-700 shadow-2xs active:scale-[0.98]"
                 }`}
                 onClick={handleTransactionUpdate}
                 disabled={!selectedStatus || selectedStatus === transaction.status}
               >
-                Confirm status
+                Confirm Status Update
               </button>
             </section>
           </div>

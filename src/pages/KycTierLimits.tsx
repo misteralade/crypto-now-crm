@@ -17,7 +17,6 @@ import {
 } from '../redux/kyc-tier-limit.slice';
 import type { RootState } from '../store';
 import type { KycTierType } from '../schemas/kyc.schema';
-import CustomButton from '../components/global/Button';
 
 const boolOptions = [
   { value: 'true', label: 'Active' },
@@ -135,65 +134,67 @@ const KycTierLimits = () => {
       <PageHeader
         title="KYC Tier Limits"
         actions={
-          <CustomButton
+          <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="flex items-center gap-2"
-            buttonText="Add limit"
+            className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-xs transition-colors"
           >
-            <Plus size={18} />
-          </CustomButton>
+            <Plus size={16} />
+            <span>Add Limit</span>
+          </button>
         }
       />
 
-      <div className="p-6 mx-auto space-y-8">
+      <div className="px-4 sm:px-6 pb-6 space-y-6">
         {loadingKycTierLimits ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-4">
-            <RefreshCcw className="w-8 h-8 text-[#575AE5] animate-spin" />
-            <p className="text-gray-500 font-medium">Loading tier limits...</p>
+          <div className="flex flex-col items-center justify-center py-20 gap-3">
+            <RefreshCcw className="w-6 h-6 text-blue-600 animate-spin" />
+            <p className="text-slate-500 text-xs font-medium">Loading tier limits...</p>
           </div>
         ) : !kycTierLimits || kycTierLimits.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-gray-200">
-            <ShieldCheck className="w-12 h-12 text-gray-200 mb-4" />
-            <p className="text-gray-900 font-semibold">No tier limits configured</p>
-            <p className="text-gray-500 text-sm mt-1">Add a limit for one of the KYC tiers.</p>
-            <CustomButton
+          <div className="flex flex-col items-center justify-center py-16 bg-white rounded-xl border border-dashed border-slate-200 p-6 text-center">
+            <ShieldCheck className="w-10 h-10 text-slate-300 mb-3" />
+            <p className="text-slate-900 font-semibold text-sm">No tier limits configured</p>
+            <p className="text-slate-500 text-xs mt-1">Add a limit for one of the KYC tiers.</p>
+            <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="mt-6"
-              buttonText="Add limit"
-            />
+              className="mt-4 inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-xs transition-colors"
+            >
+              <Plus size={16} />
+              <span>Add Limit</span>
+            </button>
           </div>
         ) : (
-          <div className="space-y-10 pb-20">
+          <div className="space-y-8 pb-12">
             {(['GUEST', 'VERIFIED'] as KycTierType[]).map((tier) => (
-              <section key={tier} className="space-y-5">
-                <div className="flex items-center gap-3 px-2">
-                  <h2 className="text-[20px] font-bold text-[#03034D] capitalize">{TIER_LABELS[tier]}</h2>
-                  <div className="h-px flex-1 bg-[#F2F4F7]" />
-                  <span className="text-[12px] font-bold text-gray-400 uppercase tracking-widest">
+              <section key={tier} className="space-y-3">
+                <div className="flex items-center gap-3 px-1">
+                  <h2 className="text-base font-bold text-slate-900 capitalize">{TIER_LABELS[tier]}</h2>
+                  <div className="h-px flex-1 bg-slate-200" />
+                  <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
                     {groupedLimits[tier]?.length || 0} config{groupedLimits[tier]?.length === 1 ? '' : 's'}
                   </span>
                 </div>
 
                 {!groupedLimits[tier] || groupedLimits[tier].length === 0 ? (
-                  <div className="p-6 bg-[#F9FAFB] rounded-3xl text-center">
-                    <p className="text-gray-400 text-sm italic">No limits defined for this tier yet.</p>
+                  <div className="p-5 bg-white rounded-xl border border-slate-200/80 text-center">
+                    <p className="text-slate-500 text-xs italic">No limits defined for this tier yet.</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {groupedLimits[tier].map((limit: any) => (
                       <div
                         key={limit.id}
-                        className="bg-white rounded-[32px] border border-[#ECECEC] p-6 transition-all hover:border-[#575AE5] group"
+                        className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs transition-all hover:border-blue-400 hover:shadow-sm"
                       >
-                        <div className="flex items-start justify-between mb-6">
+                        <div className="flex items-start justify-between mb-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-2xl bg-[#F5F5FF] flex items-center justify-center text-[#03034D] font-bold">
+                            <div className="w-10 h-10 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm">
                               {limit.currencyCode}
                             </div>
                             <div>
-                              <h3 className="text-lg font-bold text-[#03034D]">{limit.currencyCode} Limits</h3>
-                              <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${limit.isActive ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
-                                <span className={`w-1 h-1 rounded-full ${limit.isActive ? 'bg-emerald-500' : 'bg-red-500'}`} />
+                              <h3 className="text-sm font-bold text-slate-900">{limit.currencyCode} Limits</h3>
+                              <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-semibold ${limit.isActive ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60' : 'bg-slate-100 text-slate-600 border border-slate-200'}`}>
+                                <span className={`w-1.5 h-1.5 rounded-full ${limit.isActive ? 'bg-emerald-500' : 'bg-slate-400'}`} />
                                 {limit.isActive ? 'Active' : 'Inactive'}
                               </span>
                             </div>
@@ -201,39 +202,41 @@ const KycTierLimits = () => {
                           <div className="flex gap-1">
                             <button
                               onClick={() => openEditModal(limit)}
-                              className="p-2 rounded-xl text-gray-400 hover:text-[#575AE5] hover:bg-[#F5F5FF] transition-all"
+                              className="p-1.5 rounded-md text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                              title="Edit limit"
                             >
-                              <Edit2 size={16} />
+                              <Edit2 size={15} />
                             </button>
                             <button
                               onClick={() => openDeleteModal(limit.id)}
-                              className="p-2 rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all"
+                              className="p-1.5 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                              title="Delete limit"
                             >
-                              <Trash2 size={16} />
+                              <Trash2 size={15} />
                             </button>
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-x-8 gap-y-5">
-                          <div className="space-y-1">
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-left">Trans. Range</p>
-                            <p className="text-sm font-bold text-[#03034D] text-left">
-                              {limit.minTransactionAmount} to {limit.maxTransactionAmount} <span className="text-[11px] font-medium text-gray-400">{limit.currencyCode}</span>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-3 pt-3 border-t border-slate-100">
+                          <div className="space-y-0.5">
+                            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Trans. Range</p>
+                            <p className="text-xs font-bold text-slate-900 font-mono">
+                              {limit.minTransactionAmount} - {limit.maxTransactionAmount} <span className="text-[10px] font-normal text-slate-500">{limit.currencyCode}</span>
                             </p>
                           </div>
-                          <div className="space-y-1">
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-left">Periodic Limits</p>
-                            <p className="text-sm font-bold text-[#03034D] text-left">
-                              Day: {limit.dailyLimit} | Month: {limit.monthlyLimit}
+                          <div className="space-y-0.5">
+                            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Periodic Limits</p>
+                            <p className="text-xs font-bold text-slate-900 font-mono">
+                              Day: {limit.dailyLimit} | Mo: {limit.monthlyLimit}
                             </p>
                           </div>
-                          <div className="space-y-1">
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-left">Payout Attempts</p>
-                            <p className="text-sm font-bold text-[#03034D] text-left">Max {limit.maxPayoutAttempts} retries</p>
+                          <div className="space-y-0.5">
+                            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Payout Retries</p>
+                            <p className="text-xs font-semibold text-slate-900">Max {limit.maxPayoutAttempts} attempts</p>
                           </div>
-                          <div className="space-y-1">
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-left">Confirms (BTC/SOL/TRC20)</p>
-                            <p className="text-sm font-bold text-[#03034D] text-left">
+                          <div className="space-y-0.5">
+                            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Confirms (BTC/SOL/TRC)</p>
+                            <p className="text-xs font-mono font-bold text-slate-900">
                               {limit.requiredConfirmationsBTC} / {limit.requiredConfirmationsSOL} / {limit.requiredConfirmationsTRC20}
                             </p>
                           </div>
@@ -249,19 +252,19 @@ const KycTierLimits = () => {
 
         {/* Create Modal */}
         {isCreateModalOpen && (
-          <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/40 backdrop-blur-[2px]">
-            <div className="bg-white rounded-[32px] w-full max-w-2xl mx-4 p-8 max-h-[90vh] overflow-y-auto shadow-2xl border border-[#ECECEC]">
-              <div className="flex items-center justify-between mb-8">
-                <h3 className="text-[22px] font-bold text-[#03034D]">Add KYC Tier Limit</h3>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-xs">
+            <div className="bg-white rounded-xl w-full max-w-xl p-5 sm:p-6 max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200">
+              <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+                <h3 className="text-base font-bold text-slate-900">Add KYC Tier Limit</h3>
                 <button
                   onClick={closeCreateModal}
-                  className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                  className="p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
                 >
-                  <X className="w-6 h-6 text-gray-500" />
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
                 <PillSelect
                   label="KYC Tier"
                   options={tierOptions}
@@ -346,19 +349,22 @@ const KycTierLimits = () => {
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-4 mt-8 pt-6 border-t border-[#F2F4F7]">
-                <CustomButton
-                  variant="button"
+              <div className="flex items-center justify-end gap-2.5 mt-5 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
                   onClick={closeCreateModal}
-                  className="bg-white !text-[#03034D] border border-[#ECECEC] hover:bg-gray-50 px-8"
-                  buttonText="Cancel"
-                />
-                <CustomButton
+                  className="h-9 px-4 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
                   onClick={handleCreate}
                   disabled={createKycTierLimitMutation.isPending}
-                  className="px-10"
-                  buttonText={createKycTierLimitMutation.isPending ? 'Creating...' : 'Create Tier Limit'}
-                />
+                  className="h-9 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-xs transition-colors disabled:opacity-50"
+                >
+                  {createKycTierLimitMutation.isPending ? 'Creating...' : 'Create Tier Limit'}
+                </button>
               </div>
             </div>
           </div>
@@ -366,19 +372,19 @@ const KycTierLimits = () => {
 
         {/* Edit Modal */}
         {isEditModalOpen && (
-          <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/40 backdrop-blur-[2px]">
-            <div className="bg-white rounded-[32px] w-full max-w-2xl mx-4 p-8 max-h-[90vh] overflow-y-auto shadow-2xl border border-[#ECECEC]">
-              <div className="flex items-center justify-between mb-8">
-                <h3 className="text-[22px] font-bold text-[#03034D]">Edit KYC Tier Limit</h3>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-xs">
+            <div className="bg-white rounded-xl w-full max-w-xl p-5 sm:p-6 max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200">
+              <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+                <h3 className="text-base font-bold text-slate-900">Edit KYC Tier Limit</h3>
                 <button
                   onClick={closeEditModal}
-                  className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                  className="p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
                 >
-                  <X className="w-6 h-6 text-gray-500" />
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
                 <PillSelect
                   label="KYC Tier"
                   options={tierOptions}
@@ -463,19 +469,22 @@ const KycTierLimits = () => {
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-4 mt-8 pt-6 border-t border-[#F2F4F7]">
-                <CustomButton
-                  variant="button"
+              <div className="flex items-center justify-end gap-2.5 mt-5 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
                   onClick={closeEditModal}
-                  className="bg-white !text-[#03034D] border border-[#ECECEC] hover:bg-gray-50 px-8"
-                  buttonText="Cancel"
-                />
-                <CustomButton
+                  className="h-9 px-4 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
                   onClick={handleUpdate}
                   disabled={updateKycTierLimitMutation.isPending}
-                  className="px-10"
-                  buttonText={updateKycTierLimitMutation.isPending ? 'Saving...' : 'Save Changes'}
-                />
+                  className="h-9 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-xs transition-colors disabled:opacity-50"
+                >
+                  {updateKycTierLimitMutation.isPending ? 'Saving...' : 'Save Changes'}
+                </button>
               </div>
             </div>
           </div>
@@ -483,36 +492,36 @@ const KycTierLimits = () => {
 
         {/* Delete Confirmation Modal */}
         {isDeleteModalOpen && (
-          <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/40 backdrop-blur-[2px]">
-            <div className="bg-white rounded-[32px] w-full max-w-md mx-4 p-8 shadow-2xl border border-[#ECECEC]">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-bold text-[#03034D]">Delete Tier Limit</h3>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-xs">
+            <div className="bg-white rounded-xl w-full max-w-sm p-5 shadow-2xl border border-slate-200">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-bold text-slate-900">Delete Tier Limit</h3>
                 <button
                   onClick={closeDeleteModal}
-                  className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                  className="p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
-              <div className="flex items-start gap-3 bg-red-50 p-4 rounded-2xl mb-6">
-                <AlertTriangle className="text-red-500 shrink-0 mt-0.5" size={18} />
-                <p className="text-red-700 text-sm font-medium leading-relaxed">
-                  Are you sure you want to delete this KYC tier limit? This action cannot be undone and will affect all users in this tier.
+              <div className="flex items-start gap-2.5 bg-rose-50 border border-rose-200/60 p-3 rounded-lg mb-4">
+                <AlertTriangle className="text-rose-600 shrink-0 mt-0.5" size={16} />
+                <p className="text-rose-800 text-xs font-medium leading-relaxed">
+                  Are you sure you want to delete this limit? This action cannot be undone.
                 </p>
               </div>
-              <div className="flex items-center justify-end gap-3">
+              <div className="flex items-center justify-end gap-2">
                 <button
                   onClick={closeDeleteModal}
-                  className="px-6 py-2.5 rounded-full border border-[#ECECEC] text-gray-600 text-sm font-medium hover:bg-gray-50 transition-colors cursor-pointer"
+                  className="h-8 px-3 rounded-lg border border-slate-200 text-slate-600 text-xs font-semibold hover:bg-slate-50 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDelete}
                   disabled={deleteKycTierLimitMutation.isPending}
-                  className="px-8 py-2.5 rounded-full bg-red-500 text-white text-sm font-bold hover:bg-red-600 transition-colors disabled:opacity-60 cursor-pointer shadow-lg shadow-red-200"
+                  className="h-8 px-3 rounded-lg bg-rose-600 text-white text-xs font-semibold hover:bg-rose-700 transition-colors disabled:opacity-50 shadow-xs"
                 >
-                  {deleteKycTierLimitMutation.isPending ? 'Deleting...' : 'Delete Permanently'}
+                  {deleteKycTierLimitMutation.isPending ? 'Deleting...' : 'Delete'}
                 </button>
               </div>
             </div>

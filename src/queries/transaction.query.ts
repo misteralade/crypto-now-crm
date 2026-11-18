@@ -20,6 +20,7 @@ import type {
 
 type UseTransactionQueryOptions = {
   adminStatsTimeline?: TimelineFilter;
+  sessionId?: string;
 }
 
 export const useTransactionQuery = (options?: UseTransactionQueryOptions) => {
@@ -29,6 +30,10 @@ export const useTransactionQuery = (options?: UseTransactionQueryOptions) => {
   const dashboardTimelineFilter = useSelector(
     (state: RootState) => state.dashboard.timelineFilter,
   );
+  const reduxTransactionSessionId = useSelector(
+    (state: RootState) => state.transactionManagement.details.transactionSessionId,
+  );
+  const activeSessionId = options?.sessionId || reduxTransactionSessionId;
   const adminStatsTimeline = options?.adminStatsTimeline ?? 'all';
 
   const { data: transactionVolume, isLoading: loadingTransactionVolume } = useQuery({
@@ -49,9 +54,7 @@ export const useTransactionQuery = (options?: UseTransactionQueryOptions) => {
 
         return null
       },
-      enabled:
-        !!matchRoute({ to: ROUTES.DASHBOARD }) &&
-        !!dashboardTimelineFilter,
+      enabled: !!dashboardTimelineFilter,
     });
 
   const { data: weeklyTransactionCount, isLoading: loadingWeeklyTransactionCount } = useQuery({
@@ -72,9 +75,7 @@ export const useTransactionQuery = (options?: UseTransactionQueryOptions) => {
 
       return null
     },
-    enabled:
-      !!matchRoute({ to: ROUTES.DASHBOARD }) &&
-      !!dashboardTimelineFilter,
+    enabled: !!dashboardTimelineFilter,
   });
 
   const { data: transactionVolumeTrend, isLoading: loadingTransactionVolumeTrend } = useQuery({
@@ -91,9 +92,7 @@ export const useTransactionQuery = (options?: UseTransactionQueryOptions) => {
       if (success) return data as Array<WeeklyTransactionVolumeTrend>
       return [] as Array<WeeklyTransactionVolumeTrend>
     },
-    enabled:
-      !!matchRoute({ to: ROUTES.DASHBOARD }) &&
-      !!dashboardTimelineFilter,
+    enabled: !!dashboardTimelineFilter,
   });
 
   const { data: usersWithTopTransactionVolume, isLoading: loadingUsersWithTopTransactionVolume } = useQuery({
@@ -112,9 +111,7 @@ export const useTransactionQuery = (options?: UseTransactionQueryOptions) => {
       if (success) return data as Array<UsersWithTopTransactionVolume>
       return [] as Array<UsersWithTopTransactionVolume>
     },
-    enabled:
-      !!matchRoute({ to: ROUTES.DASHBOARD }) &&
-      !!dashboardTimelineFilter,
+    enabled: !!dashboardTimelineFilter,
   });
 
   const { data: transactionTypeByPercentage, isLoading: loadingTransactionTypeByPercentage } = useQuery({
@@ -131,9 +128,7 @@ export const useTransactionQuery = (options?: UseTransactionQueryOptions) => {
       if (success) return data
       return null
     },
-    enabled:
-      !!matchRoute({ to: ROUTES.DASHBOARD }) &&
-      !!dashboardTimelineFilter,
+    enabled: !!dashboardTimelineFilter,
   });
 
   const { data: adminTransactionStats, isLoading: loadingAdminTransactionStats } = useQuery({
@@ -199,13 +194,11 @@ export const useTransactionQuery = (options?: UseTransactionQueryOptions) => {
     });
   
   const { data: transactionInfo, isLoading: loadingTransactionInfo, refetch: refetchTransactionInfo } = useQuery({
-    queryKey: [QUERY_KEYS.TRANSACTION.GET_TRANSACTION_DETAILS_PAGE, (store.getState() as RootState).transactionManagement.details.transactionSessionId],
+    queryKey: [QUERY_KEYS.TRANSACTION.GET_TRANSACTION_DETAILS_PAGE, activeSessionId],
     queryFn: async () => {
-      const sessionId = (store.getState() as RootState).transactionManagement.details.transactionSessionId
+      if (!activeSessionId) return null
       
-      if (!sessionId) return null
-      
-      const { data, success } = await transactionServiceApi.adminGetTransactionDetails(sessionId)
+      const { data, success } = await transactionServiceApi.adminGetTransactionDetails(activeSessionId)
       
       if (success) {
         return data
@@ -213,7 +206,7 @@ export const useTransactionQuery = (options?: UseTransactionQueryOptions) => {
       
       return null
     },
-    enabled: !!matchRoute({ to: ROUTES.TRANSACTIONS_DETAILS }) && !!(store.getState() as RootState).transactionManagement.details.transactionSessionId
+    enabled: !!activeSessionId,
   })
 
   const adminUpdateTransactionMutation = useMutation({

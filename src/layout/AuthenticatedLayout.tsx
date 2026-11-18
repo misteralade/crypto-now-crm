@@ -1,5 +1,6 @@
 import { type ReactNode, useEffect, useMemo, useState } from 'react'
 import Sidebar from "../components/sidebar.tsx";
+import GlobalTopBar from "../components/global/GlobalTopBar.tsx";
 import {useNavigate, useRouterState} from "@tanstack/react-router";
 import {LOCAL_STORAGE_KEYS, ROUTES} from "../util/constants.util.ts";
 import { motion, AnimatePresence } from 'framer-motion'
@@ -61,7 +62,7 @@ const AuthenticatedLayout = ({ children }: { children: ReactNode }) => {
   }, [loadingAdminAuth, routerState.location.pathname]);
   
   return (
-    <div className="min-h-screen bg-[#F5F5FF]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+    <div className="min-h-screen bg-[#F8FAFC]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
       <div className="flex min-h-screen">
         <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
         <AnimatePresence>
@@ -70,19 +71,20 @@ const AuthenticatedLayout = ({ children }: { children: ReactNode }) => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/40 z-40 lg:hidden pointer-events-auto"
+              className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-40 lg:hidden pointer-events-auto"
               onClick={() => setSidebarOpen(false)}
             />
           )}
         </AnimatePresence>
         <div className="flex-1 flex flex-col min-w-0">
           <SidebarToggleProvider value={sidebarToggleValue}>
+            <GlobalTopBar />
             <motion.main
               key={window.location.pathname}
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, ease: "easeOut" }}
-              className="flex-1"
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="flex-1 pb-10"
             >
               {children}
             </motion.main>

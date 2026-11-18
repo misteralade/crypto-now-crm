@@ -9,7 +9,7 @@ import { useAdminTreasuryWalletsQuery, useAdminRefreshCustodialWalletBalanceMuta
 import type { AdminCustodialWalletDetailsResponsePayload } from "../types/response.payload.types.ts";
 
 function formatDate(value: string | Date | null | undefined) {
-  if (!value) return "—";
+  if (!value) return "-";
   return new Date(value).toLocaleString();
 }
 
@@ -57,7 +57,7 @@ function getUsageLabel(wallet: AdminCustodialWalletDetailsResponsePayload["walle
 }
 
 function shortAddress(address: string) {
-  if (!address) return "—";
+  if (!address) return "-";
   return `${address.slice(0, 8)}...${address.slice(-8)}`;
 }
 
@@ -220,11 +220,11 @@ export default function TreasuryWalletsPage() {
 
   return (
     <AuthenticatedLayout>
-      <div className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6">
-        <PageHeader
-          title={`${symbol} Custodial Wallets`}
-          onBack={() => navigate({ to: "/dashboard/treasury" })}
-        />
+      <PageHeader
+        title={`${symbol} Custodial Wallets`}
+      />
+
+      <div className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 pb-6">
 
         <div className="rounded-2xl border border-[#EEF1FF] bg-[linear-gradient(180deg,#F8F9FF_0%,#FFFFFF_100%)] p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>

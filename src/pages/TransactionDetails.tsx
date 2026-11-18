@@ -16,7 +16,7 @@ import TransactionDetailsUserProfile
 import TransactionDetailsPipeline from "../components/pages/manageTransactions/details/TransactionDetailsPipeline.tsx";
 import TransactionContext from "../components/pages/manageTransactions/details/TransactionContext.tsx";
 import { formatCompact } from "../util/asset-precision";
-import { Download } from "lucide-react";
+import { RefreshCw, Play, QrCode, FileText, AlertCircle, Fingerprint } from "lucide-react";
 import LedgerEntriesSection from "../components/pages/manageTransactions/details/LedgerEntriesSection.tsx";
 import ConfirmModal from "../components/global/ConfirmModal.tsx";
 
@@ -26,14 +26,10 @@ const TransactionDetails = () => {
     transactionInfo: transaction,
     loadingTransactionInfo,
     ledgerEntries,
-    exportingLedgerCsv,
     retryingConfirmation,
     forcingPayout,
     
-    
     // ⚙️ Functions
-    goBack,
-    handleExportLedgerCsv,
     handleRetryDepositConfirmation,
     handleForceTriggerPayout,
   } = useTransactionDetailsPage();
@@ -53,17 +49,18 @@ const TransactionDetails = () => {
     <AuthenticatedLayout>
       <PageHeader
         title="Transaction Details"
-        onBack={goBack}
+        subtitle={transaction?.sessionId ? `Order: ${transaction.sessionId.slice(0, 16)}...` : 'Comprehensive order breakdown'}
         actions={
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <div className="flex flex-wrap items-center gap-2">
             {canRetryConfirmation && (
               <button
                 type="button"
                 onClick={() => handleRetryDepositConfirmation(transaction?.sessionId)}
                 disabled={retryingConfirmation}
-                className="inline-flex items-center gap-2 rounded-full bg-[#F2994A] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#D98234] disabled:cursor-not-allowed disabled:opacity-60 whitespace-nowrap"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-amber-600 px-3.5 h-8.5 text-xs font-semibold text-white shadow-2xs hover:bg-amber-700 active:scale-98 transition-all disabled:opacity-50 cursor-pointer"
               >
-                {retryingConfirmation ? "Retrying..." : "Retry confirmation"}
+                <RefreshCw className={`w-3.5 h-3.5 ${retryingConfirmation ? 'animate-spin' : ''}`} />
+                <span>{retryingConfirmation ? "Retrying..." : "Retry Confirmation"}</span>
               </button>
             )}
             {canForcePayout && (
@@ -71,20 +68,12 @@ const TransactionDetails = () => {
                 type="button"
                 onClick={() => setShowForcePayoutConfirmModal(true)}
                 disabled={forcingPayout}
-                className="inline-flex items-center gap-2 rounded-full bg-[#B42318] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#912018] disabled:cursor-not-allowed disabled:opacity-60 whitespace-nowrap"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-3.5 h-8.5 text-xs font-semibold text-white shadow-2xs hover:bg-rose-700 active:scale-98 transition-all disabled:opacity-50 cursor-pointer"
               >
-                {forcingPayout ? "Triggering..." : "Trigger payout"}
+                <Play className="w-3.5 h-3.5" />
+                <span>{forcingPayout ? "Triggering..." : "Trigger Payout"}</span>
               </button>
             )}
-            <button
-              type="button"
-              onClick={handleExportLedgerCsv}
-              disabled={exportingLedgerCsv}
-              className="inline-flex items-center gap-2 rounded-full bg-[#03034D] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#050568] disabled:cursor-not-allowed disabled:opacity-60 whitespace-nowrap"
-            >
-              <Download className="h-4 w-4" />
-              {exportingLedgerCsv ? "Exporting..." : "Export Ledger CSV"}
-            </button>
           </div>
         }
       />
@@ -93,9 +82,9 @@ const TransactionDetails = () => {
           <LoadingSpinner size={"lg"} fullScreen={true} message={"Loading transaction details..."} />
         ) : transaction ? (
           <Fragment>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
               {/* Main Content - Left Side */}
-              <div className="lg:col-span-2 space-y-6 sm:space-y-8">
+              <div className="lg:col-span-2 space-y-5">
                 {/* Transaction Overview */}
                 <TransactionOverview
                   type={transaction.type}
@@ -113,7 +102,7 @@ const TransactionDetails = () => {
                         ? transaction.currency === 'USD'
                           ? `1 ${transaction.cryptocurrency?.symbol || 'CRYPTO'} = $ ${formatCompact(Number(transaction.amountFiat) / Number(transaction.amountCrypto), "USD", 2)}`
                           : `1 ${transaction.cryptocurrency?.symbol || 'CRYPTO'} = ₦ ${formatCompact(Number(transaction.amountFiatNGN || 0) / Number(transaction.amountCrypto), "NGN", 2)}`
-                        : '—'
+                        : '-'
                   }
                   status={transaction.status}
                   confirmationCount={transaction.confirmationCount}
@@ -171,23 +160,42 @@ const TransactionDetails = () => {
 
                 {/* Custodial Deposit Address (Sell) */}
                 {transaction.type === "SELL" && transaction.depositAddress ? (
-                  <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Deposit Address</h2>
-                    <CopyDetails
-                      text={transaction.depositAddress}
-                      className="!max-w-[700px]"
-                      iconClassName="!w-8 !h-8"
-                    />
+                  <div className="bg-white rounded-xl border border-slate-200/80 shadow-xs p-5">
+                    <div className="flex items-center gap-2.5 pb-3.5 mb-3.5 border-b border-slate-100">
+                      <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                        <QrCode className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h2 className="text-sm font-bold text-slate-900 tracking-tight">Custodial Deposit Address</h2>
+                        <p className="text-2xs text-slate-500">Inbound crypto deposit target</p>
+                      </div>
+                    </div>
+                    <div className="p-3 rounded-lg bg-slate-50 border border-slate-100/80">
+                      <CopyDetails
+                        text={transaction.depositAddress}
+                        wrap={true}
+                        className="!max-w-full font-mono text-xs font-semibold text-slate-900"
+                        iconClassName="!w-4 !h-4"
+                      />
+                    </div>
                   </div>
                 ) : null}
                 
                 {/* Bank Transfer Reference */}
                 {transaction.bankTransferReference && (
-                  <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Bank Transfer Reference</h2>
-                    <div className="flex items-center gap-2">
-                      <p className="text-base font-medium text-gray-900">{transaction.bankTransferReference}</p>
-                      <CopyDetails text={transaction.bankTransferReference} className="!max-w-[400px]" iconClassName="!w-8 !h-8" />
+                  <div className="bg-white rounded-xl border border-slate-200/80 shadow-xs p-5">
+                    <div className="flex items-center gap-2.5 pb-3.5 mb-3.5 border-b border-slate-100">
+                      <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                        <FileText className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h2 className="text-sm font-bold text-slate-900 tracking-tight">Bank Transfer Reference</h2>
+                        <p className="text-2xs text-slate-500">Payment matching identifier</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 p-3 rounded-lg bg-slate-50 border border-slate-100/80">
+                      <p className="font-mono text-xs font-bold text-slate-900">{transaction.bankTransferReference}</p>
+                      <CopyDetails text={transaction.bankTransferReference} className="!max-w-[400px]" iconClassName="!w-4 !h-4" />
                     </div>
                   </div>
                 )}
@@ -202,25 +210,33 @@ const TransactionDetails = () => {
                 
                 {/* Notes */}
                 {(transaction.userNotes || transaction.adminNotes || transaction.internalNotes) && (
-                  <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Notes</h2>
-                    <div className="space-y-4">
+                  <div className="bg-white rounded-xl border border-slate-200/80 shadow-xs p-5">
+                    <div className="flex items-center gap-2.5 pb-3.5 mb-3.5 border-b border-slate-100">
+                      <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                        <FileText className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h2 className="text-sm font-bold text-slate-900 tracking-tight">Audit & Session Notes</h2>
+                        <p className="text-2xs text-slate-500">Customer remarks and internal compliance memos</p>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
                       {transaction.userNotes && (
-                        <div className="p-4 bg-blue-50 rounded-lg">
-                          <p className="text-sm font-medium text-blue-900 mb-1">User Notes</p>
-                          <p className="text-sm text-blue-800">{transaction.userNotes}</p>
+                        <div className="p-3.5 bg-blue-50/70 border border-blue-100/80 rounded-lg">
+                          <p className="text-2xs font-bold uppercase tracking-wider text-blue-900 mb-1">User Notes</p>
+                          <p className="text-xs text-blue-800">{transaction.userNotes}</p>
                         </div>
                       )}
                       {transaction.adminNotes && (
-                        <div className="p-4 bg-purple-50 rounded-lg">
-                          <p className="text-sm font-medium text-purple-900 mb-1">Admin Notes</p>
-                          <p className="text-sm text-purple-800">{transaction.adminNotes}</p>
+                        <div className="p-3.5 bg-purple-50/70 border border-purple-100/80 rounded-lg">
+                          <p className="text-2xs font-bold uppercase tracking-wider text-purple-900 mb-1">Admin Notes</p>
+                          <p className="text-xs text-purple-800">{transaction.adminNotes}</p>
                         </div>
                       )}
                       {transaction.internalNotes && (
-                        <div className="p-4 bg-gray-50 rounded-lg">
-                          <p className="text-sm font-medium text-gray-900 mb-1">Internal Notes</p>
-                          <p className="text-sm text-gray-700">{transaction.internalNotes}</p>
+                        <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-lg">
+                          <p className="text-2xs font-bold uppercase tracking-wider text-slate-700 mb-1">Internal Notes</p>
+                          <p className="text-xs text-slate-600">{transaction.internalNotes}</p>
                         </div>
                       )}
                     </div>
@@ -229,17 +245,24 @@ const TransactionDetails = () => {
                 
                 {/* Failure Reason */}
                 {transaction.failureReason && (
-                  <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Status Reason</h2>
-                    <div className="p-4 bg-red-50 rounded-lg">
-                      <p className="text-sm font-medium text-red-900 mb-1">Reason</p>
-                      <p className="text-sm text-red-800">{transaction.failureReason}</p>
+                  <div className="bg-white rounded-xl border border-rose-200 shadow-xs p-5">
+                    <div className="flex items-center gap-2.5 pb-3.5 mb-3.5 border-b border-rose-100">
+                      <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+                        <AlertCircle className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h2 className="text-sm font-bold text-rose-900 tracking-tight">Exception Reason</h2>
+                        <p className="text-2xs text-rose-500">Reason reported by automated settlement gateway</p>
+                      </div>
+                    </div>
+                    <div className="p-3.5 bg-rose-50/60 border border-rose-100 rounded-lg">
+                      <p className="text-xs font-medium text-rose-800">{transaction.failureReason}</p>
                     </div>
                   </div>
                 )}
               </div>
               
-              <div className="space-y-6 sm:space-y-8">
+              <div className="space-y-5">
                 {/* User Profile */}
                 {transaction.user && (
                   <TransactionDetailsUserProfile
@@ -261,52 +284,48 @@ const TransactionDetails = () => {
                   processedByLastName={transaction.processor?.lastName || undefined}
                 />
                 
-                {/* Session Info */}
-                <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Session Info</h2>
-                  <div>
-                    <p className="text-sm text-gray-500 mb-2">Session ID</p>
-                    <div className="flex items-center gap-2">
-                      <CopyDetails text={transaction.sessionId} wrap={true} className="!max-w-[300px]" iconClassName="!w-8 !h-8" />
+                {/* Session Info & Identifiers */}
+                <div className="bg-white rounded-xl border border-slate-200/80 shadow-xs p-5">
+                  <div className="flex items-center gap-2.5 pb-3.5 mb-3.5 border-b border-slate-100">
+                    <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                      <Fingerprint className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h2 className="text-sm font-bold text-slate-900 tracking-tight">Identifiers & Metadata</h2>
+                      <p className="text-2xs text-slate-500">System reference keys</p>
                     </div>
                   </div>
-                </div>
-                
-                {/* IDs Reference */}
-                <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Reference IDs</h2>
-                  <div className="space-y-3 text-xs">
-                    <div>
-                      <p className="text-gray-500 mb-1">Transaction ID</p>
-                      <div className="flex items-center gap-1">
-                        <CopyDetails text={transaction.id} wrap={true} className="!max-w-[300px]" iconClassName="!w-8 !h-8" />
-                      </div>
+
+                  <div className="space-y-3">
+                    <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                      <p className="text-2xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Session ID</p>
+                      <CopyDetails text={transaction.sessionId} wrap={true} className="!max-w-full font-mono text-2xs font-semibold text-slate-800" iconClassName="!w-3.5 !h-3.5" />
                     </div>
-                    
-                    <div>
-                      <p className="text-gray-500 mb-1">{transaction.userId ? 'User ID' : 'User Email'}</p>
-                      <div className="flex items-center gap-1">
-                        <CopyDetails text={transaction.userId ? transaction.userId : transaction.email || ''} className="!max-w-[300px]" iconClassName="!w-8 !h-8" />
-                      </div>
+
+                    <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                      <p className="text-2xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Transaction ID</p>
+                      <CopyDetails text={transaction.id} wrap={true} className="!max-w-full font-mono text-2xs font-semibold text-slate-800" iconClassName="!w-3.5 !h-3.5" />
                     </div>
-                    
-                    <div>
-                      <p className="text-gray-500 mb-1">Rate Snapshot</p>
-                      <div className="flex items-center gap-1">
-                        <CopyDetails text={transaction.rateSnapshot ? JSON.stringify(transaction.rateSnapshot) : '—'} className="!max-w-[300px]" iconClassName="!w-8 !h-8" />
+
+                    {transaction.rateSnapshot && (
+                      <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                        <p className="text-2xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Rate Snapshot</p>
+                        <CopyDetails text={JSON.stringify(transaction.rateSnapshot)} wrap={true} className="!max-w-full font-mono text-2xs text-slate-600" iconClassName="!w-3.5 !h-3.5" />
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="mt-6">
+            <div className="mt-5">
               <LedgerEntriesSection ledgerEntries={ledgerEntries} />
             </div>
           </Fragment>
         ) : (
-          <p className="text-center text-[#858585] font-medium mt-10">No transaction details available.</p>
+          <div className="bg-white rounded-xl border border-slate-200/80 p-12 text-center text-slate-400 text-sm">
+            No transaction details available.
+          </div>
         )}
       </div>
       <ConfirmModal

@@ -49,9 +49,8 @@ const AdminDetails = () => {
       <PageHeader 
         title="Admin Details" 
         subtitle={adminDetails ? `${fullName} - @${adminDetails.username}` : 'Review profile, role, and activity metadata'} 
-        onBack={goBack}
       />
-      <div className="p-6 mx-auto">
+      <div className="px-4 sm:px-6 pb-6 mx-auto">
         {loadingAdminDetails ? (
           <LoadingSpinner size="lg" fullScreen message="Loading admin details..." />
         ) : adminDetails ? (

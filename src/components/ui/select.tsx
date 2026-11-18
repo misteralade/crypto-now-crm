@@ -15,15 +15,15 @@ const SelectTrigger = React.forwardRef<
   }
 >(({ className, children, error, label, ...props }, ref) => {
   const [isFocused, setIsFocused] = React.useState(false);
-  const isCompact = className?.includes('h-8') || className?.includes('h-10');
+  const isCompact = className?.includes('h-8') || className?.includes('h-7');
   
   return (
-    <div className="flex w-full flex-col gap-2">
+    <div className="flex w-full flex-col gap-1.5">
       {label && !isCompact && (
         <span
           className={cn(
-            "ml-1 text-[13px] font-medium leading-none text-[#454745]",
-            error && "text-red-500",
+            "text-xs font-semibold text-slate-700 tracking-tight",
+            error && "text-rose-600",
             isFocused && !error && "text-blue-600",
           )}
         >
@@ -36,13 +36,13 @@ const SelectTrigger = React.forwardRef<
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           className={cn(
-            "flex items-center justify-between rounded-full border border-gray-300 bg-white transition-all duration-200",
-            "text-gray-900 placeholder:text-gray-400",
-            "outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/10",
-            "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-50",
-            "data-[placeholder]:text-gray-400",
-            error && "border-red-500 focus:border-red-500 focus:ring-red-500/10",
-            isCompact ? "h-8 px-3 text-[13px]" : "h-14 px-8 text-base",
+            "flex items-center justify-between rounded-lg border border-slate-300 bg-white transition-all duration-150",
+            "text-slate-900 placeholder:text-slate-400 text-sm",
+            "outline-none hover:border-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/15",
+            "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-slate-50",
+            "data-[placeholder]:text-slate-400",
+            error && "border-rose-500 focus:border-rose-600 focus:ring-rose-600/15",
+            isCompact ? "h-8 px-2.5 text-xs" : "h-10 px-3.5 text-sm",
             className,
           )}
           {...props}
@@ -51,7 +51,7 @@ const SelectTrigger = React.forwardRef<
             {children}
           </div>
           <SelectPrimitive.Icon asChild>
-            <ChevronDown className={cn("text-[#9A9A9A] opacity-70 flex-shrink-0", isCompact ? "h-3.5 w-3.5 ml-1" : "h-5 w-5")} />
+            <ChevronDown className={cn("text-slate-400 flex-shrink-0 transition-transform", isCompact ? "h-3.5 w-3.5 ml-1" : "h-4 w-4 ml-2")} />
           </SelectPrimitive.Icon>
         </SelectPrimitive.Trigger>
       </div>
@@ -210,13 +210,13 @@ const LabeledSelect = ({
   const selectedLabel = options.find((opt) => opt.value === value)?.label;
 
   return (
-    <div className="flex flex-col gap-2 w-full mb-5">
+    <div className="flex flex-col gap-1.5 w-full mb-3.5">
       <Select value={value ?? ""} onValueChange={onValueChange} disabled={disabled}>
         <SelectTrigger className={cn(className)} error={!!error} label={label}>
           <span
             className={cn(
               "block truncate text-left",
-              selectedLabel ? "text-[#101828]" : "text-gray-400",
+              selectedLabel ? "text-slate-900 font-medium" : "text-slate-400",
             )}
           >
             {selectedLabel || placeholder}
@@ -231,7 +231,7 @@ const LabeledSelect = ({
         </SelectContent>
       </Select>
       {error && (
-        <p className="ml-1 text-[12px] font-medium text-red-500 transition-opacity duration-150">
+        <p className="ml-1 text-[11px] font-medium text-rose-600 transition-opacity duration-150">
           {error}
         </p>
       )}
@@ -253,13 +253,13 @@ const PillSelect = ({
   const selectedLabel = options.find((opt) => opt.value === value)?.label;
 
   return (
-    <div className="flex flex-col gap-2 w-full mb-5">
+    <div className="flex flex-col gap-1.5 w-full mb-3.5">
       <Select value={value ?? ""} onValueChange={onValueChange} disabled={disabled}>
         <SelectTrigger className={cn(className)} error={!!error} label={label}>
           <span
             className={cn(
               "block truncate text-left",
-              selectedLabel ? "text-[#101828]" : "text-gray-400",
+              selectedLabel ? "text-slate-900 font-medium" : "text-slate-400",
             )}
           >
             {selectedLabel || placeholder}
@@ -274,7 +274,7 @@ const PillSelect = ({
         </SelectContent>
       </Select>
       {error && (
-        <p className="ml-1 text-[12px] font-medium text-red-500 transition-opacity duration-150">
+        <p className="ml-1 text-[11px] font-medium text-rose-600 transition-opacity duration-150">
           {error}
         </p>
       )}

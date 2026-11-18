@@ -1,6 +1,6 @@
 import { Fragment, useState, useEffect } from "react";
 import { useParams, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
+import PageHeader from "../components/global/pageHeader";
 import { LoadingSpinner } from "../components/global/LoadingSpinner";
 import SelectField from "../components/global/SelectField";
 import AuthenticatedLayout from "../layout/AuthenticatedLayout";
@@ -151,28 +151,15 @@ const EditWalletPage = () => {
 
   return (
     <AuthenticatedLayout>
-      <div className="p-6 mx-auto max-w-2xl">
+      <PageHeader title={`${isReadOnly ? "View" : "Edit"} Wallet`} />
+
+      <div className="px-4 sm:px-6 pb-6 max-w-2xl">
         {loadingAllSupportedCrypto || !walletData ? (
           <div className="flex items-center justify-center min-h-[60vh]">
             <LoadingSpinner size="lg" message="Loading Wallet Details..." fullScreen={false} />
           </div>
         ) : (
           <Fragment>
-            {/* Header */}
-            <div className="flex items-center gap-4 mb-8">
-              <button
-                type="button"
-                onClick={() => navigate({ to: "/dashboard/admin-wallets", search: { cryptoId: undefined } })}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                aria-label="Go back"
-              >
-                <ArrowLeft className="h-5 w-5 text-gray-600" />
-              </button>
-              <h1 className="text-3xl font-bold text-[#03034D]">
-                {isReadOnly ? "View" : "Edit"} Wallet
-              </h1>
-            </div>
-
             {/* Wallet Info Section */}
             <div className="bg-white border border-[#E9E7E2] rounded-2xl p-6 mb-6 space-y-6">
               {/* Configurable Fields */}

@@ -3,11 +3,22 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   History,
   LogOut,
-  ChevronLeft,
-  ChevronRight,
   Wallet,
   Landmark,
   ShieldCheck,
+  LayoutDashboard,
+  ArrowRightLeft,
+  Coins,
+  Banknote,
+  UserCheck,
+  FileCheck,
+  Globe,
+  MessageSquareQuote,
+  AlertCircle,
+  Bell,
+  Users,
+  UserCog,
+  X,
 } from "lucide-react";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -36,35 +47,17 @@ const navItems = [
   {
     path: ROUTES.DASHBOARD,
     label: "Overview",
-    icon: (props: { className?: string }) => (
-      <img
-        src="/icons/overview-icon.svg"
-        alt="Overview"
-        className={`${props.className ?? ""} w-5 h-5 brightness-[5]`}
-      />
-    ),
+    icon: LayoutDashboard,
   },
   {
     path: ROUTES.TRANSACTIONS,
     label: "Transactions",
-    icon: (props: { className?: string }) => (
-      <img
-        src="/icons/transaction.svg"
-        alt="Transaction"
-        className={`${props.className ?? ""} w-5 h-5 brightness-[5]`}
-      />
-    ),
+    icon: ArrowRightLeft,
   },
   {
     path: ROUTES.COIN_MANAGEMENT,
     label: "Coin Management",
-    icon: (props: { className?: string }) => (
-      <img
-        src="/icons/btc.svg"
-        alt="BTC"
-        className={`${props.className ?? ""} w-5 h-5 brightness-[5]`}
-      />
-    ),
+    icon: Coins,
   },
   {
     path: ROUTES.ADMIN_WALLETS,
@@ -74,13 +67,7 @@ const navItems = [
   {
     path: ROUTES.MANAGE_FIAT,
     label: "Manage Fiat",
-    icon: (props: { className?: string }) => (
-      <img
-        src="/icons/naira.svg"
-        alt="Naira"
-        className={`${props.className ?? ""} w-5 h-5 brightness-[5]`}
-      />
-    ),
+    icon: Banknote,
   },
   {
     path: ROUTES.TREASURY,
@@ -90,68 +77,32 @@ const navItems = [
   {
     path: ROUTES.KYC_TIER_LIMITS,
     label: "KYC Tier Limits",
-    icon: (props: { className?: string }) => (
-      <img
-        src="/icons/user.svg"
-        alt="KYC Tier Limits"
-        className={`${props.className ?? ""} w-5 h-5 brightness-[5]`}
-      />
-    ),
+    icon: UserCheck,
   },
   {
     path: ROUTES.KYC_SESSIONS,
     label: "KYC Sessions",
-    icon: (props: { className?: string }) => (
-      <img
-        src="/icons/user.svg"
-        alt="KYC Sessions"
-        className={`${props.className ?? ""} w-5 h-5 brightness-[5]`}
-      />
-    ),
+    icon: FileCheck,
   },
   {
     path: ROUTES.SUPPORTED_CURRENCIES,
     label: "Currencies",
-    icon: (props: { className?: string }) => (
-      <img
-        src="/icons/naira.svg"
-        alt="Currencies"
-        className={`${props.className ?? ""} w-5 h-5 brightness-[5]`}
-      />
-    ),
+    icon: Globe,
   },
   {
     path: ROUTES.TESTIMONIALS,
     label: "Testimonials",
-    icon: (props: { className?: string }) => (
-      <img
-        src="/icons/testimonial.svg"
-        alt="Testimonial"
-        className={`${props.className ?? ""} w-5 h-5 brightness-[5]`}
-      />
-    ),
+    icon: MessageSquareQuote,
   },
   {
     path: ROUTES.DISPUTES,
     label: "Disputes",
-    icon: (props: { className?: string }) => (
-      <img
-        src="/icons/dispute.svg"
-        alt="Dispute"
-        className={`${props.className ?? ""} w-5 h-5 brightness-[5]`}
-      />
-    ),
+    icon: AlertCircle,
   },
   {
     path: ROUTES.NOTIFICATIONS,
     label: "Notifications",
-    icon: (props: { className?: string }) => (
-      <img
-        src="/icons/notification.svg"
-        alt="Notification"
-        className={`${props.className ?? ""} w-5 h-5 brightness-[5]`}
-      />
-    ),
+    icon: Bell,
   },
   {
     path: ROUTES.AUDIT_TRAILS,
@@ -161,24 +112,12 @@ const navItems = [
   {
     path: ROUTES.USERS,
     label: "Users",
-    icon: (props: { className?: string }) => (
-      <img
-        src="/icons/user.svg"
-        alt="User"
-        className={`${props.className ?? ""} w-5 h-5 brightness-[5]`}
-      />
-    ),
+    icon: Users,
   },
   {
     path: ROUTES.MANAGE_ADMINS,
     label: "Manage Admins",
-    icon: (props: { className?: string }) => (
-      <img
-        src="/icons/admin.svg"
-        alt="Manage Admins"
-        className={`${props.className ?? ""} w-5 h-5 brightness-[5]`}
-      />
-    ),
+    icon: UserCog,
   },
   {
     path: ROUTES.SECURITY,
@@ -208,7 +147,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     <>
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 w-[272px] z-50 bg-[#03034D] transform transition-transform duration-300 ease-in-out flex flex-col
+        className={`fixed inset-y-0 left-0 w-[260px] z-50 bg-[#122456] transform transition-transform duration-300 ease-in-out flex flex-col shadow-2xl lg:shadow-none
         ${isOpen ? "translate-x-0" : "-translate-x-full"}
         lg:sticky lg:top-0 lg:translate-x-0 lg:z-0 lg:h-screen`}
         role={isDesktop ? undefined : "dialog"}
@@ -217,42 +156,37 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       >
         <div className="flex flex-col h-full w-full overflow-y-auto">
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-5 border-b border-white/10">
+          <div className="flex items-center justify-between px-5 py-4.5 border-b border-white/10">
             <Link
               to={ROUTES.DASHBOARD}
               aria-label="Go to dashboard"
-              className="inline-flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white/80 focus-visible:ring-offset-[#03034D] rounded-md"
+              className="inline-flex items-center gap-2.5 focus:outline-none rounded-lg"
               onClick={() => {
-                // Close sidebar on mobile when navigating with the logo
                 if (!isDesktop) setIsOpen(false);
               }}
             >
               <img
                 src={logo}
                 alt="CryptoNow"
-                className="h-7 object-contain brightness-[5]"
+                className="h-7 w-auto object-contain brightness-[5]"
               />
+              <span className="text-white font-bold text-base tracking-tight">CryptoNow</span>
             </Link>
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-colors text-white"
+              className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-colors text-white lg:hidden cursor-pointer"
+              aria-label="Close sidebar"
             >
-              {isOpen ? (
-                <ChevronLeft className="w-4 h-4" />
-              ) : (
-                <ChevronRight className="w-4 h-4" />
-              )}
+              <X className="w-4 h-4" />
             </button>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+          <nav className="flex-1 px-3 py-3.5 space-y-1 overflow-y-auto">
             {navItems
               .filter((item) => {
                 const requiredPermissions = NAV_ITEM_PERMISSIONS[item.path];
                 if (!requiredPermissions) return true;
-                // Hold off showing permission-gated items until we know what the
-                // admin actually has, so nothing flashes then disappears.
                 if (loadingAdminAuth) return false;
                 return hasAnyPermission(requiredPermissions);
               })
@@ -271,34 +205,43 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                     onClick={() => {
                       if (!isDesktop) setIsOpen(false);
                     }}
-                    className={`flex items-center space-x-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
+                    className={`flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150 touch-manipulation min-h-[40px] ${
                       isActive
-                        ? "bg-white/15 text-white"
-                        : "text-white/55 hover:bg-white/8 hover:text-white/90"
+                        ? "bg-blue-600 text-white shadow-sm"
+                        : "text-blue-100/75 hover:bg-white/10 hover:text-white"
                     }`}
                   >
                     <Icon
-                      className={`w-5 h-5 flex-shrink-0 ${isActive ? "text-white" : "text-white/55"}`}
+                      className={`w-4.5 h-4.5 flex-shrink-0 ${isActive ? "text-white" : "text-blue-200/80"}`}
                     />
-                    <span className="text-[14.5px] font-medium tracking-[-0.01em]">
+                    <span className="text-[13.5px] font-medium tracking-tight">
                       {item.label}
                     </span>
-                    {isActive && (
-                      <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#948EEE]" />
-                    )}
                   </Link>
                 );
               })}
           </nav>
 
+          {/* Operational Status Pill Widget */}
+          <div className="p-3 mx-3 mb-2 rounded-xl bg-white/5 border border-white/10">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span className="text-[11px] font-semibold text-white/90">Node Network Live</span>
+            </div>
+            <p className="text-[10px] text-blue-200/60 leading-tight">Automated liquidity &amp; payout engines active.</p>
+          </div>
+
           {/* Logout */}
-          <div className="px-3 py-4 border-t border-white/10">
+          <div className="px-3 py-3 border-t border-white/10">
             <button
               onClick={handleLogout}
-              className="flex items-center space-x-3 px-4 py-2.5 rounded-xl text-sm font-medium text-[#FF8B8B] hover:bg-red-500/15 hover:text-red-300 transition-colors w-full cursor-pointer"
+              className="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-rose-300 hover:bg-rose-500/15 hover:text-rose-200 transition-colors w-full cursor-pointer touch-manipulation min-h-[40px]"
             >
-              <LogOut size={18} className="flex-shrink-0" />
-              <span className="text-[14.5px]">Logout</span>
+              <LogOut size={16} className="flex-shrink-0" />
+              <span className="text-[13.5px]">Sign Out</span>
             </button>
           </div>
         </div>

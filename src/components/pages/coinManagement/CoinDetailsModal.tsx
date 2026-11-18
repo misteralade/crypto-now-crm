@@ -251,7 +251,7 @@ export const CoinDetailsModal = ({
                   <span className="text-[20px] font-bold text-[#03034D]">
                     {coin.buyRate
                       ? `₦${Number(coin.buyRate).toLocaleString()}`
-                      : "—"}
+                      : "-"}
                   </span>
                 </div>
                 <div className="bg-[#F5F5FF] rounded-xl p-3">
@@ -264,7 +264,7 @@ export const CoinDetailsModal = ({
                   <span className="text-[20px] font-bold text-[#03034D]">
                     {coin.sellRate
                       ? `₦${Number(coin.sellRate).toLocaleString()}`
-                      : "—"}
+                      : "-"}
                   </span>
                 </div>
               </div>
@@ -422,7 +422,7 @@ export const CoinDetailsModal = ({
                           day: "2-digit",
                           year: "numeric",
                         })
-                      : "—"
+                      : "-"
                   }
                 />
               </div>

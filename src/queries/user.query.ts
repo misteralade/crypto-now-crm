@@ -12,31 +12,33 @@ export const useUserQuery = () => {
   const queryClient = useQueryClient()
   const matchRoute = useMatchRoute()
   const search = useSelector((state: RootState) => state.user.search.users)
+  const dashboardTimelineFilter = useSelector(
+    (state: RootState) => state.dashboard.timelineFilter,
+  )
 
   const { data: weeklyUserSummary, isLoading: loadingWeeklyUserSummary } =
     useQuery({
       queryKey: [
         QUERY_KEYS.USER.GET_WEEKLY_USER_STATS_SUMMARY,
-        (store.getState() as RootState).dashboard.timelineFilter,
+        dashboardTimelineFilter,
       ],
       queryFn: async () => {
-        const timeline = (store.getState() as RootState).dashboard
-          .timelineFilter
-         
-        if (!timeline) return null
+        if (!dashboardTimelineFilter) return null
 
-        const { data, success } =
-          await userServiceApi.getDashboardUserSummaryData({ timeline })
+        try {
+          const { data, success } =
+            await userServiceApi.getDashboardUserSummaryData({ timeline: dashboardTimelineFilter })
 
-        if (success) {
-          return data
+          if (success) {
+            return data
+          }
+        } catch {
+          return { activeUsersCount: 0, newUsersCount: 0, pendingPayoutsCount: 0 }
         }
 
         return null
       },
-      enabled:
-        !!matchRoute({ to: ROUTES.DASHBOARD }) &&
-        !!(store.getState() as RootState).dashboard.timelineFilter,
+      enabled: !!dashboardTimelineFilter,
     })
 
   const { data: adminSearchUsers, isLoading: loadingAdminSearchUsers } = useQuery({

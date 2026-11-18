@@ -15,7 +15,6 @@ import {
   useAdminToggleCustodialWalletActiveMutation,
 } from "../queries/crypto.querries.ts";
 import { useSweepQuery } from "../queries/sweep.querries.ts";
-import { ROUTES } from "../util/constants.util.ts";
 import { cn } from "../lib/utils.ts";
 /**
  * Strip a raw numeric(18,8) rate string's trailing zeros without rounding to any
@@ -134,26 +133,13 @@ export default function WalletDetails() {
     void refreshMutation.mutateAsync();
   };
 
-  const goBack = () => {
-    if (fromSweepId) {
-      void navigate({
-        to: "/dashboard/treasury/$sweepId",
-        params: { sweepId: fromSweepId },
-      });
-      return;
-    }
-
-    void navigate({ to: ROUTES.TREASURY });
-  };
-
   return (
     <AuthenticatedLayout>
       <PageHeader
         title="Custodial Wallet Details"
-        onBack={goBack}
       />
 
-      <div className="mx-auto max-w-6xl space-y-6 p-6">
+      <div className="mx-auto max-w-6xl space-y-6 px-4 sm:px-6 pb-6">
         <section
           className={`rounded-2xl border p-5 md:p-6 ${
             env?.sectionClass ?? "border-[#DDE0FF] bg-[--color-primary-taint] shadow-[0_18px_40px_-30px_rgba(3,3,77,0.35)]"
@@ -256,7 +242,7 @@ export default function WalletDetails() {
                 Sweep amount
               </p>
               <p className="mt-2 text-2xl font-semibold tabular-nums text-gray-900">
-                {sweepResult ? formatAmount(sweepResult.amount) : "—"}
+                {sweepResult ? formatAmount(sweepResult.amount) : "-"}
               </p>
               <p className="text-xs text-gray-500">
                 Amount moved in the selected sweep
@@ -268,7 +254,7 @@ export default function WalletDetails() {
                 Sweep status
               </p>
               <p className="mt-2 text-lg font-semibold text-gray-900">
-                {sweepResult?.status ?? sweep?.status ?? "—"}
+                {sweepResult?.status ?? sweep?.status ?? "-"}
               </p>
               <p className="text-xs text-gray-500">
                 {sweepResult?.error
@@ -282,7 +268,7 @@ export default function WalletDetails() {
                 Deposits
               </p>
               <p className="mt-2 text-2xl font-semibold tabular-nums text-gray-900">
-                {walletDetails?.wallet.totalDepositsCount ?? "—"}
+                {walletDetails?.wallet.totalDepositsCount ?? "-"}
               </p>
               <p className="text-xs text-gray-500">
                 Confirmed deposits to this wallet

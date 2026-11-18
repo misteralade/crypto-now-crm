@@ -48,14 +48,14 @@ const ActionsMenu = ({
       </button>
 
       {open && (
-        <div className="absolute right-0 z-50 mt-1 w-44 bg-white rounded-2xl shadow-lg border border-[#ECECEC] py-1 overflow-hidden">
+        <div className="absolute right-0 z-50 mt-1 w-44 bg-white rounded-xl shadow-xl border border-slate-200/80 py-1 overflow-hidden">
           <button
             onClick={(e) => {
               e.stopPropagation();
               handleNavigateToTransactionHistory(row.id);
               setOpen(false);
             }}
-            className="w-full text-left px-4 py-2.5 text-[13px] font-medium text-[#0066CC] hover:bg-[#E6F5FF] transition-colors"
+            className="w-full text-left px-3.5 py-2 text-xs font-semibold text-blue-600 hover:bg-blue-50 transition-colors"
           >
             View Transactions
           </button>
@@ -65,10 +65,10 @@ const ActionsMenu = ({
               handleUpdateUserStatus(row.id, isActive ? "SUSPENDED" : "ACTIVE");
               setOpen(false);
             }}
-            className={`w-full text-left px-4 py-2.5 text-[13px] font-medium ${
+            className={`w-full text-left px-3.5 py-2 text-xs font-semibold ${
               isActive
-                ? "text-[#EB5757] hover:bg-[#FEE2E2]"
-                : "text-[#F2994A] hover:bg-[#FEF3C7]"
+                ? "text-rose-600 hover:bg-rose-50"
+                : "text-amber-600 hover:bg-amber-50"
             } transition-colors`}
           >
             {isActive ? "Suspend User" : "Activate User"}
@@ -79,7 +79,7 @@ const ActionsMenu = ({
               handleResetUserPassword(row.id);
               setOpen(false);
             }}
-            className="w-full text-left px-4 py-2.5 text-[13px] font-medium text-[#948EEE] hover:bg-[#F5F5FF] transition-colors"
+            className="w-full text-left px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
           >
             Reset Password
           </button>
@@ -98,14 +98,14 @@ export const AdminSearchUserColumn = (
   {
     key: "id",
     header: "User ID",
-    className: "font-medium text-gray-900",
+    className: "font-medium text-slate-900 font-mono text-xs",
     render: (value) => (
       <Fragment>
-        <div className="text-[13px] text-[#101828]">
+        <div className="text-xs text-slate-900 font-mono">
           <CopyDetails
             text={value}
             className="font-medium !w-[110px]"
-            iconClassName="!h-7 !w-7"
+            iconClassName="!h-4 !w-4 text-slate-400 hover:text-slate-600"
           />
         </div>
       </Fragment>
@@ -114,20 +114,28 @@ export const AdminSearchUserColumn = (
   {
     key: "name",
     header: "Name",
-    render: (value, row) => (
-      <Fragment>
-        <div className="flex items-center gap-3">
-          <img
-            src={row.imgUrl}
-            alt={value}
-            className="w-8 h-8 rounded-full object-cover border border-[#ECECEC]"
-          />
-          <span className="font-medium text-[13px] text-[#101828]">
-            {value}
+    render: (value, row) => {
+      const displayName = value || "User";
+      const initial = displayName.charAt(0).toUpperCase();
+      return (
+        <div className="flex items-center gap-2.5">
+          {row.imgUrl ? (
+            <img
+              src={row.imgUrl}
+              alt={displayName}
+              className="w-7 h-7 rounded-full object-cover border border-slate-200"
+            />
+          ) : (
+            <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-700 font-bold text-[11px] flex items-center justify-center shrink-0">
+              {initial}
+            </div>
+          )}
+          <span className="font-semibold text-xs text-slate-900">
+            {displayName}
           </span>
         </div>
-      </Fragment>
-    ),
+      );
+    },
   },
   {
     key: "email",
@@ -195,10 +203,15 @@ export const AdminSearchUserDataRow = (
   }
 
   data.map((item: AdminSearchUsersResponsePayload) => {
+    const fullName = [item.profile?.firstName, item.profile?.lastName]
+      .filter((n) => Boolean(n) && n !== "null")
+      .join(" ")
+      .trim() || item.user.email?.split("@")[0] || "User";
+
     rowItems.push({
       id: item.user.id,
-      name: `${item.profile.firstName} ${item.profile.lastName}`,
-      imgUrl: item.profile.profileImg,
+      name: fullName,
+      imgUrl: item.profile?.profileImg,
       email: item.user.email,
       status: item.user.status,
       // amount: Number(item.totalVolume),

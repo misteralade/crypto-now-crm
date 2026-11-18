@@ -132,17 +132,17 @@ const TestimonialFormModal = ({ open, mode, initialValues, onClose, onSubmit }: 
                   />
                 </div>
 
-                <div className="px-6 pb-6 flex flex-col sm:flex-row items-center justify-end gap-3 border-t border-[#ECECEC] pt-4">
+                <div className="px-6 pb-5 flex flex-col sm:flex-row items-center justify-end gap-2.5 border-t border-slate-100 pt-4">
                   <button
                     type="button"
-                    className="text-[#03034D] font-medium text-[14px] px-6 py-2.5 rounded-full border border-[#ECECEC] hover:bg-[#F5F5FF] transition-colors w-full sm:w-auto"
+                    className="h-9 px-4 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors w-full sm:w-auto"
                     onClick={onClose}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="rounded-full bg-[#03034D] hover:bg-[#050568] active:scale-[0.98] text-white px-6 py-2.5 text-[14px] font-medium w-full sm:w-auto transition-all"
+                    className="h-9 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs font-semibold shadow-xs transition-colors w-full sm:w-auto"
                   >
                     {mode === 'create' ? 'Create Testimonial' : 'Update Testimonial'}
                   </button>

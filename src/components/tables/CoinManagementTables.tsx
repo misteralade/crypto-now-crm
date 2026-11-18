@@ -7,14 +7,13 @@ import type { SearchSupportedCryptoData } from "../../types/response.payload.typ
 import type { TableColumn } from '../table'
 
 const NetworkTags = ({ networks }: { networks: string[] }) => {
-  // Renders the networks as compact tag chips inside the table cell.
-  if (!networks || networks.length === 0) return <span className="text-[11px] text-[#9A9A9A]">—</span>
+  if (!networks || networks.length === 0) return <span className="text-[11px] text-slate-400">-</span>
   return (
     <div className="flex flex-wrap gap-1">
       {networks.map((n) => (
         <span
           key={n}
-          className="inline-block px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#D3D4F8] text-[#03034D]"
+          className="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-200/60"
         >
           {n}
         </span>
@@ -49,28 +48,29 @@ const ActionsMenu = ({
     <div ref={ref} className="relative inline-block" onClick={(e) => e.stopPropagation()}>
       <button
         onClick={(e) => { e.stopPropagation(); setOpen((v) => !v) }}
-        className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+        aria-label="Actions"
       >
-        <MoreVertical className="w-4 h-4 text-[#667085]" />
+        <MoreVertical className="w-4 h-4" />
       </button>
 
       {open && (
-        <div className="absolute right-0 z-50 mt-1 w-40 bg-white rounded-2xl shadow-lg border border-[#ECECEC] py-1 overflow-hidden">
+        <div className="absolute right-0 z-50 mt-1 w-36 bg-white rounded-xl shadow-xl border border-slate-200/90 py-1 overflow-hidden text-xs">
           <button
             onClick={(e) => { e.stopPropagation(); onEditClick(row.id); setOpen(false) }}
-            className="w-full text-left px-4 py-2.5 text-[13px] font-medium text-[#03034D] hover:bg-[#D3D4F8] transition-colors"
+            className="w-full text-left px-3.5 py-2 font-medium text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
           >
-            Edit
+            Edit Coin
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); onDisableCoin(row.id, row.status); setOpen(false) }}
-            className="w-full text-left px-4 py-2.5 text-[13px] font-medium text-[#B45309] hover:bg-[#FEF3C7] transition-colors"
+            className="w-full text-left px-3.5 py-2 font-medium text-amber-700 hover:bg-amber-50 transition-colors cursor-pointer"
           >
             {row.status ? 'Deactivate' : 'Activate'}
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); handleDeleteCryptoCurrency(row.id); setOpen(false) }}
-            className="w-full text-left px-4 py-2.5 text-[13px] font-medium text-[#EF4444] hover:bg-[#FEE2E2] transition-colors"
+            className="w-full text-left px-3.5 py-2 font-medium text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
           >
             Delete
           </button>

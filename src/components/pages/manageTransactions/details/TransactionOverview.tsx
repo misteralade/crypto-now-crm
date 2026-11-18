@@ -1,66 +1,111 @@
-import {Fragment} from "react";
-import {formatNumber} from "../../../../util/index.util.ts";
-import {formatCompact} from "../../../../util/asset-precision";
-import {StatusBadge} from "../../../global/StatusBadge.tsx";
+import { Fragment } from 'react'
+import { formatNumber } from '../../../../util/index.util.ts'
+import { formatCompact } from '../../../../util/asset-precision'
+import { StatusBadge } from '../../../global/StatusBadge.tsx'
+import { Coins, ArrowLeftRight, CheckCircle2, TrendingUp } from 'lucide-react'
 
 interface TransactionOverviewProps {
   type: 'BUY' | 'SELL'
-  amountCrypto: number;
-  symbol: string;
-  currency: string;
-  amountFiat: number;
-  amountFiatNGN: number;
-  status: string;
-  /** Explicit rate string e.g. "1 BTC = $ 100,000" or "1 BTC = ₦ 140M" */
-  exchangeRateDisplay: string;
-  confirmationCount?: number;
+  amountCrypto: number
+  symbol: string
+  currency: string
+  amountFiat: number
+  amountFiatNGN: number
+  status: string
+  exchangeRateDisplay: string
+  confirmationCount?: number
 }
 
-const TransactionOverview = ({ type: _type, amountCrypto, symbol, amountFiat: _amountFiat, amountFiatNGN, exchangeRateDisplay, status, confirmationCount }: TransactionOverviewProps) => {
+const TransactionOverview = ({
+  type,
+  amountCrypto,
+  symbol,
+  amountFiatNGN,
+  exchangeRateDisplay,
+  status,
+  confirmationCount,
+}: TransactionOverviewProps) => {
   return (
     <Fragment>
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Transaction Overview</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <p className="text-sm text-gray-500 mb-1">Crypto Amount</p>
-            <p className="text-2xl font-bold text-gray-900">
-              {formatNumber(amountCrypto)}{" "}{symbol}
-            </p>
+      <div className="bg-white rounded-xl border border-slate-200/80 shadow-xs p-4 sm:p-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 mb-3.5 border-b border-slate-100">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+              <Coins className="w-4 h-4" />
+            </div>
+            <div>
+              <h2 className="text-xs sm:text-sm font-bold text-slate-900 tracking-tight">Transaction Overview</h2>
+              <p className="text-[11px] text-slate-500">Settlement figures and conversion metrics</p>
+            </div>
           </div>
-          
-          <div>
-            <p className="text-sm text-gray-500 mb-1">Fiat Amount (NGN)</p>
-            <p className="text-2xl font-bold text-gray-900">
-              ₦ {formatCompact(amountFiatNGN, "NGN", 3)}
-            </p>
-          </div>
-          
-          <div>
-            <p className="text-sm text-gray-500 mb-1 normal-case">Exchange Rate</p>
-            <p className="text-lg font-bold text-gray-900">
-              {exchangeRateDisplay}
-            </p>
-          </div>
-          
-          <div>
-            <p className="text-sm text-gray-500 mb-1 normal-case">Transaction Status</p>
+          <div className="flex items-center gap-2">
             <StatusBadge status={status} />
           </div>
+        </div>
 
-          {_type === 'SELL' && (
-            <div>
-              <p className="text-sm text-gray-500 mb-1 normal-case">Blockchain Confirmations</p>
-              <p className="text-lg font-bold text-gray-900">
-                {confirmationCount !== undefined ? confirmationCount : 0}
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {/* Card 1: Fiat Value */}
+          <div className="p-3 rounded-lg bg-slate-50/90 border border-slate-100 flex flex-col justify-between">
+            <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider truncate mb-1">
+              Fiat Settlement
+            </p>
+            <p className="text-base sm:text-lg font-bold text-slate-900 tabular-nums truncate">
+              ₦{formatCompact(amountFiatNGN, 'NGN', 2)}
+            </p>
+            <p className="text-[10px] text-slate-400 mt-1">NGN Equivalent</p>
+          </div>
+
+          {/* Card 2: Crypto Amount */}
+          <div className="p-3 rounded-lg bg-slate-50/90 border border-slate-100 flex flex-col justify-between">
+            <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider truncate mb-1">
+              Crypto Amount
+            </p>
+            <p className="text-base sm:text-lg font-bold text-slate-900 tabular-nums truncate" title={`${amountCrypto} ${symbol}`}>
+              {formatNumber(amountCrypto)} <span className="text-xs font-semibold text-slate-600">{symbol}</span>
+            </p>
+            <p className="text-[10px] text-slate-400 mt-1">Asset Traded</p>
+          </div>
+
+          {/* Card 3: Exchange Rate */}
+          <div className="p-3 rounded-lg bg-slate-50/90 border border-slate-100 flex flex-col justify-between">
+            <div className="flex items-center gap-1 text-[11px] font-semibold text-slate-500 uppercase tracking-wider truncate mb-1">
+              <ArrowLeftRight className="w-3 h-3 text-slate-400 shrink-0" />
+              <span className="truncate">Rate</span>
+            </div>
+            <p className="text-xs sm:text-sm font-bold text-slate-900 truncate" title={exchangeRateDisplay}>
+              {exchangeRateDisplay || 'N/A'}
+            </p>
+            <p className="text-[10px] text-slate-400 mt-1">Locked Rate</p>
+          </div>
+
+          {/* Card 4: Confirmations or Type */}
+          {type === 'SELL' ? (
+            <div className="p-3 rounded-lg bg-slate-50/90 border border-slate-100 flex flex-col justify-between">
+              <div className="flex items-center gap-1 text-[11px] font-semibold text-slate-500 uppercase tracking-wider truncate mb-1">
+                <CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0" />
+                <span className="truncate">Confirmations</span>
+              </div>
+              <p className="text-base sm:text-lg font-bold text-slate-900 tabular-nums truncate">
+                {confirmationCount ?? 0}
               </p>
+              <p className="text-[10px] text-slate-400 mt-1">Block receipts</p>
+            </div>
+          ) : (
+            <div className="p-3 rounded-lg bg-slate-50/90 border border-slate-100 flex flex-col justify-between">
+              <div className="flex items-center gap-1 text-[11px] font-semibold text-slate-500 uppercase tracking-wider truncate mb-1">
+                <TrendingUp className="w-3 h-3 text-blue-500 shrink-0" />
+                <span className="truncate">Order Type</span>
+              </div>
+              <p className="text-sm sm:text-base font-bold text-blue-600 truncate">
+                BUY ORDER
+              </p>
+              <p className="text-[10px] text-slate-400 mt-1">Customer Purchasing</p>
             </div>
           )}
-          
         </div>
       </div>
     </Fragment>
   )
 }
 
-export default TransactionOverview;
+export default TransactionOverview

@@ -1,50 +1,85 @@
-import type { CreateSupportedCryptoAndAdminWalletRequestType } from "../../../../schemas/crypto.schema";
+import { useState } from 'react'
+import type { CreateSupportedCryptoAndAdminWalletRequestType } from '../../../../schemas/crypto.schema'
 import { PillInput } from '../../../ui/input'
 import { Switch } from '../../../ui/switch'
+import { ChevronDown, Sliders } from 'lucide-react'
 
 interface OptionalFieldsProps {
   onChangeInputField: (field: keyof CreateSupportedCryptoAndAdminWalletRequestType, value: any) => void
 }
 
 const OptionalFields = ({ onChangeInputField }: OptionalFieldsProps) => {
-  return (
-    <div className="mb-8">
-      <h3 className="text-[24px] font-medium text-[#0E0F0C] mb-6">Optional Fields</h3>
+  const [isExpanded, setIsExpanded] = useState(false)
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-x-8 mb-6">
-        <div>
-          <label className="block text-[13px] font-medium text-[#454745] mb-3">Stable Coin</label>
-          <Switch
-            id="isStableCoin"
-            label="Is Stable Coin"
-            defaultChecked={false}
-            onCheckedChange={(checked) => onChangeInputField("isStableCoin", checked)}
-          />
+  return (
+    <div className="mb-6 rounded-xl bg-white border border-slate-200/80 shadow-2xs overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-slate-50 transition-colors cursor-pointer"
+      >
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">
+            <Sliders className="w-3.5 h-3.5" />
+          </div>
+          <div>
+            <p className="text-xs sm:text-sm font-bold text-slate-900 leading-tight">
+              Advanced Configuration & Optional Details
+            </p>
+            <p className="text-[11px] text-slate-500">
+              Whitepaper, project links, coin description, and stablecoin flags
+            </p>
+          </div>
         </div>
 
-        <PillInput
-          id="whitepaperUrl"
-          onChange={(e) => onChangeInputField("whitepaperUrl", e.target.value)}
-          label="Whitepaper URL"
-          type="text"
-        />
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-500">
+          <span>{isExpanded ? 'Hide' : 'Show'}</span>
+          <ChevronDown
+            className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+          />
+        </div>
+      </button>
 
-        <PillInput
-          id="websiteUrl"
-          onChange={(e) => onChangeInputField("websiteUrl", e.target.value)}
-          label="Website URL"
-          type="text"
-        />
+      {isExpanded && (
+        <div className="p-4 sm:p-5 border-t border-slate-100 bg-slate-50/40 space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="sm:col-span-2">
+              <label className="block text-xs font-medium text-slate-700 mb-2">Stable Coin Classification</label>
+              <Switch
+                id="isStableCoin"
+                label="Is this asset pegged as a fiat-backed stablecoin?"
+                defaultChecked={false}
+                onCheckedChange={(checked) => onChangeInputField("isStableCoin", checked)}
+              />
+            </div>
 
-        <PillInput
-          id="description"
-          onChange={(e) => onChangeInputField("description", e.target.value)}
-          label="Description"
-          type="text"
-        />
-      </div>
+            <PillInput
+              id="whitepaperUrl"
+              onChange={(e) => onChangeInputField("whitepaperUrl", e.target.value)}
+              label="Whitepaper URL"
+              type="text"
+            />
+
+            <PillInput
+              id="websiteUrl"
+              onChange={(e) => onChangeInputField("websiteUrl", e.target.value)}
+              label="Official Website URL"
+              type="text"
+            />
+
+            <div className="sm:col-span-2">
+              <PillInput
+                id="description"
+                onChange={(e) => onChangeInputField("description", e.target.value)}
+                label="Coin Description / Overview"
+                type="text"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
 
-export default OptionalFields;
+export default OptionalFields

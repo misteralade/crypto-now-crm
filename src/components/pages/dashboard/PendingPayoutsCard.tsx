@@ -10,66 +10,54 @@ interface PendingPayoutsCardProps {
 
 const PendingPayoutsCard = ({ count, loading, onRetry, onView, retrying }: PendingPayoutsCardProps) => {
   return (
-    <div className="relative overflow-hidden bg-white rounded-2xl border border-[#ECECEC] group hover:border-[#F59E0B]/30 transition-all duration-300">
-      {/* Decorative Gradient Background */}
-      <div className="absolute top-0 right-0 w-32 h-32 -mr-8 -mt-8 bg-gradient-to-br from-[#F59E0B]/5 to-transparent rounded-full blur-3xl group-hover:from-[#F59E0B]/10 transition-colors duration-500" />
-      
-      <div className="p-4 relative z-10">
-        <div className="flex items-start justify-between mb-3">
-          <div className="space-y-1">
-            <p className="text-[12px] font-semibold text-[#9A9A9A] uppercase tracking-wider flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B] animate-pulse" />
+    <div className="bg-white rounded-xl border border-slate-200/80 shadow-xs p-4 sm:p-4.5 hover:shadow-sm transition-all flex flex-col justify-between">
+      <div>
+        <div className="flex items-start justify-between mb-2">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+            <p className="text-xs font-semibold text-slate-500 tracking-tight">
               Pending Payouts
             </p>
           </div>
-          <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 ${count > 0 ? 'bg-[#FFFBEB] text-[#F59E0B] shadow-sm shadow-amber-100' : 'bg-gray-50 text-gray-400'}`}>
-            <AlertCircle className="w-4.5 h-4.5" />
+          <div className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${count > 0 ? 'bg-amber-50 text-amber-600' : 'bg-slate-50 text-slate-400'}`}>
+            <AlertCircle className="w-4 h-4" />
           </div>
         </div>
 
         <div className="flex items-baseline gap-2 mb-3">
-          <p className="text-[28px] font-black text-[#0E0F0C] leading-none tracking-tighter">
+          <p className="text-2xl font-bold text-slate-900 tracking-tight tabular-nums">
             {loading ? "..." : count}
           </p>
-          <span className="text-[13px] font-medium text-[#9A9A9A]">Transactions</span>
-        </div>
-
-        <div className="flex items-center gap-2.5">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onRetry();
-            }}
-            disabled={count === 0 || retrying || loading}
-            className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-[12px] font-bold transition-all duration-300 ${
-              count > 0 
-                ? 'bg-[#0E0F0C] text-white hover:bg-[#1A1B18] hover:shadow-lg active:scale-95 disabled:opacity-50' 
-                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-            }`}
-          >
-            <RefreshCcw className={`w-3.5 h-3.5 ${retrying ? 'animate-spin' : ''}`} />
-            {retrying ? 'Retrying...' : 'Retry All'}
-          </button>
-          
-          <button
-            onClick={onView}
-            className="w-9 h-9 flex items-center justify-center rounded-xl border border-[#ECECEC] text-[#0E0F0C] hover:bg-gray-50 hover:border-gray-300 transition-all active:scale-95"
-            title="View Details"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
+          <span className="text-xs font-medium text-slate-400">Disbursements Waiting</span>
         </div>
       </div>
 
-      {/* Progress Bar (Bottom) */}
-      {count > 0 && (
-        <div className="absolute bottom-0 left-0 w-full h-1 bg-[#F59E0B]/10">
-          <div 
-            className="h-full bg-[#F59E0B] transition-all duration-1000" 
-            style={{ width: '100%', opacity: retrying ? 0.6 : 0 }} 
-          />
-        </div>
-      )}
+      <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onRetry();
+          }}
+          disabled={count === 0 || retrying || loading}
+          className={`flex-1 flex items-center justify-center gap-1.5 h-8.5 rounded-lg text-xs font-semibold transition-all cursor-pointer touch-manipulation ${
+            count > 0 
+              ? 'bg-amber-600 text-white hover:bg-amber-700 shadow-2xs active:scale-98 disabled:opacity-50' 
+              : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+          }`}
+        >
+          <RefreshCcw className={`w-3.5 h-3.5 ${retrying ? 'animate-spin' : ''}`} />
+          <span>{retrying ? 'Retrying...' : 'Retry All'}</span>
+        </button>
+        
+        <button
+          onClick={onView}
+          className="h-8.5 px-3 flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-all text-xs font-semibold shadow-2xs cursor-pointer touch-manipulation"
+          title="View Details"
+        >
+          <span>View</span>
+          <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
+        </button>
+      </div>
     </div>
   )
 }

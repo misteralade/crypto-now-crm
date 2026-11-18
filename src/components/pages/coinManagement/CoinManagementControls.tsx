@@ -1,31 +1,21 @@
-import { SearchInput } from '../../ui/search-input'
+import { Plus } from 'lucide-react'
 
 interface ControlsProps {
   onAddCoin: () => void
-  searchValue: string
-  onSearchChange: (value: string) => void
 }
 
-const CoinManagementControls = ({ onAddCoin, searchValue, onSearchChange }: ControlsProps) => {
+const CoinManagementControls = ({ onAddCoin }: ControlsProps) => {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 py-4 mt-4 mb-2">
-      {/* Left: search */}
-      <SearchInput
-        placeholder="Search coin..."
-        value={searchValue}
-        onChange={(e) => onSearchChange(e.target.value)}
-        containerClassName="flex-1 sm:max-w-[280px]"
-      />
-
-      {/* Right: add coin button */}
+    <div className="flex items-center justify-end my-3">
       <button
         onClick={onAddCoin}
-        className="px-5 py-2.5 text-[14px] font-medium bg-[#03034D] text-white rounded-full hover:bg-[#050568] active:scale-[0.98] transition-all cursor-pointer shadow-sm whitespace-nowrap"
+        className="h-9 px-3.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs inline-flex items-center justify-center gap-1.5 transition-colors cursor-pointer touch-manipulation whitespace-nowrap"
       >
-        + Add New Coin
+        <Plus className="w-3.5 h-3.5" />
+        <span>Add New Coin</span>
       </button>
     </div>
   )
 }
 
-export default CoinManagementControls;
+export default CoinManagementControls

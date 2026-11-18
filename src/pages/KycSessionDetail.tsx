@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "@tanstack/react-router";
 import {
   CheckCircle,
   XCircle,
@@ -24,7 +23,6 @@ import {
 } from "../redux/kyc-session.slice";
 import type { RootState } from "../store";
 import type { KycSessionStep } from "../types/kyc-session.types";
-import { ROUTES } from "../util/constants.util";
 
 const STEP_LABELS: Record<KycSessionStep, string> = {
   "Not Started": "Not Started",
@@ -51,7 +49,6 @@ interface KycSessionDetailProps {
 
 const KycSessionDetail = ({ sessionId }: KycSessionDetailProps) => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const {
     useAdminGetSessionDetail,
@@ -103,10 +100,9 @@ const KycSessionDetail = ({ sessionId }: KycSessionDetailProps) => {
       <PageHeader
         title="KYC Session Detail"
         subtitle={`Session ID: ${session.id}`}
-        onBack={() => navigate({ to: ROUTES.KYC_SESSIONS })}
       />
 
-      <div className="p-6 space-y-6 max-w-6xl mx-auto">
+      <div className="px-4 sm:px-6 pb-6 space-y-6 max-w-6xl">
         <div className="grid gap-6 lg:grid-cols-2">
           {/* User info */}
           <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
@@ -119,13 +115,13 @@ const KycSessionDetail = ({ sessionId }: KycSessionDetailProps) => {
                 <span className="font-medium text-gray-900">
                   {session.user?.profile
                     ? `${session.user.profile.firstName} ${session.user.profile.lastName}`
-                    : "—"}
+                    : "-"}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Email</span>
                 <span className="font-medium text-gray-900 text-xs">
-                  {session.user?.email ?? "—"}
+                  {session.user?.email ?? "-"}
                 </span>
               </div>
               <div className="flex justify-between">
@@ -154,7 +150,7 @@ const KycSessionDetail = ({ sessionId }: KycSessionDetailProps) => {
                 <span className="font-medium text-gray-900">
                   {session.selectedIdType
                     ? ID_TYPE_LABELS[session.selectedIdType]
-                    : "—"}
+                    : "-"}
                 </span>
               </div>
               <div className="flex justify-between">

@@ -56,6 +56,10 @@ const kycSessionSlice = createSlice({
     setKycSessionPage: (state, action: PayloadAction<number>) => {
       state.list.page = action.payload
     },
+    setKycSessionLimit: (state, action: PayloadAction<number>) => {
+      state.list.limit = action.payload
+      state.list.page = 1
+    },
     setKycSessionStatusFilter: (state, action: PayloadAction<KycSessionStep | undefined>) => {
       state.list.statusFilter = action.payload
       state.list.page = 1
@@ -111,6 +115,7 @@ const kycSessionSlice = createSlice({
 
 export const {
   setKycSessionPage,
+  setKycSessionLimit,
   setKycSessionStatusFilter,
   setKycSessionUserIdFilter,
   setSelectedKycSessionId,

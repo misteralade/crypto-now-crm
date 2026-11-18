@@ -111,7 +111,7 @@ const UserTransactionDetailsDrawer = ({ open, onClose, loading, data }: UserTran
               <div className="mt-4 flex items-center justify-between text-[16px]">
                 <div className="text-[#828282]">Name</div>
                 <div className="text-[#0E0F0C] text-sm">
-                  {data?.user.profile?.firstName || '—'}{' '}
+                  {data?.user.profile?.firstName || '-'}{' '}
                   {data?.user.profile?.lastName || '-'}
                 </div>
               </div>
@@ -119,7 +119,7 @@ const UserTransactionDetailsDrawer = ({ open, onClose, loading, data }: UserTran
               <div className="mt-4 flex items-center justify-between text-[16px]">
                 <div className="text-[#667085]">Email</div>
                 <div className="text-[#0E0F0C] text-base">
-                  {data?.user.email ?? '—'}
+                  {data?.user.email ?? '-'}
                 </div>
               </div>
 

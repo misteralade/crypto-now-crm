@@ -1,11 +1,6 @@
-import {ArrowUpRight, ChevronDown} from 'lucide-react'
-import { Fragment } from 'react'
-import { formatCompact } from '../../util/asset-precision'
-import { getTransactionAmountFiatNGN } from '../../util/transaction.util'
-import {ClickableDetails} from '../global/CopyDetails'
+import { ArrowUpRight, ChevronDown } from 'lucide-react'
 import momentClient from '../../util/moment'
 import {
-  TableAmount,
   TableDate,
   TableStatus,
   mapTransactionStatus,
@@ -19,17 +14,20 @@ import type {
 const formatCryptoAmountUpTo4Decimals = (amount: number | string | undefined, symbol?: string) => {
   if (amount === undefined || amount === null || amount === "") return "0"
   const num = Number(amount)
-  // Round up to 10-thousandth (4 decimal places)
-  const factor = 10000;
-  const rounded = Math.ceil(num * factor) / factor;
-  return `${rounded} ${symbol ? symbol.toUpperCase() : ""}`.trim();
+  const factor = 10000
+  const rounded = Math.ceil(num * factor) / factor
+  return `${rounded} ${symbol ? symbol.toUpperCase() : ""}`.trim()
 }
 
 type TransactionSummaryRow = {
+  sessionId: string
   user: string
-  transactionId: string
+  userEmail: string
+  type: string
+  cryptoSymbol: string
   amount: string
-  date: Date
+  amountCrypto: string
+  date: Date | string
   status: string
 }
 
@@ -39,54 +37,88 @@ type TransactionManagementRow = {
   amount: string
   date: string
   status: string
-  isAnonymous: string
-  updatedAt: string
+  action?: string
 }
-
 
 // Dashboard Tables Start
 export const UsersWithTopTransactionColumn = (
   handleViewTransaction: (sessionId: string) => void,
 ): Array<TableColumn<TransactionSummaryRow>> => [
   {
-    key: 'user',
-    header: 'User',
-    className: 'font-medium text-gray-900',
-  },
-  {
-    key: 'transactionId',
+    key: 'sessionId',
     header: 'Transaction ID',
-    render: (value) => (
-      <button className="flex items-center max-w-[300px] space-x-1 underline text-gray-900 hover:text-purple-600 transition-colors font-medium">
-        <span className="overflow-hidden whitespace-nowrap text-ellipsis">
-          {value}
+    render: (value, row) => (
+      <button
+        onClick={() => handleViewTransaction(row.sessionId)}
+        className="font-mono text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1 group cursor-pointer"
+        title={String(value)}
+      >
+        <span className="truncate max-w-[120px] sm:max-w-[150px]">
+          {String(value).slice(0, 10)}...{String(value).slice(-4)}
         </span>
-        <ArrowUpRight size={14} className="text-gray-400" />
+        <ArrowUpRight size={13} className="text-blue-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
       </button>
     ),
   },
   {
+    key: 'user',
+    header: 'Customer',
+    render: (value, row) => (
+      <div className="flex items-center gap-2.5">
+        <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold shrink-0">
+          {String(value || 'U').charAt(0).toUpperCase()}
+        </div>
+        <div className="min-w-0">
+          <p className="font-semibold text-slate-900 text-xs truncate max-w-[130px]">{value}</p>
+          <p className="text-2xs text-slate-400 truncate max-w-[130px]">{row.userEmail}</p>
+        </div>
+      </div>
+    ),
+  },
+  {
+    key: 'type',
+    header: 'Type & Asset',
+    render: (value, row) => (
+      <div className="flex items-center gap-1.5">
+        <span className={`px-2 py-0.5 rounded text-2xs font-bold uppercase tracking-wider ${value === 'BUY' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60' : 'bg-blue-50 text-blue-700 border border-blue-200/60'}`}>
+          {value}
+        </span>
+        <span className="text-xs font-bold text-slate-700">{row.cryptoSymbol}</span>
+      </div>
+    ),
+  },
+  {
     key: 'amount',
-    header: 'Amount',
-    render: (value) => <TableAmount amount={value} />,
+    header: 'Fiat Amount',
+    render: (value) => (
+      <span className="text-xs font-bold text-slate-900 tabular-nums">
+        {value}
+      </span>
+    ),
+  },
+  {
+    key: 'status',
+    header: 'Status',
+    render: (value) => {
+      const { displayText, variant } = mapTransactionStatus(String(value));
+      return <TableStatus status={displayText} variant={variant} />;
+    },
   },
   {
     key: 'date',
     header: 'Date',
-    render: (value) => <TableDate date={value} />,
+    render: (value) => <TableDate date={value as Date} />,
   },
   {
     key: 'action',
     header: 'Action',
     render: (_, row) => (
-      <div className="flex items-center justify-start gap-2 lg:gap-x-[16px] whitespace-nowrap">
-        <button
-          className="px-2.5 md:px-3 py-1 rounded-full bg-[#E6E6FE] cursor-pointer hover:opacity-80 text-[#03034D] text-xs md:text-xs font-medium"
-          onClick={() => handleViewTransaction(row.transactionId)}
-        >
-          View
-        </button>
-      </div>
+      <button
+        className="h-7 px-2.5 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 font-semibold text-xs transition-colors cursor-pointer"
+        onClick={() => handleViewTransaction(row.sessionId)}
+      >
+        View
+      </button>
     ),
   },
 ]
@@ -100,16 +132,18 @@ export const UsersWithTopTransactionDataRow = (
     return rowItems
   }
 
-  data.map((item: UsersWithTopTransactionVolume) => {
+  data.forEach((item: UsersWithTopTransactionVolume) => {
     rowItems.push({
-      user: `${item.userFirstName} ${item.userLastName}`,
-      transactionId: item.sessionId,
-      amount: formatCompact(getTransactionAmountFiatNGN(item), "NGN"),
+      sessionId: item.sessionId,
+      user: `${item.userFirstName || ''} ${item.userLastName || ''}`.trim() || 'Anonymous User',
+      userEmail: item.userEmail || '',
+      type: item.type,
+      cryptoSymbol: item.cryptoSymbol || 'USDT',
+      amount: `₦${Number(item.amountFiat || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      amountCrypto: item.amountCrypto,
       date: item.createdAt,
       status: item.status,
     })
-
-    return
   })
 
   return rowItems
@@ -125,17 +159,20 @@ export const TransactionsManagementColumn = (
   {
     key: 'id',
     header: (
-      <Fragment>
-        <div className="py-3 text-left text-sm font-medium text-gray-500">
-          <span className="flex items-center gap-2">
-            <span>Session ID</span>
-          </span>
-        </div>
-      </Fragment>
+      <div className="py-2.5 text-left text-xs font-semibold text-slate-600">
+        Session ID
+      </div>
     ),
     render: (value) => (
-      <div className="py-3 pr-2 text-sm text-[14px] text-[#101828] sm:py-5 sm:pr-4">
-        <ClickableDetails text={value} className="!max-w-[200px]" onClick={handleViewTransactionDetails}/>
+      <div
+        className="py-2 pr-2 font-mono text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1 group cursor-pointer"
+        onClick={() => handleViewTransactionDetails(value)}
+        title={String(value)}
+      >
+        <span className="truncate max-w-[130px] sm:max-w-[160px]">
+          {String(value).slice(0, 10)}...{String(value).slice(-4)}
+        </span>
+        <ArrowUpRight size={13} className="text-blue-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform shrink-0" />
       </div>
     ),
   },
@@ -144,114 +181,95 @@ export const TransactionsManagementColumn = (
     header: (
       <div
         onClick={() => handleSortBy('type')}
-        className="py-3 text-left text-sm font-medium text-gray-500 hover:cursor-pointer"
+        className="py-2.5 text-left text-xs font-semibold text-slate-600 hover:cursor-pointer inline-flex items-center gap-1"
       >
-        <span className="flex items-center gap-2">
-          <span>Type</span>
-          <ChevronDown className="text-gray-400" />
-        </span>
+        <span>Type</span>
+        <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
       </div>
     ),
-    render: (value) => <span className="py-3 text-sm text-gray-600 whitespace-nowrap sm:py-5">{value}</span>,
+    render: (value) => {
+      const isBuy = String(value).toUpperCase().startsWith('BUY')
+      const asset = String(value).replace(/^(BUY|SELL)\s*[-–]?\s*/i, '').trim()
+      return (
+        <div className="py-2 flex items-center gap-1.5 whitespace-nowrap">
+          <span className={`px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider ${isBuy ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60' : 'bg-blue-50 text-blue-700 border border-blue-200/60'}`}>
+            {isBuy ? 'BUY' : 'SELL'}
+          </span>
+          {asset && <span className="text-xs font-semibold text-slate-700">{asset}</span>}
+        </div>
+      )
+    },
   },
   {
     key: 'amount',
     header: (
-      <div className="py-3 text-left text-sm font-medium text-gray-500">
-        <span className="flex items-center gap-2">
-          <span>Amount</span>
-        </span>
+      <div className="py-2.5 text-left text-xs font-semibold text-slate-600">
+        Crypto Amount
       </div>
     ),
     render: (value) => (
-      <span className="py-3 text-sm text-[14px] text-gray-600 tabular-nums whitespace-nowrap sm:py-5">{value}</span>
+      <span className="py-2 text-xs sm:text-sm font-semibold text-slate-900 tabular-nums whitespace-nowrap">
+        {value}
+      </span>
     ),
   },
   {
     key: 'date',
     header: (
-      <Fragment>
-        <div 
-        className="py-3 text-left text-sm font-medium text-gray-500 hover:cursor-pointer"
+      <div
+        className="py-2.5 text-left text-xs font-semibold text-slate-600 hover:cursor-pointer inline-flex items-center gap-1"
         onClick={() => handleSortBy('createdAt')}
-        >
-          <span className="flex items-center gap-2">
-            <span>Date</span>
-            <ChevronDown className="text-gray-400 ml-4" onClick={() => handleSortBy('createdAt')} />
-          </span>
-        </div>
-      </Fragment>
+      >
+        <span>Date</span>
+        <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+      </div>
     ),
     render: (value) => (
-      <Fragment>
-        <span className="py-3 text-sm text-[14px] text-gray-600 whitespace-nowrap tabular-nums sm:py-5">{value}</span>
-      </Fragment>
+      <span className="py-2 text-xs text-slate-500 whitespace-nowrap tabular-nums">
+        {value}
+      </span>
     ),
   },
   {
     key: 'status',
     header: (
-      <Fragment>
-        <div className="py-3 text-left text-sm font-medium text-gray-500 hover:cursor-pointer" onClick={() => handleSortBy('status')}>
-          <span className="flex items-center gap-2">
-            <span>Status</span>
-            <ChevronDown
-              className="text-gray-400"
-              onClick={() => handleSortBy('status')}
-            />
-          </span>
-        </div>
-      </Fragment>
+      <div
+        className="py-2.5 text-left text-xs font-semibold text-slate-600 hover:cursor-pointer inline-flex items-center gap-1"
+        onClick={() => handleSortBy('status')}
+      >
+        <span>Status</span>
+        <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+      </div>
     ),
     render: (value) => {
       const { displayText, variant } = mapTransactionStatus(value)
-      return <TableStatus status={displayText} variant={variant} />
-    },
-  },
-  {
-    key: 'isAnonymous',
-    header: (
-      <Fragment>
-        <div className="py-3 text-left text-sm font-medium text-gray-500">
-          <span className="flex items-center gap-2">
-            <span>User Type</span>
-          </span>
-        </div>
-      </Fragment>
-    ),
-    render: (value) => {
-      let badgeClass = 'bg-green-100 text-green-800'
-      let label = 'Registered'
-      if (value === 'GUEST' || value === 'Anonymous') {
-        badgeClass = 'bg-orange-100 text-orange-800'
-        label = 'Guest'
-      } else if (value === 'OTHER') {
-        badgeClass = 'bg-gray-100 text-gray-800'
-        label = 'Other'
-      }
       return (
-        <span className={`text-sm text-[14px] px-3 py-1 rounded-full inline-flex items-center ${badgeClass}`}>
-          {label}
-        </span>
+        <div className="py-2">
+          <TableStatus status={displayText} variant={variant} />
+        </div>
       )
     },
   },
   {
-    key: "updatedAt",
+    key: 'action',
     header: (
-      <Fragment>
-        <div className="py-3 text-left text-sm font-medium text-gray-500 hover:cursor-pointer" onClick={() => handleSortBy('updatedAt')}>
-          <span className="flex items-center gap-2">
-            <span>Last Updated</span>
-            <ChevronDown className="text-gray-400 ml-4" onClick={() => handleSortBy('updatedAt')} />
-          </span>
-        </div>
-      </Fragment>
+      <div className="py-2.5 text-right text-xs font-semibold text-slate-600">
+        Action
+      </div>
     ),
-    render: (value) => (
-      <Fragment>
-        <span className="py-3 text-sm text-[14px] text-gray-600 whitespace-nowrap tabular-nums sm:py-5">{value}</span>
-      </Fragment>
+    render: (_, row) => (
+      <div className="py-2 text-right">
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            handleViewTransactionDetails(row.id)
+          }}
+          className="h-7 px-2.5 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 font-semibold text-xs transition-colors cursor-pointer touch-manipulation inline-flex items-center gap-1"
+        >
+          <span>Details</span>
+          <ArrowUpRight className="w-3 h-3 text-slate-400" />
+        </button>
+      </div>
     ),
   },
 ]
@@ -265,21 +283,16 @@ export const TransactionsManagementDataRow = (
     return rowItems
   }
 
-  data.map((item: SearchTransactionsResponse) => {
+  data.forEach((item: SearchTransactionsResponse) => {
     rowItems.push({
       id: item.sessionId,
       type: `${item.type} ${item.cryptocurrency ? `- ${item.cryptocurrency.symbol}` : ''}`,
       amount: formatCryptoAmountUpTo4Decimals(item.amountCrypto, item.cryptocurrency?.symbol),
       date: momentClient.formatToNormalisedDateAndTime(item.createdAt),
       status: item.status,
-      isAnonymous: item.userType || (item?.email ? 'GUEST' : 'REGISTERED'),
-      updatedAt: momentClient.formatToNormalisedDateAndTime(item.updatedAt),
     })
-
-    return
   })
 
   return rowItems
 }
 // End Transactions Management Tables
-

@@ -1,19 +1,11 @@
-import { Fragment, useState } from 'react'
-import { Upload, X } from 'lucide-react'
+import { useState, useRef } from 'react'
+import { Upload, X, Image as ImageIcon } from 'lucide-react'
 import type { UseMutationResult } from '@tanstack/react-query'
 
 interface UploadCoinIconProps {
-  oldImgUrl?: string;
-  onChangeInputField: (
-    field: any,
-    value: any,
-  ) => void
-  uploadCryptoLogoIcon: UseMutationResult<
-    string | undefined,
-    Error,
-    FormData,
-    unknown
-  >
+  oldImgUrl?: string
+  onChangeInputField: (field: any, value: any) => void
+  uploadCryptoLogoIcon: UseMutationResult<string | undefined, Error, FormData, unknown>
 }
 
 const UploadCoinIcon = ({
@@ -22,108 +14,108 @@ const UploadCoinIcon = ({
   uploadCryptoLogoIcon,
 }: UploadCoinIconProps) => {
   const [imageUrl, setImageUrl] = useState<string | undefined>(oldImgUrl)
-  const [image, setImage] = useState<any>(null)
   const [error, setError] = useState('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleFileChange = async (e: any) => {
-    const file = e.target.files[0]
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
     setError('')
-
     if (!file) return
 
-    // Check if file is an image
     if (!file.type.startsWith('image/')) {
-      setError('Please upload an image file')
+      setError('Please upload a valid image file (PNG, JPG, SVG)')
       return
     }
 
-    // Check file size (2MB = 2 * 1024 * 1024 bytes)
-    const maxSize = 2 * 1024 * 1024
-    if (file.size > maxSize) {
+    if (file.size > 2 * 1024 * 1024) {
       setError('Image size must be less than 2MB')
       return
     }
 
-    const reader = new FileReader()
-    reader.onloadend = () => {
-      setImage({
-        file: file,
-        preview: reader.result,
-        name: file.name,
-      })
-    }
-    reader.readAsDataURL(file)
-
-    // Create preview
     const formData = new FormData()
     formData.append('file', file)
-    const url = await uploadCryptoLogoIcon.mutateAsync(formData)
-    setImageUrl(url);
-    onChangeInputField('logoUrl', url)
+    try {
+      const url = await uploadCryptoLogoIcon.mutateAsync(formData)
+      if (url) {
+        setImageUrl(url)
+        onChangeInputField('logoUrl', url)
+      }
+    } catch {
+      setError('Failed to upload image. Please try again.')
+    }
   }
 
-  const handleRemove = () => {
-    setImage(null)
+  const handleRemove = (e: React.MouseEvent) => {
+    e.stopPropagation()
     setImageUrl(undefined)
-    setError('')
+    onChangeInputField('logoUrl', '')
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
   }
 
   return (
-    <Fragment>
-      <div className="mb-8">
-        <h2 className="text-xl font-medium text-gray-800 mb-2">Coin Icon</h2>
-
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-          {!(imageUrl || image) ? (
-            <label className="cursor-pointer block">
-              <input
-                type="file"
-                className="hidden"
-                accept="image/*"
-                onChange={handleFileChange}
-              />
-              <div className="flex flex-col items-center">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                  <Upload className="w-8 h-8 text-gray-400" />
-                </div>
-                <p className="text-gray-600 mb-2">
-                  <span className="text-indigo-600 font-medium">
-                    Click to upload
-                  </span>{' '}
-                  or drag and drop
-                </p>
-                <p className="text-sm text-gray-400">PNG, JPG, GIF up to 2MB</p>
-              </div>
-            </label>
-          ) : (
-            <div className="flex items-center justify-center gap-6">
+    <div className="mb-6 p-4 rounded-xl bg-white border border-slate-200/80 shadow-2xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        {/* Left: Small Logo Avatar Preview & Metadata */}
+        <div className="flex items-center gap-3.5">
+          <div className="relative w-12 h-12 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
+            {imageUrl ? (
               <img
-                src={image ? image?.preview : imageUrl}
-                alt="Coin preview"
-                className="w-24 h-24 object-cover rounded-lg border border-gray-200"
+                src={imageUrl}
+                alt="Coin logo"
+                className="w-full h-full object-contain p-1"
               />
-              {image && (
-                <div className="text-left flex-1">
-                  <p className="text-gray-800 font-medium mb-1">{image.name || ''}</p>
-                  <p className="text-sm text-gray-400">
-                    {(image.file.size / 1024).toFixed(2)} KB
-                  </p>
-                </div>
-              )}
-              <button
-                onClick={handleRemove}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                title="Remove image"
-              >
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
-            </div>
-          )}
+            ) : (
+              <ImageIcon className="w-5 h-5 text-slate-400" />
+            )}
+          </div>
+
+          <div>
+            <p className="text-xs sm:text-sm font-bold text-slate-900 leading-tight">
+              Currency Logo
+            </p>
+            <p className="text-[11px] text-slate-500 mt-0.5">
+              PNG, SVG, or JPG (max 2MB). Displayed across trading feeds.
+            </p>
+            {error && <p className="text-[11px] text-rose-600 mt-1">{error}</p>}
+          </div>
         </div>
 
-        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+        {/* Right: Actions */}
+        <div className="flex items-center gap-2 shrink-0">
+          <input
+            ref={fileInputRef}
+            type="file"
+            className="hidden"
+            accept="image/*"
+            onChange={handleFileChange}
+          />
+
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploadCryptoLogoIcon.isPending}
+            className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 active:scale-98 text-xs font-semibold text-slate-700 shadow-2xs transition-all cursor-pointer disabled:opacity-50"
+          >
+            <Upload className="w-3.5 h-3.5 text-slate-500" />
+            <span>{uploadCryptoLogoIcon.isPending ? 'Uploading...' : imageUrl ? 'Change Logo' : 'Upload Logo'}</span>
+          </button>
+
+          {imageUrl && (
+            <button
+              type="button"
+              onClick={handleRemove}
+              className="inline-flex items-center justify-center h-8 w-8 rounded-lg border border-slate-200 text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+              title="Remove logo"
+              aria-label="Remove logo"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
       </div>
-    </Fragment>
+    </div>
   )
 }
 

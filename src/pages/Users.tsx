@@ -1,5 +1,6 @@
 import { useMemo } from "react";
-import { SearchInput } from "../components/ui/search-input";
+import { Filter } from "lucide-react";
+import { useNavbarSearch } from "../layout/navbar-search-context.tsx";
 import { useUsersPage } from "../hooks/pages/useUsersPage";
 import {
   AdminSearchUserColumn,
@@ -67,43 +68,40 @@ const Users = () => {
     [loadingAdminSearchUsers, adminSearchUsers?.users]
   );
 
+  useNavbarSearch(
+    useMemo(
+      () => ({
+        placeholder: "Search users by name, email, phone or ID...",
+        value: searchQuery || "",
+        onChange: handleSearchChange,
+      }),
+      [searchQuery, handleSearchChange]
+    )
+  );
+
   return (
     <AuthenticatedLayout>
-      <PageHeader title="Users" />
-
-      <div className="p-6 mx-auto">
-        {/* Controls */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 py-4 mt-4 mb-2">
-          <SearchInput
-            placeholder="Search users..."
-            value={searchQuery}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            containerClassName="flex-1 sm:max-w-[280px]"
-          />
+      <PageHeader
+        title="Users"
+        actions={
           <button
-            className="inline-flex cursor-pointer hover:border-[#948EEE] hover:bg-[#F5F5FF] items-center justify-center gap-2 h-10 px-4 border border-[#ECECEC] rounded-full transition-colors bg-white shadow-sm"
+            className="inline-flex cursor-pointer hover:bg-slate-50 items-center justify-center gap-1.5 h-8.5 px-3 border border-slate-200 rounded-lg transition-colors bg-white shadow-2xs text-xs font-semibold text-slate-700 active:scale-98"
             onClick={toggleFilter}
           >
-            <img
-              src="/icons/Filter.svg"
-              alt="Filter"
-              className="w-4 h-4 opacity-70"
-            />
-            <span className="text-[14px] font-medium text-[#454745]">
-              Filter
-            </span>
+            <Filter className="w-3.5 h-3.5 text-slate-500" />
+            <span>Filter</span>
           </button>
-        </div>
+        }
+      />
 
-        <div className="mt-4 space-y-4">
-          <div className="bg-white rounded-2xl border border-[#ECECEC] overflow-hidden">
-            <Table
-              data={data}
-              columns={columns}
-              loading={loadingAdminSearchUsers}
-              onRowClick={(row) => handleNavigateToUserDetails(row.id)}
-            />
-          </div>
+      <div className="px-4 sm:px-6 pb-6">
+        <div className="bg-white rounded-xl border border-slate-200/80 shadow-xs overflow-hidden">
+          <Table
+            data={data}
+            columns={columns}
+            loading={loadingAdminSearchUsers}
+            onRowClick={(row) => handleNavigateToUserDetails(row.id)}
+          />
 
           <TableFooter
             currentPage={adminSearchUsers?.page || 1}

@@ -1,7 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useMatchRoute } from "@tanstack/react-router";
 import { toast } from "react-toastify";
-import { ROUTES } from '../util/constants.util';
 import { kycServiceApi } from "../api/kyc.api";
 import { store } from "../store";
 import { QUERY_KEYS } from './querries.keys';
@@ -10,20 +8,21 @@ import type { AxiosServerError } from "../types/response.payload.types";
 
 export const useKycQuery = () => {
   const queryClient = useQueryClient();
-  const matchRoute = useMatchRoute();
 
   const { data: kycTierLimits, isLoading: loadingKycTierLimits } = useQuery({
     queryKey: [QUERY_KEYS.KYC.GET_ALL_KYC_TIER_LIMITS],
     queryFn: async () => {
-      const { data, success } = await kycServiceApi.getAllKycTierLimits();
-
-      if (success) {
-        return data;
+      try {
+        const res = await kycServiceApi.getAllKycTierLimits();
+        if (res && res.success) {
+          return res.data;
+        }
+        return [];
+      } catch {
+        return [];
       }
-
-      return null;
     },
-    enabled: !!(matchRoute({ to: ROUTES.KYC_TIER_LIMITS })),
+    retry: false,
   });
 
   const createKycTierLimitMutation = useMutation({

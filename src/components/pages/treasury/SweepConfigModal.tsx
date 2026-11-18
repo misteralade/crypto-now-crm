@@ -948,11 +948,11 @@ export default function SweepConfigModal({
           </div>
         </div>
 
-        <div className="flex gap-3 border-t border-[--color-border] bg-[#FBFBFF] px-6 py-4">
+        <div className="flex gap-2.5 border-t border-slate-200 bg-slate-50/50 px-5 py-3.5">
           <button
             type="button"
             onClick={requestClose}
-            className="flex-1 rounded-xl border border-[#E4E7EC] bg-white px-4 py-2.5 text-sm font-semibold text-[#03034D] transition-colors hover:bg-[#F8F8FF]"
+            className="flex-1 h-9 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50"
           >
             Cancel
           </button>
@@ -960,7 +960,7 @@ export default function SweepConfigModal({
             <button
               onClick={handlePreview}
               disabled={!canPreview || isPreviewLoading}
-              className="flex-1 rounded-xl bg-[#03034D] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#050568] disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex-1 h-9 rounded-lg bg-blue-600 px-3 text-xs font-semibold text-white shadow-xs transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isPreviewLoading ? "Loading Preview..." : "Preview Sweep"}
             </button>
@@ -968,7 +968,7 @@ export default function SweepConfigModal({
             <button
               onClick={handleInitiate}
               disabled={confirmSweepDisabled}
-              className="flex-1 rounded-xl bg-[#03034D] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#050568] disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex-1 h-9 rounded-lg bg-blue-600 px-3 text-xs font-semibold text-white shadow-xs transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {initiateSweepMutation.isPending
                 ? "Starting..."

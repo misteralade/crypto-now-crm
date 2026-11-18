@@ -23,7 +23,7 @@ import type {
 } from "../../schemas/transaction.schema";
 import type {RootState} from "../../store";
 import type { TimelineFilter } from "../../types/global.types";
-import type {AxiosServerError, SearchTransactionsResponse} from "../../types/response.payload.types";
+import type {AxiosServerError} from "../../types/response.payload.types";
 
 export const useManageTransactionsPage = () => {
   const dispatch = useDispatch()
@@ -205,57 +205,6 @@ export const useManageTransactionsPage = () => {
     setSelectedStatsTimeline(timeline)
   }
 
-  const toCsv = (rows: Array<SearchTransactionsResponse>) => {
-    const headers = [
-      "Transaction ID",
-      "Date",
-      "Type",
-      "Amount Fiat",
-      "Amount Crypto",
-      "Status",
-      "Email",
-      "Priority",
-      "Currency",
-    ];
-    const lines = rows.map((row) =>
-      [
-        row.id,
-        row.createdAt,
-        row.type,
-        row.amountFiat,
-        row.amountCrypto,
-        row.status,
-        row.email ?? "",
-        row.priority,
-        row.currency,
-      ]
-        .map((value) => `"${String(value).replace(/"/g, '""')}"`)
-        .join(","),
-    );
-    return [headers.join(","), ...lines].join("\n");
-  };
-
-  const downloadBlob = (content: BlobPart, fileName: string, mimeType = "text/csv") => {
-    const blob = new Blob([content], { type: mimeType });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = fileName;
-    link.click();
-    window.setTimeout(() => URL.revokeObjectURL(url), 100);
-  };
-
-  const handleExportAll = () => {
-    const transactions = searchTransactions?.transactions ?? [];
-    if (transactions.length === 0) {
-      toast.info("No transactions found.");
-      return;
-    }
-
-    const csv = toCsv(transactions);
-    downloadBlob(csv, "transactions.csv");
-  };
-
   return {
     // 🧩 Values
     searchTransactions,
@@ -283,7 +232,6 @@ export const useManageTransactionsPage = () => {
     forcingPayout: adminForceTriggerPayoutMutation.isPending,
     handlePageSizeChange,
     handleSelectedStatsTimelineChange,
-    handleExportAll,
     handleRefreshTransactions: refetchSearchTransactions,
     isFetchingTransactions: fetchingSearchTransactions,
     clearUserFilter,

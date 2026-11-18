@@ -6,7 +6,6 @@ import { PillInput } from '../components/ui/input';
 import { PillSelect } from '../components/ui/select';
 import { useCurrencyQuery } from '../queries/currency.querries';
 import type { SupportedCurrencyResponsePayload } from '../types/response.payload.types';
-import CustomButton from '../components/global/Button';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -124,26 +123,26 @@ const SupportedCurrencies = () => {
 
   return (
     <AuthenticatedLayout>
-      <div className="p-6 mx-auto">
-        <PageHeader 
-          title="Supported Currencies" 
-          actions={
-            <CustomButton
-              onClick={openCreateModal}
-              className="flex items-center gap-2"
-            >
-              <Plus size={18} />
-              Add Currency
-            </CustomButton>
-          }
-        />
+      <PageHeader 
+        title="Supported Currencies" 
+        actions={
+          <button
+            onClick={openCreateModal}
+            className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-xs transition-colors"
+          >
+            <Plus size={16} />
+            <span>Add Currency</span>
+          </button>
+        }
+      />
 
+      <div className="px-4 sm:px-6 pb-6 space-y-4">
         {/* Heading row */}
-        <div className="flex mt-8 w-full items-center justify-between mb-8">
-          <h2 className="text-[24px] font-bold text-[#03034D]">
+        <div className="flex w-full items-center justify-between">
+          <h2 className="text-base font-bold text-slate-900">
             System Currencies
             {currencies && (
-              <span className="ml-3 text-base text-gray-400 font-medium">
+              <span className="ml-2 text-xs text-slate-500 font-medium">
                 ({currencies.length})
               </span>
             )}
@@ -153,69 +152,71 @@ const SupportedCurrencies = () => {
         {/* Grid */}
         {loadingCurrencies ? (
           <div className="flex items-center justify-center py-20">
-            <div className="w-10 h-10 border-4 border-[#575AE5] border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
             {!currencies || currencies.length === 0 ? (
-              <div className="col-span-full rounded-3xl border border-dashed border-[#ECECEC] bg-white p-12 text-center text-gray-400">
+              <div className="col-span-full rounded-xl border border-dashed border-slate-200 bg-white p-12 text-center text-slate-400 text-xs">
                 No currencies configured yet. Click "+ Add Currency" to create one.
               </div>
             ) : (
               currencies.map((currency) => (
                 <div
                   key={currency.id}
-                  className="rounded-[32px] border border-[#ECECEC] bg-white p-6 flex flex-col gap-5 hover:border-[#575AE5] transition-all group"
+                  className="rounded-xl border border-slate-200/80 bg-white p-5 flex flex-col gap-4 hover:border-blue-400 hover:shadow-xs transition-all group"
                 >
                   <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3">
                       {currency.logoUrl ? (
                         <img
                           src={currency.logoUrl}
                           alt={currency.name}
-                          className="w-12 h-12 rounded-2xl object-cover border border-[#ECECEC]"
+                          className="w-10 h-10 rounded-lg object-cover border border-slate-200"
                         />
                       ) : (
-                        <div className="w-12 h-12 rounded-2xl bg-[#F5F5FF] flex items-center justify-center text-[#03034D] font-bold text-lg">
+                        <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-700 font-bold text-sm flex items-center justify-center">
                           {currency.code.slice(0, 2)}
                         </div>
                       )}
                       <div>
-                        <p className="font-bold text-[#03034D] leading-tight">{currency.name}</p>
-                        <p className="text-xs font-medium text-gray-400 uppercase tracking-widest mt-0.5">{currency.code}</p>
+                        <p className="font-bold text-slate-900 text-sm leading-tight">{currency.name}</p>
+                        <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mt-0.5">{currency.code}</p>
                       </div>
                     </div>
                   </div>
 
                   <div className="flex flex-wrap gap-2">
                     <span
-                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                      className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider ${
                         currency.isActive
-                          ? 'bg-emerald-50 text-emerald-600'
-                          : 'bg-gray-100 text-gray-500'
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60'
+                          : 'bg-slate-100 text-slate-600 border border-slate-200'
                       }`}
                     >
-                      <span className={`w-1.5 h-1.5 rounded-full ${currency.isActive ? 'bg-emerald-500' : 'bg-gray-400'}`} />
+                      <span className={`w-1.5 h-1.5 rounded-full ${currency.isActive ? 'bg-emerald-500' : 'bg-slate-400'}`} />
                       {currency.isActive ? 'Active' : 'Inactive'}
                     </span>
                   </div>
 
                   {currency.description && (
-                    <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">{currency.description}</p>
+                    <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">{currency.description}</p>
                   )}
 
-                  <div className="flex items-center justify-end gap-1 border-t border-[#F2F4F7] pt-4 mt-auto">
+                  <div className="flex items-center justify-end gap-1 border-t border-slate-100 pt-3 mt-auto">
                     <button
                       onClick={() => openEditModal(currency)}
-                      className="p-2 rounded-xl text-gray-400 hover:text-[#575AE5] hover:bg-[#F5F5FF] transition-all"
+                      className="p-1.5 rounded-md text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                      title="Edit currency"
                     >
-                      <Pencil size={16} />
+                      <Pencil size={15} />
                     </button>
                     <button
                       onClick={() => openDeleteModal(currency)}
-                      className="p-2 rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all"
+                      className="p-1.5 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                      title="Delete currency"
                     >
-                      <Trash2 size={16} />
+                      <Trash2 size={15} />
                     </button>
                   </div>
                 </div>
@@ -276,8 +277,8 @@ const SupportedCurrencies = () => {
             confirmDisabled={deleteCurrencyMutation.isPending}
             confirmDestructive
           >
-            <p className="text-gray-600 text-sm leading-relaxed">
-              Are you sure you want to delete <strong>{deleteTarget.name}</strong> ({deleteTarget.code})? This action cannot be undone and will affect system-wide exchange rates.
+            <p className="text-slate-600 text-xs leading-relaxed">
+              Are you sure you want to delete <strong>{deleteTarget.name}</strong> ({deleteTarget.code})? This action cannot be undone.
             </p>
           </Modal>
         )}
@@ -351,33 +352,38 @@ type ModalProps = {
 
 function Modal({ title, children, onClose, onConfirm, confirmLabel, confirmDisabled, confirmDestructive }: ModalProps) {
   return (
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/40 backdrop-blur-[2px]">
-      <div className="bg-white rounded-[32px] w-full max-w-lg mx-4 p-8 max-h-[90vh] overflow-y-auto shadow-2xl border border-[#ECECEC]">
-        <div className="flex items-center justify-between mb-8">
-          <h3 className="text-[22px] font-bold text-[#03034D]">{title}</h3>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-xs">
+      <div className="bg-white rounded-xl w-full max-w-md p-5 sm:p-6 max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200">
+        <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+          <h3 className="text-base font-bold text-slate-900">{title}</h3>
           <button
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+            className="p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
           >
-            <X className="w-6 h-6 text-gray-500" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         {children}
 
-        <div className="flex items-center justify-end gap-4 mt-8 pt-6 border-t border-[#F2F4F7]">
-          <CustomButton
-            variant="button"
+        <div className="flex items-center justify-end gap-2.5 mt-5 pt-3 border-t border-slate-100">
+          <button
+            type="button"
             onClick={onClose}
-            className="bg-white !text-[#03034D] border border-[#ECECEC] hover:bg-gray-50 px-8"
-            buttonText="Cancel"
-          />
-          <CustomButton
+            className="h-9 px-4 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
             onClick={onConfirm}
             disabled={confirmDisabled}
-            className={confirmDestructive ? 'bg-red-500 hover:bg-red-600 px-10' : 'px-10'}
-            buttonText={confirmLabel}
-          />
+            className={`h-9 px-4 rounded-lg text-white text-xs font-semibold shadow-xs transition-colors disabled:opacity-50 ${
+              confirmDestructive ? 'bg-rose-600 hover:bg-rose-700' : 'bg-blue-600 hover:bg-blue-700'
+            }`}
+          >
+            {confirmLabel}
+          </button>
         </div>
       </div>
     </div>

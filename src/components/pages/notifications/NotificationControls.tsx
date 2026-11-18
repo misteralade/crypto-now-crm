@@ -1,34 +1,21 @@
-import { SearchInput } from '../../ui/search-input'
+import { Filter } from 'lucide-react'
 
 interface ControlsProps {
   onOpenFilter: () => void
-  searchValue: string
-  onSearchChange: (value: string) => void
 }
 
-const NotificationControls = ({ onOpenFilter, searchValue, onSearchChange }: ControlsProps) => {
+const NotificationControls = ({ onOpenFilter }: ControlsProps) => {
   return (
-    <div className="mb-6">
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
-        <div className="flex w-full lg:w-auto items-center gap-2">
-          <SearchInput
-            placeholder="Search notifications"
-            value={searchValue}
-            onChange={(e) => onSearchChange(e.target.value)}
-            containerClassName="flex-1 lg:flex-none"
-            className="md:w-[280px]"
-          />
-          <button
-            onClick={onOpenFilter}
-            className="inline-flex cursor-pointer hover:border-[#948EEE] hover:bg-[#F5F5FF] items-center justify-center gap-2 h-10 px-4 border border-[#ECECEC] rounded-full transition-colors bg-white"
-          >
-            <img src="/icons/Filter.svg" alt="Filter" className="w-4 h-4 opacity-70" />
-            <span className="text-[14px] font-medium text-[#454745]">Filter</span>
-          </button>
-        </div>
-      </div>
+    <div className="py-2 mb-4 flex items-center justify-end">
+      <button
+        onClick={onOpenFilter}
+        className="inline-flex cursor-pointer hover:bg-slate-50 items-center justify-center gap-1.5 h-9 px-3.5 border border-slate-200 rounded-lg transition-colors bg-white shadow-xs text-xs font-semibold text-slate-700 shrink-0"
+      >
+        <Filter className="w-3.5 h-3.5 text-slate-500" />
+        <span>Filter</span>
+      </button>
     </div>
   )
 }
 
-export default NotificationControls;
+export default NotificationControls

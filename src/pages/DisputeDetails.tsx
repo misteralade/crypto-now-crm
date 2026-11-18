@@ -20,7 +20,6 @@ const DisputeDetails = () => {
     
     // ⚙️ Functions
     adminSendDisputeMutation,
-    goBack,
     navigateToEdit,
   } = useDisputeDetailsPage();
   
@@ -58,7 +57,6 @@ const DisputeDetails = () => {
           <PageHeader
             title="Dispute Details"
             subtitle={`Dispute ID: ${disputeDetails.id}`}
-            onBack={goBack}
             actions={
               <div className="flex items-center gap-3">
                 <div
@@ -78,7 +76,7 @@ const DisputeDetails = () => {
               </div>
             }
           />
-          <div className="p-6 mx-auto max-w-7xl">
+          <div className="px-4 sm:px-6 pb-6 mx-auto max-w-7xl">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
               {/* Left Column - Transaction & Dispute Info */}
               <div className="lg:col-span-5 space-y-6">
@@ -92,11 +90,11 @@ const DisputeDetails = () => {
                   fiatCurrency={disputeDetails.transaction?.currency || ''}
                   exchangeRateDisplay={(() => {
                     const tx = disputeDetails.transaction;
-                    if (!tx?.cryptocurrency?.symbol) return '—';
+                    if (!tx?.cryptocurrency?.symbol) return '-';
                     const symbol = tx.cryptocurrency.symbol;
                     const amountCrypto = Number(tx.amountCrypto);
                     const currency = tx.currency;
-                    if (amountCrypto <= 0) return '—';
+                    if (amountCrypto <= 0) return '-';
                     if (tx.exchangeRate) {
                       const rate = Number(tx.exchangeRate.rate);
                       const platformRate = Number(tx.exchangeRate.platformRate);

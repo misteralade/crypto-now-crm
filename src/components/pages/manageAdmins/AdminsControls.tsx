@@ -1,51 +1,41 @@
-import { SearchInput } from '../../ui/search-input'
-import CustomButton from '../../global/Button'
+import { Filter, Plus } from 'lucide-react'
 
 interface AdminsControlsProps {
   onOpenFilter: () => void;
-  searchValue: string;
-  onSearchChange: (value: string) => void;
   onOpenCreate: () => void;
   onOpenCreateRole: () => void;
 }
 
-const AdminsControls = ({ onOpenFilter, searchValue, onSearchChange, onOpenCreate, onOpenCreateRole }: AdminsControlsProps) => {
+const AdminsControls = ({ onOpenFilter, onOpenCreate, onOpenCreateRole }: AdminsControlsProps) => {
   return (
-    <div className="py-4 mb-6">
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
-        <div className="flex w-full lg:w-auto items-center gap-2">
-          <SearchInput
-            placeholder="Search admins"
-            value={searchValue}
-            onChange={(e) => onSearchChange(e.target.value)}
-            containerClassName="flex-1 lg:flex-none"
-            className="md:w-[280px]"
-          />
-          <button
-            onClick={onOpenFilter}
-            className="inline-flex cursor-pointer hover:border-[#948EEE] hover:bg-[#F5F5FF] items-center justify-center gap-2 h-12 px-5 border border-[#ECECEC] rounded-full transition-all bg-white shadow-sm active:scale-95"
-          >
-            <img src="/icons/Filter.svg" alt="Filter" className="w-4 h-4 opacity-70" />
-            <span className="text-[14px] font-medium text-[#454745]">Filter</span>
-          </button>
-        </div>
+    <div className="py-2 mb-4">
+      <div className="flex items-center justify-between gap-3">
+        <button
+          onClick={onOpenFilter}
+          className="inline-flex cursor-pointer hover:bg-slate-50 items-center justify-center gap-1.5 h-9 px-3.5 border border-slate-200 rounded-lg transition-colors bg-white shadow-xs text-xs font-semibold text-slate-700 shrink-0"
+        >
+          <Filter className="w-3.5 h-3.5 text-slate-500" />
+          <span>Filter</span>
+        </button>
 
-        <div className="flex w-full lg:w-auto items-center gap-2 lg:justify-end">
-          <CustomButton
-            onClick={onOpenCreate}
-            className="w-full md:w-auto h-12"
-            buttonText="Add new admin"
-          />
-          <CustomButton
-            variant="button"
+        <div className="flex flex-wrap items-center gap-2 justify-end">
+          <button
             onClick={onOpenCreateRole}
-            className="bg-white !text-[#03034D] border border-[#ECECEC] hover:bg-[#F5F5FF] w-full md:w-auto h-12 shadow-sm"
-            buttonText="Add New Role"
-          />
+            className="h-9 px-3.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+          >
+            Add Role
+          </button>
+          <button
+            onClick={onOpenCreate}
+            className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+          >
+            <Plus size={16} />
+            <span>Add Admin</span>
+          </button>
         </div>
       </div>
     </div>
   )
 }
 
-export default AdminsControls;
+export default AdminsControls

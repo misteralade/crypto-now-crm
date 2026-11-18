@@ -1,6 +1,8 @@
 import { useMemo } from "react";
-import ManageTransactionsControls from "../components/pages/manageTransactions/ManageTransactionsControls.tsx";
+import { Filter, RefreshCcw } from "lucide-react";
 import PageHeader from "../components/global/pageHeader.tsx";
+import { useNavbarSearch } from "../layout/navbar-search-context.tsx";
+import { cn } from "../lib/utils";
 import {
   TransactionsManagementColumn,
   TransactionsManagementDataRow,
@@ -35,7 +37,6 @@ const ManageTransactions = () => {
     retryingConfirmation,
     forcingPayout,
     handlePageSizeChange: updatePageSize,
-    handleExportAll,
     isFetchingTransactions,
     filteredUserId,
     filteredUserName,
@@ -71,6 +72,17 @@ const ManageTransactions = () => {
     timeline: "all",
   });
 
+  useNavbarSearch(
+    useMemo(
+      () => ({
+        placeholder: "Search transaction by session ID, amount...",
+        value: query,
+        onChange: handleSearchQuery,
+      }),
+      [query, handleSearchQuery]
+    )
+  );
+
   const handleRefreshTransactions = () => {
     resetSearchFilter();
   };
@@ -99,48 +111,61 @@ const ManageTransactions = () => {
 
   return (
     <AuthenticatedLayout>
-      <PageHeader title="Transactions" />
-      <div className="p-3 sm:p-6 mx-auto space-y-5">
+      <PageHeader
+        title="Transactions"
+        actions={
+          <div className="flex items-center gap-2">
+            <button
+              onClick={toggleApplyFilter}
+              className="inline-flex h-8.5 items-center justify-center gap-1.5 rounded-lg border border-slate-200/90 bg-white px-3 text-xs font-semibold text-slate-700 shadow-2xs transition-all hover:bg-slate-50 active:scale-98 cursor-pointer touch-manipulation"
+            >
+              <Filter className="h-3.5 w-3.5 text-slate-500" />
+              <span>Filter</span>
+            </button>
+
+            <button
+              onClick={handleRefreshTransactions}
+              disabled={!!isFetchingTransactions}
+              className="inline-flex h-8.5 items-center justify-center gap-1.5 rounded-lg border border-slate-200/90 bg-white px-3 text-xs font-semibold text-slate-700 shadow-2xs transition-colors hover:bg-slate-50 disabled:opacity-50 active:scale-98 cursor-pointer touch-manipulation"
+              title="Refresh Transactions"
+            >
+              <RefreshCcw
+                className={cn("h-3.5 w-3.5 text-slate-500", isFetchingTransactions && "animate-spin")}
+              />
+              <span className="hidden sm:inline">Refresh</span>
+            </button>
+          </div>
+        }
+      />
+
+      <div className="px-4 sm:px-6 pb-6 space-y-3">
         {filteredUserId && (
-          <div className="flex items-center justify-between gap-3 rounded-xl border border-[#ECECEC] bg-[#F9FAFB] px-4 py-2.5">
-            <span className="text-sm text-[#03034D]">
-              Showing transactions for{" "}
-              <span className="font-semibold">
-                {filteredUserName ?? "this user"}
-              </span>{" "}
-              only
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-blue-100 bg-blue-50/60 px-4 py-2 text-xs text-blue-900">
+            <span>
+              Showing transactions for <strong className="font-semibold">{filteredUserName ?? "this user"}</strong> only
             </span>
             <button
               type="button"
               onClick={clearUserFilter}
-              className="text-sm font-medium text-[#5B5EA6] hover:underline"
+              className="font-medium text-blue-600 hover:underline cursor-pointer"
             >
               Clear filter
             </button>
           </div>
         )}
 
-        <ManageTransactionsControls
-          onOpenFilter={toggleApplyFilter}
-          searchValue={query}
-          onSearchChange={handleSearchQuery}
-          handleExportAll={handleExportAll}
-          handleRefreshTransactions={handleRefreshTransactions}
-          isFetchingTransactions={isFetchingTransactions}
-        />
-
-        <div className="bg-white rounded-3xl border border-[#ECECEC] shadow-sm overflow-hidden p-2">
+        <div className="bg-white rounded-xl border border-slate-200/80 shadow-xs overflow-hidden">
           {/* Transactions Table */}
           <div className="overflow-hidden">
-          <Table
-            data={data}
-            columns={columns}
-            loading={loadingSearchTransactions}
-            onRowClick={(row) => handleShowTransactionDetails(row.id)}
-          />
+            <Table
+              data={data}
+              columns={columns}
+              loading={loadingSearchTransactions}
+              onRowClick={(row) => handleShowTransactionDetails(row.id)}
+            />
           </div>
 
-          <div className="px-4 py-4 bg-[#F9FAFB] border-t border-[#ECECEC] rounded-b-3xl">
+          <div className="px-4 py-3 bg-white border-t border-slate-100">
             <TableFooter
               currentPage={searchTransactions?.page || 1}
               totalPages={searchTransactions?.totalPages || 1}

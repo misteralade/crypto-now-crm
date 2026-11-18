@@ -1,25 +1,22 @@
 import {useDispatch} from "react-redux";
 import {useEffect} from "react";
 import {useNavigate, useParams} from "@tanstack/react-router";
-import { useMutation } from "@tanstack/react-query";
-import { toast } from "react-toastify";
 import {clearTransactionDetailSessionId, setTransactionDetailSessionId } from "../../redux/transaction-management.slice";
 import {useTransactionQuery} from "../../queries/transaction.query.ts";
 import {ROUTES} from "../../util/constants.util.ts";
-import { transactionServiceApi } from "../../api/transaction.api";
 
 export const useTransactionDetailsPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { id } = useParams({ from: '/dashboard/transaction/$id' })
+  
   const {
     transactionInfo,
     loadingTransactionInfo,
     refetchTransactionInfo,
     adminRetryDepositConfirmationMutation,
     adminForceTriggerPayoutMutation,
-  } = useTransactionQuery();
-  
-  const { id } = useParams({ from: '/dashboard/transaction/$id' })
+  } = useTransactionQuery({ sessionId: id });
   
   useEffect(() => {
     if (id) {
@@ -27,40 +24,8 @@ export const useTransactionDetailsPage = () => {
     }
   }, [id, dispatch]);
 
-  const exportLedgerMutation = useMutation({
-    mutationFn: async () => {
-      if (!id) {
-        throw new Error("Transaction session ID is missing");
-      }
-
-      return await transactionServiceApi.adminDownloadTransactionLedgerCsv(id);
-    },
-    onSuccess: (blob) => {
-      const url = window.URL.createObjectURL(blob);
-      const anchor = document.createElement("a");
-      anchor.href = url;
-      anchor.download = `transaction-${id}-ledger.csv`;
-      document.body.appendChild(anchor);
-      anchor.click();
-      anchor.remove();
-      window.URL.revokeObjectURL(url);
-      toast.success("Ledger CSV exported successfully");
-    },
-    onError: (error: unknown) => {
-      if (error instanceof Error) {
-        toast.error(error.message || "Failed to export ledger CSV");
-        return;
-      }
-
-      toast.error("Failed to export ledger CSV");
-    },
-  });
-
   const handleRetryDepositConfirmation = async (sessionId?: string) => {
-    if (!sessionId) {
-      toast.error("Transaction session ID is required to retry confirmation");
-      return;
-    }
+    if (!sessionId) return;
 
     const res = await adminRetryDepositConfirmationMutation.mutateAsync(sessionId);
     if (res?.success) {
@@ -69,10 +34,7 @@ export const useTransactionDetailsPage = () => {
   };
 
   const handleForceTriggerPayout = async (sessionId?: string) => {
-    if (!sessionId) {
-      toast.error("Transaction session ID is required to trigger payout");
-      return;
-    }
+    if (!sessionId) return;
 
     const res = await adminForceTriggerPayoutMutation.mutateAsync({
       sessionId,
@@ -98,14 +60,11 @@ export const useTransactionDetailsPage = () => {
     transactionInfo,
     loadingTransactionInfo,
     ledgerEntries: transactionInfo?.ledgerEntries || [],
-    exportingLedgerCsv: exportLedgerMutation.isPending,
     retryingConfirmation: adminRetryDepositConfirmationMutation.isPending,
     forcingPayout: adminForceTriggerPayoutMutation.isPending,
     
-    
     // ⚙️ Functions
     goBack,
-    handleExportLedgerCsv: () => exportLedgerMutation.mutate(),
     handleRetryDepositConfirmation,
     handleForceTriggerPayout,
   }

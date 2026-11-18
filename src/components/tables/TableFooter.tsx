@@ -1,3 +1,4 @@
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 
 interface TableFooterProps {
@@ -10,7 +11,7 @@ interface TableFooterProps {
   maxVisible?: number;
 }
 
-const TableFooter = ({ currentPage, totalPages, pageSize, totalItems, onPageChange, onPageSizeChange, maxVisible = 10 }: TableFooterProps) => {
+const TableFooter = ({ currentPage, totalPages, pageSize, totalItems, onPageChange, onPageSizeChange, maxVisible = 5 }: TableFooterProps) => {
   const getVisiblePages = () => {
     const pages = []
 
@@ -49,57 +50,39 @@ const TableFooter = ({ currentPage, totalPages, pageSize, totalItems, onPageChan
     onPageChange(1)
   }
 
-  const startItem = (currentPage - 1) * pageSize + 1
+  const startItem = totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1
   const endItem = Math.min(currentPage * pageSize, totalItems)
 
   return (
-    <div className="flex flex-wrap items-center justify-between w-full mt-6 gap-4 px-2">
-      {/* Left side - Items per page + count */}
-      <div className="flex items-center gap-3">
-        <span className="text-[13px] text-[#9A9A9A] font-medium">Show</span>
-        <Select value={pageSize === totalItems ? 'all' : String(pageSize)} onValueChange={handlePageSizeChange}>
-          <SelectTrigger className="h-9 w-[80px] rounded-full border-[#ECECEC] text-[13px] text-[#03034D] px-4 font-bold shadow-sm mb-0">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="10">10</SelectItem>
-            <SelectItem value="20">20</SelectItem>
-            <SelectItem value="50">50</SelectItem>
-            <SelectItem value="100">100</SelectItem>
-            <SelectItem value="all">All</SelectItem>
-          </SelectContent>
-        </Select>
-        <span className="text-[13px] text-[#9A9A9A] font-medium ml-1">
-          Showing <span className="text-[#03034D] font-bold">{startItem}–{endItem}</span> of <span className="text-[#03034D] font-bold">{totalItems}</span>
-        </span>
+    <div className="flex flex-col sm:flex-row items-center justify-between w-full border-t border-slate-100 gap-3 px-4 py-3 bg-white">
+      {/* Left side - Showing count (SilverLogix style) */}
+      <div className="text-xs text-slate-500 font-medium">
+        Showing <span className="text-slate-800 font-semibold">{startItem}</span> to <span className="text-slate-800 font-semibold">{endItem}</span> of <span className="text-slate-800 font-semibold">{totalItems}</span> entries
       </div>
 
-      {/* Right side - Pagination */}
+      {/* Center - Numbered Pagination */}
       <div className="flex items-center gap-1.5">
         <button
           onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className={`px-3 py-1.5 text-[13px] font-medium rounded-full transition-colors ${
-            currentPage === 1
-              ? 'text-[#D1D5DB] cursor-not-allowed'
-              : 'text-[#454745] hover:bg-[#F5F5FF] cursor-pointer'
-          }`}
+          disabled={currentPage <= 1}
+          className="w-7 h-7 flex items-center justify-center rounded-md border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer touch-manipulation shadow-2xs"
+          aria-label="Previous page"
         >
-          ← Prev
+          <ChevronLeft className="w-3.5 h-3.5" />
         </button>
 
         <div className="flex items-center gap-1">
           {getVisiblePages().map((page, index) => (
             page === '...' ? (
-              <span key={`${index}-ellipsis`} className="px-1 text-[#9A9A9A] text-[13px]">···</span>
+              <span key={`${index}-ellipsis`} className="px-1 text-slate-400 text-xs">···</span>
             ) : (
               <button
                 key={page}
                 onClick={() => onPageChange(page as number)}
-                className={`w-8 h-8 rounded-full text-[13px] font-semibold transition-all cursor-pointer ${
+                className={`w-7 h-7 rounded-md text-xs font-semibold transition-all cursor-pointer touch-manipulation ${
                   currentPage === page
-                    ? 'bg-[#03034D] text-white shadow-sm'
-                    : 'text-[#9A9A9A] hover:bg-[#F5F5FF] hover:text-[#03034D]'
+                    ? 'bg-blue-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                 }`}
               >
                 {page}
@@ -110,15 +93,29 @@ const TableFooter = ({ currentPage, totalPages, pageSize, totalItems, onPageChan
 
         <button
           onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className={`px-3 py-1.5 text-[13px] font-medium rounded-full transition-colors ${
-            currentPage === totalPages
-              ? 'text-[#D1D5DB] cursor-not-allowed'
-              : 'text-[#454745] hover:bg-[#F5F5FF] cursor-pointer'
-          }`}
+          disabled={currentPage >= totalPages}
+          className="w-7 h-7 flex items-center justify-center rounded-md border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer touch-manipulation shadow-2xs"
+          aria-label="Next page"
         >
-          Next →
+          <ChevronRight className="w-3.5 h-3.5" />
         </button>
+      </div>
+
+      {/* Right side - Rows per page */}
+      <div className="flex items-center gap-2">
+        <span className="text-xs text-slate-500 font-medium">Rows per page</span>
+        <Select value={pageSize === totalItems ? 'all' : String(pageSize)} onValueChange={handlePageSizeChange}>
+          <SelectTrigger className="h-7.5 w-[70px] rounded-md border-slate-200 text-xs text-slate-800 font-semibold shadow-2xs px-2">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="10">10</SelectItem>
+            <SelectItem value="20">20</SelectItem>
+            <SelectItem value="50">50</SelectItem>
+            <SelectItem value="100">100</SelectItem>
+            <SelectItem value="all">All</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
     </div>
   )

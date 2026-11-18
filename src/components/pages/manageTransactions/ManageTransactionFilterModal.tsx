@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { CalendarRange, Layers3, SlidersHorizontal, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { X, Calendar, DollarSign } from "lucide-react";
 import { TRANSACTION_STATUS_OPTIONS } from "../../../util/constants.util.ts";
 import type { SearchSupportedCryptoData } from "../../../types/response.payload.types";
 import type { TransactionStatus } from "../../../schemas/enum.schema";
@@ -26,46 +26,6 @@ interface FilterModalProps {
   selectedStatus: TransactionStatus | undefined | "ALL";
   handleSelectedStatus: (status: TransactionStatus | "ALL") => void;
 }
-
-const moneyFormatter = new Intl.NumberFormat("en-NG", {
-  maximumFractionDigits: 2,
-});
-
-const formatDateLabel = (date: Date | undefined) => {
-  if (!date) return "Any date";
-  return new Intl.DateTimeFormat("en-NG", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(date);
-};
-
-const formatMoneyLabel = (amount: number | undefined) => {
-  if (amount === undefined) return "Any amount";
-  return `₦${moneyFormatter.format(amount)}`;
-};
-
-const SectionCard = ({
-  icon,
-  title,
-  children,
-}: {
-  icon: ReactNode;
-  title: string;
-  children: ReactNode;
-}) => (
-  <section className="rounded-2xl border border-[#E7EAF4] bg-[#FBFCFF] p-4 shadow-sm">
-    <div className="flex items-center gap-3">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#EEF1FF] text-[#03034D]">
-        {icon}
-      </div>
-      <h3 className="text-[15px] font-semibold text-[#0B1027]">
-        {title}
-      </h3>
-    </div>
-    <div className="mt-4">{children}</div>
-  </section>
-);
 
 const ManageTransactionFilterModal = ({
   isOpen,
@@ -97,244 +57,148 @@ const ManageTransactionFilterModal = ({
       const timer = window.setTimeout(() => {
         setShouldRender(false);
         setIsClosing(false);
-      }, 200);
+      }, 150);
       return () => window.clearTimeout(timer);
     }
   }, [isOpen, shouldRender]);
 
-  useEffect(() => {
-    if (!isOpen) return;
-    const handler = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [isOpen, onClose]);
-
-  const cryptoOptions = useMemo(
-    () => [
-      { value: "", label: "All cryptocurrencies" },
-      ...(supportedCryptos?.map((crypto) => ({
+  const cryptoOptions = useMemo(() => {
+    const list =
+      supportedCryptos?.map((crypto) => ({
         value: crypto.id,
-        label: `${crypto.name} (${crypto.symbol.toUpperCase()})`,
-      })) ?? []),
-    ],
-    [supportedCryptos],
-  );
-
-  const selectedCrypto = supportedCryptos?.find(
-    (crypto) => crypto.id === selectedCryptoId,
-  );
-
-  const selectedStatusLabel =
-    TRANSACTION_STATUS_OPTIONS.find((option) => option.value === selectedStatus)
-      ?.label ?? "All statuses";
-
-  const summaryItems = [
-    fromDate || toDate
-      ? {
-          label: "Date",
-          value: `${formatDateLabel(fromDate)} → ${formatDateLabel(toDate)}`,
-        }
-      : null,
-    minAmountRange !== undefined || maxAmountRange !== undefined
-      ? {
-          label: "Amount",
-          value: `${formatMoneyLabel(minAmountRange)} → ${formatMoneyLabel(maxAmountRange)}`,
-        }
-      : null,
-    selectedCrypto
-      ? {
-          label: "Crypto",
-          value: `${selectedCrypto.name} (${selectedCrypto.symbol.toUpperCase()})`,
-        }
-      : null,
-    selectedStatus !== "ALL"
-      ? {
-          label: "Status",
-          value: selectedStatusLabel,
-        }
-      : null,
-  ].filter((item): item is { label: string; value: string } => item !== null);
-
-  const activeFilterCount = summaryItems.length;
+        label: `${crypto.name} (${crypto.symbol})`,
+      })) || [];
+    return [{ value: "", label: "All assets" }, ...list];
+  }, [supportedCryptos]);
 
   if (!shouldRender) return null;
 
   return (
-    <div className="fixed inset-0 z-[1000]" role="dialog" aria-modal="true">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4" role="dialog" aria-modal="true">
       <div
         className={cn(
-          "absolute inset-0 bg-[#050816]/55 backdrop-blur-md",
+          "fixed inset-0 bg-slate-900/50 backdrop-blur-xs",
           isClosing ? "animate-modal-backdrop-out" : "animate-modal-backdrop-in",
         )}
         onClick={onClose}
       />
 
-      <div className="absolute inset-0 flex items-end justify-center overflow-y-auto sm:items-center">
-        <div className="flex min-h-full w-full items-end justify-center px-0 sm:min-h-0 sm:px-4 sm:py-6">
-          <div
-            className={cn(
-              "relative w-full max-h-[92vh] overflow-y-auto rounded-t-[28px] border border-white/70 bg-white shadow-[0_30px_120px_rgba(11,15,42,0.22)] sm:max-w-[760px] sm:rounded-[32px]",
-              isClosing ? "animate-modal-content-out" : "animate-modal-content-in",
-            )}
+      <div
+        className={cn(
+          "relative w-full sm:max-w-md max-h-[90vh] overflow-y-auto bg-white rounded-t-2xl sm:rounded-xl border border-slate-200/80 shadow-2xl p-5 sm:p-6 transition-all z-10",
+          isClosing ? "animate-modal-content-out" : "animate-modal-content-in",
+        )}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-slate-100">
+          <div>
+            <h2 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
+              Filter Transactions
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Refine transactions by date, amount, or status
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+            aria-label="Close"
           >
-            <div className="px-5 pb-5 pt-6 sm:px-8 sm:pb-8 sm:pt-8">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-[#8A91A8]">
-                    Transaction filters
-                  </p>
-                  <h2 className="mt-2 text-[24px] font-semibold tracking-[-0.03em] text-[#03034D]">
-                    Filter Transactions
-                  </h2>
-                  <p className="mt-1 max-w-[54ch] text-sm leading-6 text-[#667085]">
-                    Use date, amount, crypto, and status to narrow the table
-                    without losing the ledger context.
-                  </p>
-                  <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-[#E6E9F4] bg-[#F7F8FF] px-3 py-2 text-[12px] text-[#344054]">
-                    <span className="font-semibold text-[#667085]">
-                      Active filters
-                    </span>
-                    <span className="text-[#03034D]">
-                      {activeFilterCount}
-                    </span>
-                  </div>
-                </div>
+            <X className="w-4 h-4" />
+          </button>
+        </div>
 
-                <button
-                  type="button"
-                  onClick={onClose}
-                  aria-label="Close filter modal"
-                  className="rounded-full border border-[#E8EBF5] bg-white p-2 text-[#667085] transition-colors hover:border-[#CFD5EA] hover:text-[#03034D]"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-
-              {summaryItems.length > 0 && (
-                <div className="mt-5 flex flex-wrap gap-2">
-                  {summaryItems.map((item) => (
-                    <span
-                      key={item.label}
-                      className="inline-flex items-center gap-2 rounded-full border border-[#E6E9F4] bg-[#F7F8FF] px-3 py-2 text-[12px] text-[#344054]"
-                    >
-                      <span className="font-semibold text-[#667085]">
-                        {item.label}
-                      </span>
-                      <span className="text-[#03034D]">{item.value}</span>
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              <div className="mt-6 grid gap-4">
-                <SectionCard
-                  icon={<CalendarRange className="h-5 w-5" />}
-                  title="Date range"
-                >
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <DateInput
-                      value={fromDate}
-                      onChange={handleFromDate}
-                      placeholder="From"
-                      className="rounded-2xl border-[#D8DDF0] bg-[#FBFCFF] px-4 py-3 pr-10 text-[14px] shadow-sm focus:border-[#03034D] focus:shadow-[0_0_0_3px_rgba(3,3,77,0.08)]"
-                    />
-                    <DateInput
-                      value={toDate}
-                      onChange={handleToDate}
-                      placeholder="To"
-                      className="rounded-2xl border-[#D8DDF0] bg-[#FBFCFF] px-4 py-3 pr-10 text-[14px] shadow-sm focus:border-[#03034D] focus:shadow-[0_0_0_3px_rgba(3,3,77,0.08)]"
-                    />
-                  </div>
-                </SectionCard>
-
-                <SectionCard
-                  icon={<SlidersHorizontal className="h-5 w-5" />}
-                  title="Amount range (NGN)"
-                >
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <Input
-                      label="Minimum"
-                      placeholder="Min"
-                      type="number"
-                      value={minAmountRange !== undefined ? minAmountRange : ""}
-                      onChange={(event) =>
-                        handleMinAmountRange(Number(event.target.value))
-                      }
-                      className={cn(
-                        "border-[#D8DDF0] bg-[#FBFCFF] px-4 text-[14px] shadow-sm placeholder:text-[#98A2B3]",
-                        "focus:border-[#03034D] focus:ring-[#03034D]/10",
-                      )}
-                    />
-                    <Input
-                      label="Maximum"
-                      placeholder="Max"
-                      type="number"
-                      value={maxAmountRange !== undefined ? maxAmountRange : ""}
-                      onChange={(event) =>
-                        handleMaxAmountRange(Number(event.target.value))
-                      }
-                      className={cn(
-                        "border-[#D8DDF0] bg-[#FBFCFF] px-4 text-[14px] shadow-sm placeholder:text-[#98A2B3]",
-                        "focus:border-[#03034D] focus:ring-[#03034D]/10",
-                      )}
-                    />
-                  </div>
-                </SectionCard>
-
-                <SectionCard
-                  icon={<Layers3 className="h-5 w-5" />}
-                  title="Asset and status"
-                >
-                  <div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
-                    <LabeledSelect
-                      label="Cryptocurrency"
-                      value={selectedCryptoId ?? ""}
-                      onValueChange={(value) =>
-                        handleSelectedCryptoId(value === "__empty__" ? "" : value)
-                      }
-                      options={cryptoOptions}
-                      className="mb-0"
-                    />
-                    <LabeledSelect
-                      label="Status"
-                      value={selectedStatus ?? "ALL"}
-                      onValueChange={(value) =>
-                        handleSelectedStatus(value as TransactionStatus | "ALL")
-                      }
-                      options={TRANSACTION_STATUS_OPTIONS.map((status) => ({
-                        value: status.value || "ALL",
-                        label: status.label,
-                      }))}
-                      className="mb-0"
-                    />
-                  </div>
-                </SectionCard>
-              </div>
-
-              <div className="mt-8 flex flex-col-reverse gap-3 border-t border-[#EEF1F7] pt-6 sm:flex-row sm:items-center sm:justify-between">
-                <button
-                  type="button"
-                  className="inline-flex items-center justify-center rounded-full border border-transparent px-4 py-2.5 text-sm font-medium text-[#667085] transition-colors hover:bg-[#F5F7FF] hover:text-[#03034D]"
-                  onClick={() => {
-                    onReset();
-                    onClose();
-                  }}
-                >
-                  Reset filters
-                </button>
-
-                <button
-                  type="button"
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#03034D] px-5 py-3 text-sm font-semibold text-white shadow-[0_16px_30px_rgba(3,3,77,0.18)] transition-transform hover:bg-[#0A0A63] active:scale-[0.99]"
-                  onClick={onClose}
-                >
-                  Apply filters
-                </button>
-              </div>
+        {/* Form Body */}
+        <div className="space-y-4">
+          {/* Date Range */}
+          <div>
+            <label className="text-xs font-semibold text-slate-700 tracking-tight flex items-center gap-1.5 mb-1.5">
+              <Calendar className="w-3.5 h-3.5 text-slate-400" />
+              <span>Date Range</span>
+            </label>
+            <div className="grid grid-cols-2 gap-2.5">
+              <DateInput
+                value={fromDate}
+                onChange={handleFromDate}
+                placeholder="From date"
+                className="h-9.5 text-xs rounded-lg border-slate-300"
+              />
+              <DateInput
+                value={toDate}
+                onChange={handleToDate}
+                placeholder="To date"
+                className="h-9.5 text-xs rounded-lg border-slate-300"
+              />
             </div>
           </div>
+
+          {/* Amount Range */}
+          <div>
+            <label className="text-xs font-semibold text-slate-700 tracking-tight flex items-center gap-1.5 mb-1.5">
+              <DollarSign className="w-3.5 h-3.5 text-slate-400" />
+              <span>Amount Range (NGN)</span>
+            </label>
+            <div className="grid grid-cols-2 gap-2.5">
+              <Input
+                placeholder="Min ₦"
+                type="number"
+                value={minAmountRange !== undefined ? minAmountRange : ""}
+                onChange={(e) => handleMinAmountRange(Number(e.target.value))}
+                className="h-9.5 text-xs rounded-lg border-slate-300 mb-0"
+              />
+              <Input
+                placeholder="Max ₦"
+                type="number"
+                value={maxAmountRange !== undefined ? maxAmountRange : ""}
+                onChange={(e) => handleMaxAmountRange(Number(e.target.value))}
+                className="h-9.5 text-xs rounded-lg border-slate-300 mb-0"
+              />
+            </div>
+          </div>
+
+          {/* Asset & Status */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <LabeledSelect
+              label="Asset"
+              value={selectedCryptoId ?? ""}
+              onValueChange={(val) => handleSelectedCryptoId(val === "__empty__" ? "" : val)}
+              options={cryptoOptions}
+              className="mb-0"
+            />
+            <LabeledSelect
+              label="Status"
+              value={selectedStatus ?? "ALL"}
+              onValueChange={(val) => handleSelectedStatus(val as TransactionStatus | "ALL")}
+              options={TRANSACTION_STATUS_OPTIONS.map((status) => ({
+                value: status.value || "ALL",
+                label: status.label,
+              }))}
+              className="mb-0"
+            />
+          </div>
+        </div>
+
+        {/* Footer Actions */}
+        <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              onReset();
+              onClose();
+            }}
+            className="h-9 px-3.5 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer touch-manipulation"
+          >
+            Reset Filters
+          </button>
+
+          <button
+            type="button"
+            onClick={onClose}
+            className="h-9 px-4.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer touch-manipulation"
+          >
+            Apply Filters
+          </button>
         </div>
       </div>
     </div>
