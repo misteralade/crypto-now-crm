@@ -1,4 +1,4 @@
-import { Fragment } from 'react'
+﻿import { Fragment } from 'react'
 import { formatNumber } from '../../../../util/index.util.ts'
 import { formatCompact } from '../../../../util/asset-precision'
 import { StatusBadge } from '../../../global/StatusBadge.tsx'
@@ -8,6 +8,7 @@ interface TransactionOverviewProps {
   type: 'BUY' | 'SELL'
   amountCrypto: number
   symbol: string
+  logoUrl?: string
   currency: string
   amountFiat: number
   amountFiatNGN: number
@@ -20,6 +21,7 @@ const TransactionOverview = ({
   type,
   amountCrypto,
   symbol,
+  logoUrl,
   amountFiatNGN,
   exchangeRateDisplay,
   status,
@@ -31,11 +33,11 @@ const TransactionOverview = ({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 mb-3.5 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-              <Coins className="w-4 h-4" />
+              {logoUrl ? <img src={logoUrl} alt={`${symbol} logo`} className="h-7 w-7 object-contain" /> : <Coins className="w-4 h-4" />}
             </div>
             <div>
               <h2 className="text-xs sm:text-sm font-bold text-slate-900 tracking-tight">Transaction Overview</h2>
-              <p className="text-[11px] text-slate-500">Settlement figures and conversion metrics</p>
+
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -50,7 +52,7 @@ const TransactionOverview = ({
               Fiat Settlement
             </p>
             <p className="text-base sm:text-lg font-bold text-slate-900 tabular-nums truncate">
-              ₦{formatCompact(amountFiatNGN, 'NGN', 2)}
+              â‚¦{formatCompact(amountFiatNGN, 'NGN', 2)}
             </p>
             <p className="text-[10px] text-slate-400 mt-1">NGN Equivalent</p>
           </div>
@@ -109,3 +111,4 @@ const TransactionOverview = ({
 }
 
 export default TransactionOverview
+

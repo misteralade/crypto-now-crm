@@ -12,7 +12,6 @@ import Table from "../components/table.tsx";
 import TableFooter from "../components/tables/TableFooter.tsx";
 import ManageTransactionFilterModal from "../components/pages/manageTransactions/ManageTransactionFilterModal.tsx";
 import AuthenticatedLayout from "../layout/AuthenticatedLayout.tsx";
-import TransactionDetailsDrawer from "../components/pages/manageTransactions/TransactionDetailsDrawer.tsx";
 import { useManageTransactionsPage } from "../hooks/pages/useManageTransactionsPage";
 
 const ManageTransactions = () => {
@@ -23,21 +22,9 @@ const ManageTransactions = () => {
     loadingSearchTransactions,
     allSupportedCrypto,
     loadingAllSupportedCrypto,
-    transactionDetail,
-    loadingTransactionDetails,
-    showTransactionDetails,
 
     // ⚙️ Functions
     handleSortBy,
-    handleShowTransactionDetails,
-    handleTransactionUpdateField,
-    handleTransactionUpdate,
-    handleTransactionReceiptUpload,
-    handleRetryDepositConfirmation,
-    handleForceTriggerPayout,
-    retryingConfirmation,
-    forcingPayout,
-    updatingTransactionStatus,
     handlePageSizeChange: updatePageSize,
     isFetchingTransactions,
     filteredUserId,
@@ -93,13 +80,11 @@ const ManageTransactions = () => {
     () =>
       TransactionsManagementColumn(
         handleSortBy,
-        handleShowTransactionDetails,
         handleViewTransactionDetails,
         sortModel,
       ),
     [
       handleSortBy,
-      handleShowTransactionDetails,
       handleViewTransactionDetails,
       sortModel,
     ],
@@ -165,7 +150,7 @@ const ManageTransactions = () => {
               data={data}
               columns={columns}
               loading={loadingSearchTransactions}
-              onRowClick={(row) => handleShowTransactionDetails(row.id)}
+              onRowClick={(row) => handleViewTransactionDetails(row.id)}
             />
           </div>
 
@@ -206,21 +191,6 @@ const ManageTransactions = () => {
           handleSelectedStatus={handleSelectedStatus}
         />
 
-        {/* Transaction Details Drawer */}
-        <TransactionDetailsDrawer
-          isOpen={showTransactionDetails}
-          onClose={handleShowTransactionDetails}
-          transaction={transactionDetail}
-          loading={loadingTransactionDetails}
-          handleTransactionUpdateField={handleTransactionUpdateField}
-          handleTransactionUpdate={handleTransactionUpdate}
-          handleTransactionReceiptUpload={handleTransactionReceiptUpload}
-          handleRetryDepositConfirmation={handleRetryDepositConfirmation}
-          handleForceTriggerPayout={handleForceTriggerPayout}
-          retryingConfirmation={retryingConfirmation}
-          forcingPayout={forcingPayout}
-          isSavingStatus={updatingTransactionStatus}
-        />
       </div>
     </AuthenticatedLayout>
   );

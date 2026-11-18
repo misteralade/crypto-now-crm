@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+﻿import { Fragment } from "react";
 import CopyDetails from "../../../global/CopyDetails";
 import { formatNumber } from "../../../../util/index.util";
 import type { LedgerEntryResponsePayload } from "../../../../types/response.payload.types";
@@ -77,7 +77,7 @@ const LedgerEntriesSection = ({
         </div>
         <div>
           <h2 className="text-sm font-bold text-slate-900 tracking-tight">Ledger Journal Entries</h2>
-          <p className="text-2xs text-slate-500">Double-entry accounting journal for this transaction lifecycle</p>
+
         </div>
       </div>
 
@@ -171,3 +171,4 @@ const LedgerEntriesSection = ({
 };
 
 export default LedgerEntriesSection;
+

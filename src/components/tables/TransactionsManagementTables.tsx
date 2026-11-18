@@ -154,7 +154,6 @@ export const UsersWithTopTransactionDataRow = (
 // Start Transactions Management Tables
 export const TransactionsManagementColumn = (
   handleSortBy: (columnKey: string) => void,
-  _handleShowTransactionDetails: (sessionId: string) => void,
   handleViewTransactionDetails: (sessionId: string) => void,
   sortModel: SearchTransactionsRequestType['sortModel'],
 ): Array<TableColumn<TransactionManagementRow>> => [

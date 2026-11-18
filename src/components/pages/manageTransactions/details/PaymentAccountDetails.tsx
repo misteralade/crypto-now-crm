@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+﻿import { Fragment } from "react";
 import CopyDetails, { CopyButton } from "../../../global/CopyDetails.tsx";
 import { Building2, Wallet } from "lucide-react";
 
@@ -40,7 +40,7 @@ const PaymentAccountDetails = ({
               </div>
               <div>
                 <h2 className="text-sm font-bold text-slate-900 tracking-tight">Customer Payout Bank</h2>
-                <p className="text-2xs text-slate-500">Destination fiat bank account for disbursement</p>
+
               </div>
             </div>
             {isDeleted && (
@@ -79,7 +79,7 @@ const PaymentAccountDetails = ({
               </div>
               <div>
                 <h2 className="text-sm font-bold text-slate-900 tracking-tight">Customer Crypto Destination</h2>
-                <p className="text-2xs text-slate-500">Destination wallet address where bought crypto is sent</p>
+
               </div>
             </div>
           </div>
@@ -110,3 +110,4 @@ const PaymentAccountDetails = ({
 };
 
 export default PaymentAccountDetails;
+

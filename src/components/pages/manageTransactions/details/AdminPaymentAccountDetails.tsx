@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+﻿import { Fragment } from "react";
 import CopyDetails, { CopyButton } from "../../../global/CopyDetails.tsx";
 import { Landmark, ShieldCheck } from "lucide-react";
 
@@ -37,7 +37,7 @@ const AdminPaymentAccountDetails = ({
             </div>
             <div>
               <h2 className="text-sm font-bold text-slate-900 tracking-tight">Platform Custody Wallet</h2>
-              <p className="text-2xs text-slate-500">Inbound custodial receiver for sell deposit</p>
+
             </div>
           </div>
           
@@ -70,7 +70,7 @@ const AdminPaymentAccountDetails = ({
             </div>
             <div>
               <h2 className="text-sm font-bold text-slate-900 tracking-tight">Platform Bank Account</h2>
-              <p className="text-2xs text-slate-500">Inbound fiat payment receiving account</p>
+
             </div>
           </div>
 
@@ -98,3 +98,4 @@ const AdminPaymentAccountDetails = ({
 };
 
 export default AdminPaymentAccountDetails;
+

@@ -1,4 +1,4 @@
-import {Fragment, useEffect, useState} from "react";
+﻿import {Fragment, useEffect, useState} from "react";
 import {ExternalLink, Link2} from "lucide-react";
 import CopyDetails from "../../../global/CopyDetails.tsx";
 import type {CryptoNetworkType} from "../../../../schemas/enum.schema.ts";
@@ -28,7 +28,7 @@ const TransactionHash = ({ cryptoTxHash, network, walletAddress }: TransactionHa
             </div>
             <div>
               <h2 className="text-sm font-bold text-slate-900 tracking-tight">On-Chain Transaction</h2>
-              <p className="text-2xs text-slate-500">Blockchain explorer broadcast verification</p>
+
             </div>
           </div>
           {chainUrl && (
@@ -61,3 +61,4 @@ const TransactionHash = ({ cryptoTxHash, network, walletAddress }: TransactionHa
 }
 
 export default TransactionHash;
+

@@ -2,6 +2,7 @@ import { Fragment } from 'react'
 import { CopyButton } from '../../../global/CopyDetails.tsx'
 import { ROUTES } from '../../../../util/constants.util.ts'
 import { User, ExternalLink, Phone } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
 
 interface TransactionDetailsUserProfileProps {
   userId: string
@@ -32,7 +33,6 @@ const TransactionDetailsUserProfile = ({
             </div>
             <div>
               <h2 className="text-xs sm:text-sm font-bold text-slate-900 tracking-tight">Customer Profile</h2>
-              <p className="text-[11px] text-slate-500">Account identity & communication</p>
             </div>
           </div>
 
@@ -51,9 +51,9 @@ const TransactionDetailsUserProfile = ({
           </div>
 
           <div className="min-w-0 flex-1">
-            <p className="text-xs sm:text-sm font-bold text-slate-900 tracking-tight truncate">
+            <Link to={ROUTES.USERS_DETAILS} params={{ userId }} className="block text-xs sm:text-sm font-bold text-slate-900 tracking-tight truncate hover:text-blue-600">
               {fullName}
-            </p>
+            </Link>
             <div className="flex items-center gap-1.5 mt-0.5 min-w-0">
               <p className="text-xs text-slate-500 truncate" title={email}>
                 {email || 'No email provided'}
@@ -79,17 +79,6 @@ const TransactionDetailsUserProfile = ({
             </div>
           ) : null}
 
-          {userId ? (
-            <div className="flex items-center justify-between text-xs gap-2">
-              <span className="text-slate-400 font-medium">User ID</span>
-              <div className="flex items-center gap-1 min-w-0">
-                <span className="font-mono text-[11px] text-slate-600 truncate max-w-[140px]" title={userId}>
-                  {userId}
-                </span>
-                <CopyButton text={userId} iconClassName="w-3 h-3" />
-              </div>
-            </div>
-          ) : null}
         </div>
       </div>
     </Fragment>
