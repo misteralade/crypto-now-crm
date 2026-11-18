@@ -1,10 +1,8 @@
 import { Fragment } from "react"
-import { Link } from '@tanstack/react-router'
 import {StatusColumn} from "./global";
 import type {TableColumn} from "../table";
 import momentClient from "../../util/moment";
 import type {SearchAdminResponsePayload} from "../../types/response.payload.types.ts";
-import { ROUTES } from "../../util/constants.util.ts";
 
 type SearchAdminTableRow = {
   id: string
@@ -39,14 +37,6 @@ export const SearchAdminDataColumn = (
           {value}{' '}
           {row.id === currentAdminId && <span className="ml-1 rounded-full bg-blue-100 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-blue-700">You</span>}
         </p>
-        <Link
-          to={ROUTES.ADMIN_DETAILS.replace('$adminId', row.id)}
-          className="mt-1 block text-sm font-medium text-[#03034D] hover:underline"
-          onClick={(event) => event.stopPropagation()}
-          title={`View ${row.username} details`}
-        >
-          @{row.username}
-        </Link>
       </div>
     ),
   },
