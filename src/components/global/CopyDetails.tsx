@@ -6,9 +6,10 @@ interface CopyButtonProps {
   text: string
   className?: string
   iconClassName?: string
+  ariaLabel?: string
 }
 
-export const CopyButton = ({ text, className = '', iconClassName = 'w-3.5 h-3.5' }: CopyButtonProps) => {
+export const CopyButton = ({ text, className = '', iconClassName = 'w-3.5 h-3.5', ariaLabel = 'Copy' }: CopyButtonProps) => {
   const [copied, setCopied] = useState(false)
 
   const handleCopy = (e: React.MouseEvent) => {
@@ -25,7 +26,7 @@ export const CopyButton = ({ text, className = '', iconClassName = 'w-3.5 h-3.5'
       onClick={handleCopy}
       className={`p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 active:scale-95 transition-all shrink-0 cursor-pointer inline-flex items-center justify-center ${className}`}
       title={copied ? 'Copied!' : 'Copy to clipboard'}
-      aria-label="Copy"
+      aria-label={ariaLabel}
     >
       {copied ? (
         <Check className={`${iconClassName} text-emerald-600`} />

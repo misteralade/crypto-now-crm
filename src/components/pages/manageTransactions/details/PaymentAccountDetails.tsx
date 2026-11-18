@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import CopyDetails from "../../../global/CopyDetails.tsx";
+import CopyDetails, { CopyButton } from "../../../global/CopyDetails.tsx";
 import { Building2, Wallet } from "lucide-react";
 
 interface PaymentAccountDetailsProps {
@@ -57,11 +57,11 @@ const PaymentAccountDetails = ({
             </div>
             
             <div className="p-3 rounded-lg bg-slate-50 border border-slate-100/80">
-              <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Account Number</p>
-              <div className="flex items-center gap-1.5">
-                <p className="text-sm font-mono font-bold text-slate-900">{accountNumber || '-'}</p>
-                {accountNumber && <CopyDetails text={accountNumber} iconClassName="!w-3.5 !h-3.5" />}
+              <div className="mb-1 flex items-center gap-1">
+                <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wider">Account Number</p>
+                {accountNumber && <CopyButton text={accountNumber} iconClassName="w-3.5 h-3.5" ariaLabel="Copy account number" />}
               </div>
+              <p className="text-sm font-mono text-slate-700">{accountNumber || '-'}</p>
             </div>
 
             <div className="col-span-1 sm:col-span-2 p-3 rounded-lg bg-slate-50 border border-slate-100/80">

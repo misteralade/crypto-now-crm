@@ -123,13 +123,10 @@ const EditCoinDetails = ({
       </div>
 
       {/* SECTION 2: WALLETS SUMMARY (READ-ONLY, LINKS OUT) */}
-      <div className="bg-white border border-[#E9E7E2] rounded-3xl p-6 shadow-sm space-y-4">
-        <div className="flex justify-between items-start gap-4 flex-wrap sm:flex-nowrap">
+      <div className="bg-white border border-[#E9E7E2] rounded-3xl px-5 py-4 shadow-sm space-y-3">
+        <div className="flex justify-between items-center gap-4 flex-wrap sm:flex-nowrap">
           <div>
-            <h3 className="text-xl font-bold text-[#03034D]">Wallets</h3>
-            <p className="text-xs text-gray-500 mt-1">
-              Sending, receiving, and fueling wallets are managed on the dedicated Admin Wallets page.
-            </p>
+            <h3 className="text-lg font-bold text-[#03034D]">Wallets</h3>
           </div>
           <Link
             to={ROUTES.ADMIN_WALLETS}
@@ -141,19 +138,10 @@ const EditCoinDetails = ({
           </Link>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
-          <div className="rounded-2xl border border-[#ECECEC] bg-[#FCFCFE] p-4 text-center">
-            <div className="text-2xl font-bold text-[#03034D]">{walletCounts.sending}</div>
-            <div className="text-[11px] text-gray-500 mt-1">Sending Wallets</div>
-          </div>
-          <div className="rounded-2xl border border-[#ECECEC] bg-[#FCFCFE] p-4 text-center">
-            <div className="text-2xl font-bold text-[#03034D]">{walletCounts.receiving}</div>
-            <div className="text-[11px] text-gray-500 mt-1">Receiving Wallets</div>
-          </div>
-          <div className="rounded-2xl border border-[#ECECEC] bg-[#F4F4F7] p-4 text-center">
-            <div className="text-2xl font-bold text-[#03034D]">{walletCounts.fueling}</div>
-            <div className="text-[11px] text-gray-500 mt-1">Fueling Wallets</div>
-          </div>
+        <div className="flex flex-wrap gap-x-6 gap-y-2 border-t border-slate-100 pt-3 text-sm text-slate-600">
+          <p>Sending: <span className="font-semibold text-[#03034D]">{walletCounts.sending}</span></p>
+          <p>Receiving: <span className="font-semibold text-[#03034D]">{walletCounts.receiving}</span></p>
+          <p>Fueling: <span className="font-semibold text-[#03034D]">{walletCounts.fueling}</span></p>
         </div>
       </div>
 

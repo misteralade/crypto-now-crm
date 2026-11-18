@@ -19,6 +19,7 @@ import { formatCompact } from "../util/asset-precision";
 import { RefreshCw, Play, QrCode, FileText, AlertCircle, Fingerprint } from "lucide-react";
 import LedgerEntriesSection from "../components/pages/manageTransactions/details/LedgerEntriesSection.tsx";
 import ConfirmModal from "../components/global/ConfirmModal.tsx";
+import IdentifierCard from "../components/pages/manageTransactions/details/IdentifierCard.tsx";
 
 const TransactionDetails = () => {
   const {
@@ -50,6 +51,7 @@ const TransactionDetails = () => {
       <PageHeader
         title="Transaction Details"
         subtitle={transaction?.sessionId ? `Order: ${transaction.sessionId.slice(0, 16)}...` : 'Comprehensive order breakdown'}
+        mobileActionsRight
         actions={
           <div className="flex flex-wrap items-center gap-2">
             {canRetryConfirmation && (
@@ -297,21 +299,10 @@ const TransactionDetails = () => {
                   </div>
 
                   <div className="space-y-3">
-                    <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
-                      <p className="text-2xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Session ID</p>
-                      <CopyDetails text={transaction.sessionId} wrap={true} className="!max-w-full font-mono text-2xs font-semibold text-slate-800" iconClassName="!w-3.5 !h-3.5" />
-                    </div>
-
-                    <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
-                      <p className="text-2xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Transaction ID</p>
-                      <CopyDetails text={transaction.id} wrap={true} className="!max-w-full font-mono text-2xs font-semibold text-slate-800" iconClassName="!w-3.5 !h-3.5" />
-                    </div>
-
+                    <IdentifierCard label="Session ID" value={transaction.sessionId} />
+                    <IdentifierCard label="Transaction ID" value={transaction.id} />
                     {transaction.rateSnapshot && (
-                      <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
-                        <p className="text-2xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Rate Snapshot</p>
-                        <CopyDetails text={JSON.stringify(transaction.rateSnapshot)} wrap={true} className="!max-w-full font-mono text-2xs text-slate-600" iconClassName="!w-3.5 !h-3.5" />
-                      </div>
+                      <IdentifierCard label="Rate Snapshot" value={JSON.stringify(transaction.rateSnapshot, null, 2)} formatted />
                     )}
                   </div>
                 </div>

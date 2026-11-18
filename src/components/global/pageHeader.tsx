@@ -6,12 +6,13 @@ interface PageHeaderProps {
   badge?: ReactNode
   actions?: ReactNode
   className?: string
+  mobileActionsRight?: boolean
 }
 
-const PageHeader = ({ title, subtitle, badge, actions, className }: PageHeaderProps) => {
+const PageHeader = ({ title, subtitle, badge, actions, className, mobileActionsRight = false }: PageHeaderProps) => {
   return (
     <div className={`px-4 sm:px-6 pt-4 pb-3 ${className ?? ''}`}>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className={`flex ${mobileActionsRight ? 'flex-row items-start' : 'flex-col'} sm:flex-row sm:items-center justify-between gap-3`}>
         <div className="min-w-0">
           <div className="flex items-center gap-2.5 flex-wrap">
             <h1 className="text-xl sm:text-2xl font-bold leading-tight text-slate-900 tracking-tight">
@@ -27,7 +28,7 @@ const PageHeader = ({ title, subtitle, badge, actions, className }: PageHeaderPr
         </div>
 
         {actions && (
-          <div className="flex items-center gap-2 flex-wrap shrink-0">
+          <div className={`flex items-center gap-2 flex-wrap shrink-0 ${mobileActionsRight ? 'justify-end' : ''}`}>
             {actions}
           </div>
         )}
