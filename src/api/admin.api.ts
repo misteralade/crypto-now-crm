@@ -7,7 +7,7 @@ import {
 import type {
   AdminGetAllPermissionsAPIResponse,
   AdminGetAllRolesAPIResponse,
-  BaseApiResponse, SearchAdminsAPIResponse
+  BaseApiResponse, SearchAdminsAPIResponse, RoleCatalogueItem
 } from "../types/response.payload.types";
 import type { CreateNewAdminRequestType, CreateNewRoleRequestType, SearchAdminRequestType } from "../schemas/admin.schema";
 
@@ -31,6 +31,10 @@ class AdminServiceApi {
 
   async getAllRoles() {
     return await axiosGetRequestHandler("/admin/roles/all") as AdminGetAllRolesAPIResponse;
+  }
+
+  async getRoleCatalogue() {
+    return await axiosGetRequestHandler("/admin/roles/catalogue") as BaseApiResponse<RoleCatalogueItem[]>;
   }
   
   async adminCreateNewRole(payload: CreateNewRoleRequestType) {

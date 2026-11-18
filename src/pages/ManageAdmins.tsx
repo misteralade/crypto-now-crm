@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { Filter, Plus } from 'lucide-react'
 import {useManageAdminPage} from "../hooks/pages/useManageAdminPage";
@@ -13,6 +13,7 @@ import AuthenticatedLayout from "../layout/AuthenticatedLayout.tsx";
 import { useNavbarSearch } from "../layout/navbar-search-context.tsx";
 import { getLoggedInAdminId } from '../util/auth.util';
 import { ROUTES } from '../util/constants.util';
+import RoleCatalogueModal from '../components/pages/manageAdmins/RoleCatalogueModal';
 
 const ManageAdmins = () => {
   const {
@@ -53,6 +54,7 @@ const ManageAdmins = () => {
     handlePageSizeChange,
   } = useManageAdminPage();
   const navigate = useNavigate();
+  const [showRoles, setShowRoles] = useState(false);
 
   const currentAdminId = useMemo(() => getLoggedInAdminId(), []);
 
@@ -83,13 +85,19 @@ const ManageAdmins = () => {
       <PageHeader
         title="Admins"
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={toggleFilter}
               className="inline-flex cursor-pointer hover:bg-slate-50 items-center justify-center gap-1.5 h-8.5 px-3 border border-slate-200 rounded-lg transition-colors bg-white shadow-2xs text-xs font-semibold text-slate-700 shrink-0 active:scale-98"
             >
               <Filter className="w-3.5 h-3.5 text-slate-500" />
               <span>Filter</span>
+            </button>
+            <button
+              onClick={() => setShowRoles(true)}
+              className="h-8.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50"
+            >
+              View roles
             </button>
             <button
               onClick={toggleAddNewRoleModal}
@@ -146,6 +154,8 @@ const ManageAdmins = () => {
           handleRoleName={handleRoleNameChange}
           handleRoleDescription={handleRoleDescriptionChange}
         />
+
+        <RoleCatalogueModal open={showRoles} onClose={() => setShowRoles(false)} />
         
         <ManageAdminFilterModal
           isOpen={showFilter}

@@ -535,6 +535,14 @@ export type AdminGetAllPermissionsAPIResponse = BaseApiResponse<Array<AdminPermi
 
 export type AdminGetAllRolesAPIResponse = BaseApiResponse<Array<RolesResponsePayload>>;
 
+export type RoleCatalogueItem = {
+  id: string;
+  name: string;
+  description: string | null;
+  isBuiltIn: boolean;
+  permissions: Array<{ id: string; code: string; description: string | null }>;
+};
+
 export type SearchAdminsAPIResponse = BaseApiResponse<AdminSearchAdminsResponse>;
 
 export type AdminSearchAdminsResponse = {
