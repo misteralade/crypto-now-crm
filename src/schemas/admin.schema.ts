@@ -14,6 +14,7 @@ export const CreateNewAdminRequestSchema = z.object({
   lastName: z.string().min(1, "Last name must be at least 1 character long").max(50, "Last name must be at most 50 characters long"),
   roleId: z.string().uuid("Invalid role ID"),
   active: z.boolean().default(false),
+  twoFactorEnabled: z.boolean().default(true),
 });
 
 export const SearchAdminRequestSchema = BasicSearchQuerySchema.extend({

@@ -98,6 +98,15 @@ const CreateAdminModal = ({ open, roles, createAdmin, onClose, onCreate, handleC
                     onCheckedChange={(checked) => handleCreateAdminFieldChange("active", checked)}
                   />
                 </div>
+                <div className="sm:col-span-2">
+                  <Switch
+                    id="admin-two-factor"
+                    label="Require two-factor authentication"
+                    description="Send a verification code when this admin signs in."
+                    checked={createAdmin.twoFactorEnabled !== false}
+                    onCheckedChange={(checked) => handleCreateAdminFieldChange("twoFactorEnabled", checked)}
+                  />
+                </div>
               </div>
 
               <div className="px-8 pb-8 flex flex-col sm:flex-row items-center justify-end gap-4 border-t border-[#F2F4F7] pt-6">

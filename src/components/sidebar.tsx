@@ -90,6 +90,11 @@ const navItems = [
     icon: Globe,
   },
   {
+    path: ROUTES.REVIEWS,
+    label: "Reviews",
+    icon: MessageSquareQuote,
+  },
+  {
     path: ROUTES.TESTIMONIALS,
     label: "Testimonials",
     icon: MessageSquareQuote,

@@ -10,7 +10,6 @@ import CreateAdminModal from '../components/pages/manageAdmins/CreateAdminModal.
 import CreateNewPermissionsModal from '../components/pages/manageAdmins/CreateNewPermissionModals.tsx';
 import ManageAdminFilterModal from "../components/pages/manageAdmins/ManageAdminFilterModal.tsx";
 import AuthenticatedLayout from "../layout/AuthenticatedLayout.tsx";
-import ConfirmModal from "../components/global/ConfirmModal.tsx";
 import { useNavbarSearch } from "../layout/navbar-search-context.tsx";
 import { getLoggedInAdminId } from '../util/auth.util';
 import { ROUTES } from '../util/constants.util';
@@ -33,7 +32,6 @@ const ManageAdmins = () => {
     searchedAdmins,
     loadingSearchedAdmins,
     pageSize,
-    showDeleteAdminModal,
 
 
     // ⚙️ Functions
@@ -51,30 +49,14 @@ const ManageAdmins = () => {
     handleToDateChange,
     handleSelectedRoleIdChange,
     handleResetFilters,
-    handleUpdateAdminStatus,
     handlePageChange,
     handlePageSizeChange,
-    handleDeleteAdmin,
-    toggleDeleteAdminModal,
-    handleConfirmDeleteAdmin,
   } = useManageAdminPage();
   const navigate = useNavigate();
 
   const currentAdminId = useMemo(() => getLoggedInAdminId(), []);
 
-  const columns = useMemo(
-    () =>
-      SearchAdminDataColumn(
-        handleUpdateAdminStatus,
-        handleDeleteAdmin,
-        currentAdminId,
-      ),
-    [
-      handleUpdateAdminStatus,
-      handleDeleteAdmin,
-      currentAdminId,
-    ],
-  );
+  const columns = useMemo(() => SearchAdminDataColumn(currentAdminId), [currentAdminId]);
 
   const data = useMemo(
     () => SearchAdminDataRow(!loadingSearchedAdmins ? searchedAdmins?.admins : []),
@@ -179,14 +161,7 @@ const ManageAdmins = () => {
         />
       </div>
       
-      <ConfirmModal
-        open={showDeleteAdminModal}
-        actionType="delete"
-        onClose={toggleDeleteAdminModal}
-        onConfirm={handleConfirmDeleteAdmin}
-        message="Are you sure you want to delete this admin?"
-        confirmText="Delete Admin"
-      />
+
     </AuthenticatedLayout>
   )
 }

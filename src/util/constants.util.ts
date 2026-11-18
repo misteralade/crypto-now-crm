@@ -64,6 +64,7 @@ export const ROUTES = {
   MANAGE_ADMINS: '/dashboard/manage-admins',
   ADMIN_DETAILS: '/dashboard/manage-admins/$adminId',
   TESTIMONIALS: '/dashboard/testimonials',
+  REVIEWS: '/dashboard/reviews',
   KYC_TIER_LIMITS: '/dashboard/kyc-tier-limits',
   SUPPORTED_CURRENCIES: '/dashboard/supported-currencies',
   KYC_SESSIONS: '/dashboard/kyc-sessions',

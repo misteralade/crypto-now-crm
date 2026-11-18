@@ -12,6 +12,7 @@ export const createNewRoleInitialState: CreateNewRoleRequestType = {
 
 export const createNewAdminInitialState: CreateNewAdminRequestType = {
   active: true,
+  twoFactorEnabled: true,
   email: "",
   firstName: "",
   lastName: "",

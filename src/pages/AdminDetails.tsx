@@ -1,10 +1,13 @@
-import { Fragment } from 'react'
+import { Fragment, useState } from 'react'
 import { ArrowLeft, BadgeCheck, CalendarClock, Mail, ShieldUser, User } from 'lucide-react'
 import AuthenticatedLayout from '../layout/AuthenticatedLayout'
 import PageHeader from '../components/global/pageHeader'
 import { LoadingSpinner } from '../components/global/LoadingSpinner'
 import { useAdminDetailsPage } from '../hooks/pages/useAdminDetailsPage'
 import momentClient from '../util/moment'
+import ConfirmModal from '../components/global/ConfirmModal'
+import { useAdminAuth } from '../hooks/useAdminAuth'
+import { PERMISSIONS } from '../util/permissions.util'
 
 const DetailItem = ({
   label,
@@ -38,7 +41,13 @@ const AdminDetails = () => {
     loadingAdminDetails,
     isCurrentAdmin,
     goBack,
+    loadError,
+    retry,
+    updateStatus,
+    deleteAdmin,
   } = useAdminDetailsPage()
+  const { hasPermission } = useAdminAuth()
+  const [showDelete, setShowDelete] = useState(false)
 
   const fullName = adminDetails
     ? `${adminDetails.firstName} ${adminDetails.lastName}`.trim()
@@ -55,6 +64,11 @@ const AdminDetails = () => {
           <LoadingSpinner size="lg" fullScreen message="Loading admin details..." />
         ) : adminDetails ? (
           <Fragment>
+            {loadError && (
+              <div role="alert" className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                Could not refresh these details. <button type="button" className="font-semibold underline" onClick={() => void retry()}>Try again</button>
+              </div>
+            )}
             <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.6fr)]">
               <section className="rounded-3xl border border-[#ECECEC] bg-white p-6 shadow-sm">
                 <div className="flex flex-wrap items-start justify-between gap-4">
@@ -87,8 +101,25 @@ const AdminDetails = () => {
                   <DetailItem label="Last Name" value={adminDetails.lastName} />
                   <DetailItem label="Email" value={adminDetails.email} />
                   <DetailItem label="Created At" value={momentClient.formatToNormalisedDateAndTime(adminDetails.createdAt)} />
-                  <DetailItem label="Last Active" value={momentClient.formatToNormalisedDateAndTime(adminDetails.lastActive)} />
                   <DetailItem label="Role Count" value={adminDetails.adminRoles.length} />
+                </div>
+
+                <div className="mt-6 flex flex-wrap gap-3 border-t border-[#ECECEC] pt-5">
+                  {hasPermission(PERMISSIONS.ADMIN.WRITE) && (
+                    <button type="button" disabled={isCurrentAdmin || updateStatus.isPending || deleteAdmin.isPending}
+                      onClick={() => updateStatus.mutate(!adminDetails.active)}
+                      title={isCurrentAdmin ? 'You cannot change your own status' : undefined}
+                      className="rounded-xl border border-[#F3CACA] px-4 py-2 text-sm font-medium text-[#C93636] disabled:cursor-not-allowed disabled:opacity-50">
+                      {updateStatus.isPending ? 'Saving...' : adminDetails.active ? 'Suspend' : 'Unsuspend'}
+                    </button>
+                  )}
+                  {hasPermission(PERMISSIONS.ADMIN.DELETE) && (
+                    <button type="button" disabled={isCurrentAdmin || updateStatus.isPending || deleteAdmin.isPending}
+                      onClick={() => setShowDelete(true)} title={isCurrentAdmin ? 'You cannot delete yourself' : undefined}
+                      className="rounded-xl bg-[#EF4444] px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50">
+                      Delete
+                    </button>
+                  )}
                 </div>
               </section>
 
@@ -155,6 +186,11 @@ const AdminDetails = () => {
               </aside>
             </div>
           </Fragment>
+        ) : loadError ? (
+          <div className="rounded-3xl border border-dashed border-[#D7D7E7] bg-white p-10 text-center shadow-sm">
+            <p className="text-lg font-semibold text-[#101828]">Could not load admin details</p>
+            <button type="button" onClick={() => void retry()} className="mt-6 rounded-full bg-[#03034D] px-5 py-2.5 text-sm font-medium text-white">Try again</button>
+          </div>
         ) : (
           <div className="rounded-3xl border border-dashed border-[#D7D7E7] bg-white p-10 text-center shadow-sm">
             <p className="text-lg font-semibold text-[#101828]">Admin not found</p>
@@ -170,6 +206,9 @@ const AdminDetails = () => {
           </div>
         )}
       </div>
+      <ConfirmModal open={showDelete} actionType="delete" onClose={() => setShowDelete(false)}
+        onConfirm={() => { if (!deleteAdmin.isPending) deleteAdmin.mutate() }}
+        message="Are you sure you want to delete this admin?" confirmText="Delete Admin" />
     </AuthenticatedLayout>
   )
 }

@@ -5,11 +5,10 @@ import { useAdminQuery } from "../../queries/admin.querries";
 import {
   clearCreateAdminField,
   clearCreateRoleField,
-  clearDeleteAdminId,
-  clearSearchAdminField, clearUpdateAdminField,
+  clearSearchAdminField,
   setCreateAdminField,
-  setCreateRoleField, setDeleteAdminId,
-  setSearchAdminField, setUpdateAdminField,
+  setCreateRoleField,
+  setSearchAdminField,
 } from '../../redux/admin.slice'
 import {debounce} from "../../util/debouce.util";
 import {TIME_IN_MILLISECONDS} from "../../util/constants.util.ts";
@@ -32,8 +31,6 @@ export const useManageAdminPage = () => {
     // Mutations
     createRoleMutation,
     createAdminMutation,
-    updateAdminActiveStatusMutation,
-    adminSoftDeleteAdminMutation,
   } = useAdminQuery();
 
   // Filters
@@ -47,7 +44,6 @@ export const useManageAdminPage = () => {
   const [showAddNewRole, setShowAddNewRole] = useState(false);
   const [showAddNewAdmin, setShowAddNewAdmin] = useState(false);
   const [showFilter, setShowFilter] = useState(false);
-  const [showDeleteAdminModal, setShowDeleteAdminModal] = useState(false);
 
   // Create Role
   const [selectedPermissions, setSelectedPermissions] = useState<Array<string>>([])
@@ -123,23 +119,6 @@ export const useManageAdminPage = () => {
     }
   }
 
-  const handleUpdateAdminStatus = async (id: string, active: boolean) => {
-    dispatch(setUpdateAdminField({
-      field: 'id',
-      value: id,
-    }));
-    dispatch(setUpdateAdminField({
-      field: 'active',
-      value: active,
-    }));
-
-    const { success } = await updateAdminActiveStatusMutation.mutateAsync();
-
-    if (success) {
-      dispatch(clearUpdateAdminField());
-    }
-  }
-
   // Permission
   const handleSelectPermission = (id: string) => {
     if (selectedPermissions.includes(id)) {
@@ -200,19 +179,6 @@ export const useManageAdminPage = () => {
     }
   }
   
-  const handleDeleteAdmin = (id: string) => {
-    toggleDeleteAdminModal();
-    dispatch(setDeleteAdminId(id));
-  }
-  
-  const handleConfirmDeleteAdmin = async () => {
-    const { success } = await adminSoftDeleteAdminMutation.mutateAsync();
-    if (success) {
-      toggleDeleteAdminModal();
-      dispatch(clearDeleteAdminId());
-    }
-  }
-
   // Toggle Modals
   const toggleAddNewRoleModal = () => setShowAddNewRole(!showAddNewRole);
 
@@ -220,7 +186,6 @@ export const useManageAdminPage = () => {
 
   const toggleFilter = () => setShowFilter(!showFilter);
   
-  const toggleDeleteAdminModal = () => setShowDeleteAdminModal(!showDeleteAdminModal);
   
   return {
     // 🧩 Values
@@ -242,7 +207,6 @@ export const useManageAdminPage = () => {
     searchedAdmins,
     loadingSearchedAdmins,
     pageSize,
-    showDeleteAdminModal,
 
 
     // ⚙️ Functions
@@ -260,11 +224,7 @@ export const useManageAdminPage = () => {
     handleToDateChange,
     handleSelectedRoleIdChange,
     handleResetFilters,
-    handleUpdateAdminStatus,
     handlePageChange,
     handlePageSizeChange,
-    handleDeleteAdmin,
-    toggleDeleteAdminModal,
-    handleConfirmDeleteAdmin,
   }
 }

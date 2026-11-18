@@ -1,7 +1,5 @@
-import { Fragment } from "react"
 import {StatusColumn} from "./global";
 import type {TableColumn} from "../table";
-import momentClient from "../../util/moment";
 import type {SearchAdminResponsePayload} from "../../types/response.payload.types.ts";
 
 type SearchAdminTableRow = {
@@ -11,12 +9,9 @@ type SearchAdminTableRow = {
   email: string
   role: string
   status: boolean
-  date: string
 }
 
 export const SearchAdminDataColumn = (
-  handleUpdateAdminStatus: (id: string, status: boolean) => void,
-  handleDeleteUser: (id: string) => void,
   currentAdminId?: string | null,
 ): Array<TableColumn> => [
   {
@@ -65,52 +60,7 @@ export const SearchAdminDataColumn = (
       <StatusColumn status={String(value)} />
     ),
   },
-  {
-    key: 'date',
-    header: 'Last Active',
-    render: (value) => (
-      <span className="overflow-hidden truncate whitespace-nowrap text-sm font-medium leading-tight tabular-nums text-[#667085]">
-        {value}
-      </span>
-    ),
-  },
-  {
-    key: 'action',
-    header: (
-      <Fragment>
-        <div className="py-3 text-left text-sm font-medium text-gray-500">
-          <span className="flex items-center gap-2"></span>
-        </div>
-      </Fragment>
-    ),
-    render: (_, row) => (
-      <div className="flex items-center justify-start gap-2 lg:gap-x-[16px] whitespace-nowrap">
-        <button
-          className={`px-2.5 md:px-3 py-1 rounded-full text-2xs cursor-pointer hover:opacity-80 md:text-xs font-medium ${row.status === true ? 'bg-[#FCE8E8] text-[#EB5757]' : 'bg-[#FDF2E7] text-[#F2994A]'} disabled:opacity-50 disabled:cursor-not-allowed`}
-          onClick={(event) => {
-            event.stopPropagation()
-            handleUpdateAdminStatus(row.id, !row.status)
-          }}
-          disabled={row.id === currentAdminId}
-          title={row.id === currentAdminId ? "You cannot suspend yourself" : ""}
-        >
-          {row.status === true ? 'Suspend' : 'Unsuspend'}
-        </button>
-        
-        <button
-          className="px-3 py-1 font-medium text-xs bg-[#EF4444] text-white rounded-full hover:opacity-70 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-          onClick={(event) => {
-            event.stopPropagation()
-            handleDeleteUser(row.id)
-          }}
-          disabled={row.id === currentAdminId}
-          title={row.id === currentAdminId ? "You cannot delete yourself" : ""}
-        >
-          Delete
-        </button>
-      </div>
-    ),
-  },
+
 ]
 
 export const SearchAdminDataRow = (
@@ -130,7 +80,6 @@ export const SearchAdminDataRow = (
       email: item.email,
       role: item.adminRoles[0]?.role?.name || 'N/A',
       status: item.active,
-      date: momentClient.formatToNormalisedDateAndTime(item.lastActive),
     })
 
     return

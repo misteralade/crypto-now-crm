@@ -61,6 +61,9 @@ export const useSignInPage = () => {
           to: ROUTES.VERIFY_TWO_FACTOR,
           search: { email },
         });
+      } else if (data?.twoFactorRequired === false) {
+        sessionStorage.removeItem("adminVerificationChallenge");
+        navigate({ to: ROUTES.DASHBOARD });
       } else {
         setError("Unable to start verification. Please sign in again.");
       }
