@@ -56,7 +56,7 @@ const ManageAdminFilterModal = ({
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-20">
       <div className={`absolute inset-0 bg-black/40 ${isClosing ? 'animate-modal-backdrop-out' : 'animate-modal-backdrop-in'}`} onClick={onClose} />
       <div className={`relative bg-white rounded-2xl shadow-xl w-[442px] p-6 border border-[#ECECEC] ${isClosing ? 'animate-modal-content-out' : 'animate-modal-content-in'}`}>
-        <h3 className="text-[13px] font-semibold text-[#667085] mb-4">Date Range</h3>
+        <h3 className="text-sm font-semibold text-[#667085] mb-4">Date Range</h3>
         <div className="grid grid-cols-2 gap-3 mb-6">
           <DateInput value={fromDate} onChange={handleFromDate} placeholder="From" />
           <DateInput value={toDate} onChange={handleToDate} placeholder="To" />
@@ -70,7 +70,7 @@ const ManageAdminFilterModal = ({
         />
 
         <div className="flex justify-end items-center gap-4 mt-6">
-          <button className="text-[13px] font-medium text-[#03034D] cursor-pointer hover:underline" onClick={onReset}>
+          <button className="text-sm font-medium text-[#03034D] cursor-pointer hover:underline" onClick={onReset}>
             Reset filters
           </button>
         </div>

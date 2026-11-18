@@ -24,13 +24,13 @@ const VerifyTwoFactor = () => {
           <h1 className="md:text-[40px] text-3xl md:leading-[48px] font-semibold text-[#0E0F0C] mb-1 md:mb-2">
             Two-Factor Verification
           </h1>
-          <p className="md:text-[18px] text-base text-[#454745] font-normal">
+          <p className="md:text-lg text-base text-[#454745] font-normal">
             Enter the verification code sent to your email address.
           </p>
         </div>
 
         {error && (
-          <div className="mb-5 px-4 py-3 rounded-xl bg-[#FEF2F2] border border-[#FECACA] text-[#EB5757] text-[14px] font-medium">
+          <div className="mb-5 px-4 py-3 rounded-xl bg-[#FEF2F2] border border-[#FECACA] text-[#EB5757] text-sm font-medium">
             {error}
           </div>
         )}
@@ -83,7 +83,7 @@ const VerifyTwoFactor = () => {
         <div className="mt-4 text-center">
           <Link
             to={ROUTES.LOGIN}
-            className="text-[14px] text-[#6B7280] hover:text-[#1E1B4B] underline transition-colors duration-200"
+            className="text-sm text-[#6B7280] hover:text-[#1E1B4B] underline transition-colors duration-200"
           >
             Back to Sign In
           </Link>

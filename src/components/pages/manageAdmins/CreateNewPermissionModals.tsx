@@ -81,7 +81,7 @@ const CreateNewPermissionsModal = ({
             }`}
           >
             <div className="px-6 pt-6 pb-2 flex items-start justify-between">
-              <div className="flex-1 text-center text-[24px] leading-7 font-bold">
+              <div className="flex-1 text-center text-2xl leading-7 font-bold">
                 Create Role
               </div>
               <button

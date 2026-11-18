@@ -16,7 +16,7 @@ export const StatusColumn = ({ status }: { status: string }) => {
           }`}
         />
         <span
-          className={`text-[12px] font-medium ${
+          className={`text-xs font-medium ${
             isActive ? 'text-[#037847]' : 'text-[#364254]'
           }`}
         >

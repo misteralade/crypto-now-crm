@@ -45,7 +45,7 @@ const CreateAdminModal = ({ open, roles, createAdmin, onClose, onCreate, handleC
               className="w-full max-w-2xl bg-white rounded-[32px] shadow-2xl border border-[#ECECEC] max-h-[90vh] overflow-y-auto pointer-events-auto"
             >
               <div className="px-8 pt-8 pb-6 flex items-center justify-between border-b border-[#F2F4F7]">
-                <h2 className="text-[22px] font-bold text-[#0E0F0C]">Create Admin</h2>
+                <h2 className="text-2xl font-bold text-[#0E0F0C]">Create Admin</h2>
                 <button 
                   onClick={onClose} 
                   className="p-2 rounded-full hover:bg-gray-100 transition-colors text-[#9A9A9A] hover:text-[#03034D]"
@@ -85,7 +85,7 @@ const CreateAdminModal = ({ open, roles, createAdmin, onClose, onCreate, handleC
                     onValueChange={(v) => handleCreateAdminFieldChange("roleId", v === '__empty__' ? '' : v)}
                   />
                   {selectedRole?.description && (
-                    <p className="-mt-3 ml-1 text-[13px] italic text-[#9A9A9A]">
+                    <p className="-mt-3 ml-1 text-sm italic text-[#9A9A9A]">
                       {selectedRole.description}
                     </p>
                   )}

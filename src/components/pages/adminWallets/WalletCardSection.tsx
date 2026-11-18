@@ -124,10 +124,10 @@ const WalletCardSection = ({ walletType, cryptos, defaultCryptoId: _defaultCrypt
 
               {/* Badges */}
               <div className="flex flex-wrap gap-2">
-                <span className="text-[10px] bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full font-medium">
+                <span className="text-2xs bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full font-medium">
                   {w.network}
                 </span>
-                <span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full font-medium">
+                <span className="text-2xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full font-medium">
                   {w.blockchainEnvironment}
                 </span>
               </div>

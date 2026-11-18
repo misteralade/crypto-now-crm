@@ -7,13 +7,13 @@ import type { SearchSupportedCryptoData } from "../../types/response.payload.typ
 import type { TableColumn } from '../table'
 
 const NetworkTags = ({ networks }: { networks: string[] }) => {
-  if (!networks || networks.length === 0) return <span className="text-[11px] text-slate-400">-</span>
+  if (!networks || networks.length === 0) return <span className="text-2xs text-slate-400">-</span>
   return (
     <div className="flex flex-wrap gap-1">
       {networks.map((n) => (
         <span
           key={n}
-          className="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-200/60"
+          className="inline-block px-2 py-0.5 rounded text-2xs font-semibold bg-slate-100 text-slate-700 border border-slate-200/60"
         >
           {n}
         </span>
@@ -101,7 +101,7 @@ export const SearchSupportedCryptoColumn = (
           </div>
           <div className="text-left text-sm font-medium text-gray-500">
             <span className="flex items-center gap-2">
-              <span className="font-medium text-[12px] text-[#667085]">
+              <span className="font-medium text-xs text-[#667085]">
                 {value}
               </span>
             </span>
@@ -126,7 +126,7 @@ export const SearchSupportedCryptoColumn = (
     className: 'font-medium text-gray-900',
     render: (value) => (
       <Fragment>
-        <span className="font-medium text-[12px] text-[#667085]">{value}</span>
+        <span className="font-medium text-xs text-[#667085]">{value}</span>
       </Fragment>
     ),
   },
@@ -146,7 +146,7 @@ export const SearchSupportedCryptoColumn = (
     className: 'font-medium text-gray-900',
     render: (value) => (
       <Fragment>
-        <span className="font-medium text-[12px] text-[#667085] flex items-center gap-2">
+        <span className="font-medium text-xs text-[#667085] flex items-center gap-2">
           <span>{value}</span>
         </span>
       </Fragment>
@@ -158,7 +158,7 @@ export const SearchSupportedCryptoColumn = (
     className: 'font-medium text-gray-900',
     render: (value) => (
       <Fragment>
-        <span className="font-medium text-[12px] text-[#667085] flex items-center gap-2">
+        <span className="font-medium text-xs text-[#667085] flex items-center gap-2">
           <span>{value}</span>
         </span>
       </Fragment>
@@ -170,7 +170,7 @@ export const SearchSupportedCryptoColumn = (
     className: 'font-medium text-gray-900',
     render: (value) => (
       <Fragment>
-        <span className="font-medium text-[12px] text-[#667085] flex items-center gap-2">
+        <span className="font-medium text-xs text-[#667085] flex items-center gap-2">
           <span>{value}</span>
         </span>
       </Fragment>

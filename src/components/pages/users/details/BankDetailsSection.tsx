@@ -93,12 +93,12 @@ const BankDetailsSection = ({ bankDetails, loading = false, banks, onUpdateAccou
                     </button>
                   )}
                   {bank.isDefault && (
-                    <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full bg-blue-100 text-blue-700 border border-blue-200">
+                    <span className="px-2 py-0.5 text-2xs font-bold uppercase tracking-wider rounded-full bg-blue-100 text-blue-700 border border-blue-200">
                       Default
                     </span>
                   )}
                   {bank.isDeleted && (
-                    <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full bg-red-100 text-red-700 border border-red-200">
+                    <span className="px-2 py-0.5 text-2xs font-bold uppercase tracking-wider rounded-full bg-red-100 text-red-700 border border-red-200">
                       Deleted
                     </span>
                   )}
@@ -140,7 +140,7 @@ const BankDetailsSection = ({ bankDetails, loading = false, banks, onUpdateAccou
       {accountToEdit && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-labelledby="edit-user-bank-title">
           <button type="button" className="absolute inset-0 cursor-default" aria-label="Close edit bank account" onClick={closeEdit} />
-          <section className="relative z-10 w-full max-w-lg rounded-2xl bg-white p-5 shadow-xl">
+          <section className="relative z-10 max-h-[calc(100dvh-2rem)] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-5 shadow-xl">
             <header className="mb-5 flex items-start justify-between gap-3">
               <div>
                 <h3 id="edit-user-bank-title" className="text-lg font-semibold text-slate-900">Edit customer bank account</h3>

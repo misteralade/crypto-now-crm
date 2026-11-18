@@ -130,7 +130,7 @@ export default function GlobalTopBar() {
       </div>
 
       {/* Right: Admin Profile Block (name, email & direct link to admin profile page) */}
-      <div className="flex items-center">
+      <div className="flex shrink-0 items-center">
         <Link
           to={profileLink as any}
           className="group flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg hover:bg-slate-50 border border-transparent hover:border-slate-200/70 transition-all cursor-pointer touch-manipulation"
@@ -160,7 +160,7 @@ export default function GlobalTopBar() {
               {displayName}
             </p>
             {displayEmail ? (
-              <p className="text-[11px] font-medium text-slate-500 leading-tight truncate max-w-[170px]">
+              <p className="text-2xs font-medium text-slate-500 leading-tight truncate max-w-[170px]">
                 {displayEmail}
               </p>
             ) : null}

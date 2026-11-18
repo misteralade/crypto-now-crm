@@ -97,7 +97,7 @@ const EditCoinDetails = ({
         </div>
 
         <div className="bg-[#F8F9FA] p-5 rounded-2xl border border-[#ECECEC]">
-          <label className="block text-[11px] font-semibold text-[#03034D] uppercase tracking-wider mb-3">
+          <label className="block text-2xs font-semibold text-[#03034D] uppercase tracking-wider mb-3">
             Active Networks
           </label>
           <div className="flex flex-wrap gap-4">
@@ -153,7 +153,7 @@ const EditCoinDetails = ({
         </div>
         <PillInput label="Buy decimal places" id="buyPrecision" type="number" min={0} max={8} value={editedBuyPrecision ?? (buyPrecision == null ? "" : String(buyPrecision))} onChange={(event) => { setEditedBuyPrecision(event.target.value); onChangeInputField("buyPrecision", event.target.valueAsNumber); }} />
         <div>
-          <label className="block text-[13px] font-semibold text-[#454745] mb-3">
+          <label className="block text-sm font-semibold text-[#454745] mb-3">
             Coin Status
           </label>
           <Switch

@@ -126,7 +126,7 @@ export const AdminSearchUserColumn = (
               className="w-7 h-7 rounded-full object-cover border border-slate-200"
             />
           ) : (
-            <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-700 font-bold text-[11px] flex items-center justify-center shrink-0">
+            <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-700 font-bold text-2xs flex items-center justify-center shrink-0">
               {initial}
             </div>
           )}
@@ -141,7 +141,7 @@ export const AdminSearchUserColumn = (
     key: "email",
     header: "Email",
     render: (value) => (
-      <div className="text-[13px] text-[#667085]">{value}</div>
+      <div className="text-sm text-[#667085]">{value}</div>
     ),
   },
   {
@@ -155,7 +155,7 @@ export const AdminSearchUserColumn = (
     key: "lastLogin",
     header: "Last Login",
     render: (value) => (
-      <div className="text-[13px] text-[#667085]">
+      <div className="text-sm text-[#667085]">
         {value ? (
           <div className="flex flex-col">
             <span className="font-medium text-[#101828]">
@@ -165,7 +165,7 @@ export const AdminSearchUserColumn = (
                 year: "numeric",
               })}
             </span>
-            <span className="text-[11px] text-[#9A9A9A]">
+            <span className="text-2xs text-[#9A9A9A]">
               {new Date(value).toLocaleTimeString("en-US", {
                 hour: "2-digit",
                 minute: "2-digit",

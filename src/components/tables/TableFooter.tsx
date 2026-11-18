@@ -54,7 +54,7 @@ const TableFooter = ({ currentPage, totalPages, pageSize, totalItems, onPageChan
   const endItem = Math.min(currentPage * pageSize, totalItems)
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between w-full border-t border-slate-100 gap-3 px-4 py-3 bg-white">
+    <div className="flex w-full min-w-0 flex-wrap items-center justify-center gap-3 border-t border-slate-100 bg-white px-1 py-3 sm:justify-between sm:px-4">
       {/* Left side - Showing count (SilverLogix style) */}
       <div className="text-xs text-slate-500 font-medium">
         Showing <span className="text-slate-800 font-semibold">{startItem}</span> to <span className="text-slate-800 font-semibold">{endItem}</span> of <span className="text-slate-800 font-semibold">{totalItems}</span> entries

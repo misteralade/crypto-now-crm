@@ -125,7 +125,7 @@ export default function TreasuryWalletsPage() {
                   <Copy className="h-3.5 w-3.5" />
                 </button>
               </div>
-              <p className="text-[10px] text-gray-500">
+              <p className="text-2xs text-gray-500">
                 Created: {formatDate(row.wallet.createdAt)}
               </p>
             </div>
@@ -141,9 +141,9 @@ export default function TreasuryWalletsPage() {
             return (
               <div className="space-y-1">
                 <p className="text-sm font-semibold text-[#03034D]">{label}</p>
-                <p className="text-[11px] text-gray-500 font-medium">{usage}</p>
+                <p className="text-2xs text-gray-500 font-medium">{usage}</p>
                 {row.user?.email && row.user.email !== label && (
-                  <p className="text-[11px] text-gray-400 font-mono">{row.user.email}</p>
+                  <p className="text-2xs text-gray-400 font-mono">{row.user.email}</p>
                 )}
               </div>
             );
@@ -154,17 +154,17 @@ export default function TreasuryWalletsPage() {
           header: "Purpose / Status",
           render: (_, row) => (
             <div className="space-y-1">
-              <span className="inline-flex rounded-full bg-indigo-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-indigo-700">
+              <span className="inline-flex rounded-full bg-indigo-50 px-2.5 py-1 text-2xs font-semibold uppercase tracking-wide text-indigo-700">
                 {row.wallet.walletPurpose}
               </span>
               <div>
                 {row.wallet.isActive ? (
-                  <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600">
+                  <span className="inline-flex items-center gap-1 text-2xs font-medium text-emerald-600">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                     Active
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 text-[11px] font-medium text-red-500">
+                  <span className="inline-flex items-center gap-1 text-2xs font-medium text-red-500">
                     <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
                     Inactive
                   </span>
@@ -181,7 +181,7 @@ export default function TreasuryWalletsPage() {
               <p className="font-mono text-sm font-semibold text-[#03034D] tabular-nums">
                 {formatAmount(row.wallet.cachedBalance, symbol)}
               </p>
-              <p className="text-[11px] text-gray-500">{symbol ?? row.wallet.network}</p>
+              <p className="text-2xs text-gray-500">{symbol ?? row.wallet.network}</p>
             </div>
           ),
         },
@@ -228,7 +228,7 @@ export default function TreasuryWalletsPage() {
 
         <div className="rounded-2xl border border-[#EEF1FF] bg-[linear-gradient(180deg,#F8F9FF_0%,#FFFFFF_100%)] p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#575AE5]">
+            <span className="text-2xs font-semibold uppercase tracking-[0.08em] text-[#575AE5]">
               Asset Profile
             </span>
             <h2 className="text-xl font-bold text-[#03034D] mt-1">{name} ({symbol})</h2>
@@ -236,7 +236,7 @@ export default function TreasuryWalletsPage() {
           </div>
           <div className="bg-white px-4 py-3 rounded-xl border border-[#DDE0FF] shadow-sm flex items-center gap-3">
             <div className="text-right">
-              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Wallets Count</p>
+              <p className="text-2xs font-semibold text-gray-400 uppercase tracking-wider">Wallets Count</p>
               <p className="text-lg font-bold text-[#03034D] tabular-nums mt-0.5">{rows.length}</p>
             </div>
           </div>

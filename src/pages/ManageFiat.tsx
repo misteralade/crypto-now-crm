@@ -62,7 +62,7 @@ const ManageFiat = () => {
         <section className="rounded-xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-xl">
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-blue-600">
+              <div className="text-2xs font-semibold uppercase tracking-wider text-blue-600">
                 Payout Review Controls
               </div>
               <h2 className="mt-1 text-base sm:text-lg font-bold text-slate-900 tracking-tight">
@@ -140,7 +140,7 @@ const ManageFiat = () => {
               </svg>
             </div>
             <span className="text-xs font-bold text-slate-800 group-hover:text-blue-600">Add Bank Account</span>
-            <span className="text-[11px] text-slate-400 mt-0.5">Connect a new commercial payout account</span>
+            <span className="text-2xs text-slate-400 mt-0.5">Connect a new commercial payout account</span>
           </button>
         </section>
 

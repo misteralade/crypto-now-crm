@@ -162,7 +162,7 @@ const EditUserModal = ({
                   {/* Date of Birth */}
                   <div>
                     <fieldset className="rounded-full border-[1.5px] border-[#E4E7EC] px-[16px] py-[12px] transition-all duration-150 focus-within:border-[#948EEE] focus-within:shadow-[0_0_0_3px_rgba(211,212,248,0.5)]">
-                      <legend className="px-3 font-medium text-[14px] leading-[24px] text-[#454745]">
+                      <legend className="px-3 font-medium text-sm leading-[24px] text-[#454745]">
                         Date of Birth
                       </legend>
                       <div className="relative">

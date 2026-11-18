@@ -128,7 +128,7 @@ export default function Table<T extends Record<string, any> = Record<string, any
   if (loading) {
     return (
       <div className={`bg-white rounded-2xl overflow-hidden ${className}`}>
-        <div className="overflow-x-auto">
+        <div className="min-w-0 overflow-x-auto overscroll-x-contain" tabIndex={0} aria-label="Scrollable table">
           <table className={`w-full ${tableClassName}`}>
             <thead className="bg-[#F8F8FF] border-b border-[#ECECEC]">
               <tr>
@@ -209,7 +209,7 @@ export default function Table<T extends Record<string, any> = Record<string, any
 
   return (
     <div className={`bg-white rounded-xl border border-slate-200/80 shadow-xs overflow-hidden ${className}`}>
-      <div className="overflow-x-auto">
+      <div className="min-w-0 overflow-x-auto overscroll-x-contain" tabIndex={0} aria-label="Scrollable table">
         <table className={`w-full text-left border-collapse ${tableClassName}`}>
           <thead className={theadClassName}>
             <tr className={headerRowClassName}>
@@ -239,7 +239,7 @@ export default function Table<T extends Record<string, any> = Record<string, any
               {columns.map((column) => (
                 <th
                   key={column.key}
-                  className={`px-3.5 py-3 text-left text-[11.5px] font-bold text-slate-700 uppercase tracking-wider ${headerCellClassName} ${column.headerClassName || ''}`}
+                  className={`px-3.5 py-3 text-left text-xs font-bold text-slate-700 uppercase tracking-wider ${headerCellClassName} ${column.headerClassName || ''}`}
                 >
                   {column.header}
                 </th>
@@ -402,7 +402,7 @@ export const TableStatus: FC<{
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider rounded-md border ${variants[variant]}`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 text-2xs font-bold uppercase tracking-wider rounded-md border ${variants[variant]}`}
     >
       <span className={`h-1.5 w-1.5 rounded-full ${dotColors[variant]}`} />
       {status}
@@ -415,7 +415,7 @@ export const UserStatusBadge: FC<{
 }> = ({ status }) => {
   if (!status || typeof status !== 'string') {
     return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider rounded-md border bg-slate-100 text-slate-600 border-slate-200/70">
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-2xs font-bold uppercase tracking-wider rounded-md border bg-slate-100 text-slate-600 border-slate-200/70">
         <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
         Unknown
       </span>
@@ -444,7 +444,7 @@ export const UserStatusBadge: FC<{
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider rounded-md border ${variant}`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 text-2xs font-bold uppercase tracking-wider rounded-md border ${variant}`}
     >
       <span className={`h-1.5 w-1.5 rounded-full ${dotColor}`} />
       {status}

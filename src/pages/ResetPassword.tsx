@@ -60,12 +60,12 @@ const ResetPassword = () => {
             <h1 className="md:text-[40px] text-3xl md:leading-[48px] font-semibold text-[#0E0F0C] mb-1 md:mb-2">
               Invalid Reset Link
             </h1>
-            <p className="md:text-[18px] text-base md:leading-[24px] text-[#454745] font-normal mb-6">
+            <p className="md:text-lg text-base md:leading-[24px] text-[#454745] font-normal mb-6">
               The password reset link is invalid or has expired. Please request a new one.
             </p>
             <Link
               to={ROUTES.FORGOT_PASSWORD}
-              className="text-[14px] text-[#6B7280] hover:text-[#1E1B4B] underline transition-colors duration-200"
+              className="text-sm text-[#6B7280] hover:text-[#1E1B4B] underline transition-colors duration-200"
             >
               Request New Reset Link
             </Link>
@@ -83,7 +83,7 @@ const ResetPassword = () => {
           <h1 className="md:text-[40px] text-3xl md:leading-[48px] font-semibold text-[#0E0F0C] mb-1 md:mb-2">
             Reset Password
           </h1>
-          <p className="md:text-[18px] text-base md:leading-[24px] text-[#454745] font-normal">
+          <p className="md:text-lg text-base md:leading-[24px] text-[#454745] font-normal">
             Enter your new password below.
           </p>
         </div>
@@ -162,7 +162,7 @@ const ResetPassword = () => {
         <div className="mt-6 text-center">
           <Link
             to={ROUTES.LOGIN}
-            className="text-[14px] text-[#6B7280] hover:text-[#1E1B4B] underline transition-colors duration-200"
+            className="text-sm text-[#6B7280] hover:text-[#1E1B4B] underline transition-colors duration-200"
           >
             Back to Sign In
           </Link>

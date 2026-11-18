@@ -89,7 +89,7 @@ const FuelingWalletCard = ({
     >
       <div className="flex justify-between items-start">
         <div>
-          <span className="text-[10px] bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+          <span className="text-2xs bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
             {row.network} Network
           </span>
           <h4 className="text-sm font-bold text-[#03034D] mt-2">
@@ -97,11 +97,11 @@ const FuelingWalletCard = ({
           </h4>
         </div>
         {row.fuelingWallet ? (
-          <span className="text-[10px] bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full font-semibold">
+          <span className="text-2xs bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full font-semibold">
             Active
           </span>
         ) : (
-          <span className="text-[10px] bg-gray-100 text-gray-500 px-2.5 py-1 rounded-full font-semibold">
+          <span className="text-2xs bg-gray-100 text-gray-500 px-2.5 py-1 rounded-full font-semibold">
             Inactive
           </span>
         )}
@@ -110,13 +110,13 @@ const FuelingWalletCard = ({
       <div className="space-y-2 border-t border-[#ECECEC]/70 pt-3">
         <div className="flex justify-between items-center text-xs">
           <span className="text-gray-500 font-medium">Required Gas Asset</span>
-          <span className="font-bold text-[#03034D] bg-indigo-50 px-2.5 py-0.5 rounded-lg text-[11px]">
+          <span className="font-bold text-[#03034D] bg-indigo-50 px-2.5 py-0.5 rounded-lg text-2xs">
             {depositAsset}
           </span>
         </div>
 
         <div className="rounded-xl bg-[#F4F4F7] p-3 border border-[#E4E7EC] space-y-1 relative group">
-          <span className="text-[10px] text-gray-500 font-semibold uppercase tracking-wider block">
+          <span className="text-2xs text-gray-500 font-semibold uppercase tracking-wider block">
             Admin Deposit Wallet Address
           </span>
           <div className="font-mono text-xs text-gray-700 break-all select-all font-medium leading-relaxed mt-1 pr-8">
@@ -148,7 +148,7 @@ const FuelingWalletCard = ({
                 {balanceData !== null ? `${Number(balanceData.balance).toFixed(8).replace(/\.?0+$/, '')} ${balanceData.symbol}` : "-"}
               </span>
               {balanceData?.updatedAt && (
-                <span className="text-[10px] text-gray-400 block mt-0.5">
+                <span className="text-2xs text-gray-400 block mt-0.5">
                   Last checked: {formatTime(balanceData.updatedAt)}
                 </span>
               )}
@@ -178,7 +178,7 @@ const FuelingWalletCard = ({
             {isGenerating ? "Generating..." : "Generate Fueling Wallet"}
           </button>
         ) : (
-          <div className="text-[11px] text-gray-500 leading-normal bg-blue-50/50 p-2.5 rounded-xl border border-blue-100 w-full">
+          <div className="text-2xs text-gray-500 leading-normal bg-blue-50/50 p-2.5 rounded-xl border border-blue-100 w-full">
             ⚠️ <strong className="text-blue-800">Operational Note:</strong> Deposit <strong>{row.network === "ERC20" ? "ETH" : "TRX"}</strong> directly into this address to cover transaction gas fees for custodial sweeping.
           </div>
         )}

@@ -140,7 +140,7 @@ const SelectLabel = React.forwardRef<
   <SelectPrimitive.Label
     ref={ref}
     className={cn(
-      "px-3 py-2 text-[11px] font-bold text-gray-500 uppercase tracking-widest",
+      "px-3 py-2 text-2xs font-bold text-gray-500 uppercase tracking-widest",
       className,
     )}
     {...props}
@@ -231,7 +231,7 @@ const LabeledSelect = ({
         </SelectContent>
       </Select>
       {error && (
-        <p className="ml-1 text-[11px] font-medium text-rose-600 transition-opacity duration-150">
+        <p className="ml-1 text-2xs font-medium text-rose-600 transition-opacity duration-150">
           {error}
         </p>
       )}
@@ -274,7 +274,7 @@ const PillSelect = ({
         </SelectContent>
       </Select>
       {error && (
-        <p className="ml-1 text-[11px] font-medium text-rose-600 transition-opacity duration-150">
+        <p className="ml-1 text-2xs font-medium text-rose-600 transition-opacity duration-150">
           {error}
         </p>
       )}

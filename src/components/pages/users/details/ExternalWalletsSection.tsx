@@ -95,22 +95,22 @@ const ExternalWalletsSection = ({ userId }: ExternalWalletsSectionProps) => {
                       <div className="font-medium text-[#0E0F0C] truncate">
                         {title}
                       </div>
-                      <span className="text-[12px] px-2 py-1 rounded-full bg-[#F2F4F7] text-[#344054]">
+                      <span className="text-xs px-2 py-1 rounded-full bg-[#F2F4F7] text-[#344054]">
                         {wallet.network}
                       </span>
                       {wallet.isPrimary ? (
-                        <span className="text-[12px] px-2 py-1 rounded-full bg-[#E8F8F0] text-[#037847]">
+                        <span className="text-xs px-2 py-1 rounded-full bg-[#E8F8F0] text-[#037847]">
                           PRIMARY
                         </span>
                       ) : null}
                       {wallet.isVerified ? (
-                        <span className="text-[12px] px-2 py-1 rounded-full bg-[#E0ECFF] text-[#1D4ED8]">
+                        <span className="text-xs px-2 py-1 rounded-full bg-[#E0ECFF] text-[#1D4ED8]">
                           VERIFIED
                         </span>
                       ) : null}
                     </div>
 
-                    <div className="mt-2 font-mono text-[13px] text-[#475467] break-all">
+                    <div className="mt-2 font-mono text-sm text-[#475467] break-all">
                       {wallet.walletAddress}
                     </div>
                   </div>

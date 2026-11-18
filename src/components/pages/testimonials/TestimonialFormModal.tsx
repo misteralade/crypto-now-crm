@@ -58,7 +58,7 @@ const TestimonialFormModal = ({ open, mode, initialValues, onClose, onSubmit }: 
       <div className="absolute inset-0 grid place-items-center p-4">
         <div className={`w-full max-w-xl bg-white rounded-2xl shadow-xl border border-[#ECECEC] max-h-[90vh] overflow-y-auto ${isClosing ? 'animate-modal-content-out' : 'animate-modal-content-in'}`}>
           <div className="px-6 pt-6 pb-4 flex items-center justify-between border-b border-[#ECECEC]">
-            <h2 className="text-[18px] font-semibold text-[#0E0F0C]">
+            <h2 className="text-lg font-semibold text-[#0E0F0C]">
               {mode === 'create' ? 'Create Testimonial' : 'Edit Testimonial'}
             </h2>
             <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-[#F5F5FF] transition-colors text-[#9A9A9A]">
@@ -83,7 +83,7 @@ const TestimonialFormModal = ({ open, mode, initialValues, onClose, onSubmit }: 
                       onChange={(e) => setFieldValue('contentLink', e.target.value)}
                     />
                     {errors.contentLink && touched.contentLink && (
-                      <p className="text-red-500 text-[12px] mt-1 ml-2">{errors.contentLink}</p>
+                      <p className="text-red-500 text-xs mt-1 ml-2">{errors.contentLink}</p>
                     )}
                   </div>
 
@@ -95,7 +95,7 @@ const TestimonialFormModal = ({ open, mode, initialValues, onClose, onSubmit }: 
                       onChange={(e) => setFieldValue('name', e.target.value || undefined)}
                     />
                     {errors.name && touched.name && (
-                      <p className="text-red-500 text-[12px] mt-1 ml-2">{errors.name}</p>
+                      <p className="text-red-500 text-xs mt-1 ml-2">{errors.name}</p>
                     )}
                   </div>
 
@@ -108,7 +108,7 @@ const TestimonialFormModal = ({ open, mode, initialValues, onClose, onSubmit }: 
                       rows={4}
                     />
                     {errors.description && touched.description && (
-                      <p className="text-red-500 text-[12px] mt-1 ml-2">{errors.description}</p>
+                      <p className="text-red-500 text-xs mt-1 ml-2">{errors.description}</p>
                     )}
                   </div>
 
@@ -120,7 +120,7 @@ const TestimonialFormModal = ({ open, mode, initialValues, onClose, onSubmit }: 
                       options={contentTypeOptions}
                     />
                     {errors.contentType && touched.contentType && (
-                      <p className="text-red-500 text-[12px] mt-1 ml-2">{errors.contentType}</p>
+                      <p className="text-red-500 text-xs mt-1 ml-2">{errors.contentType}</p>
                     )}
                   </div>
 

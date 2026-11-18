@@ -181,14 +181,14 @@ const SupportedCurrencies = () => {
                       )}
                       <div>
                         <p className="font-bold text-slate-900 text-sm leading-tight">{currency.name}</p>
-                        <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mt-0.5">{currency.code}</p>
+                        <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wider mt-0.5">{currency.code}</p>
                       </div>
                     </div>
                   </div>
 
                   <div className="flex flex-wrap gap-2">
                     <span
-                      className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider ${
+                      className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-2xs font-semibold uppercase tracking-wider ${
                         currency.isActive
                           ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60'
                           : 'bg-slate-100 text-slate-600 border border-slate-200'

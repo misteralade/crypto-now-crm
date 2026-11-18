@@ -23,7 +23,7 @@ export default function CustomerAccountDetails({
     <div className="">
       <div className="space-y-4">
         <section className="flex items-center justify-between gap-x-12 md:gap-x-28">
-          <div className="text-[#828282] text-[16px]">Address</div>
+          <div className="text-[#828282] text-base">Address</div>
           <div className="flex items-center gap-2 break-all">
             <span className="font-medium text-sm text-[#0E0F0C]">
               {address}
@@ -41,12 +41,12 @@ export default function CustomerAccountDetails({
         </section>
 
         <section className="flex items-center justify-between gap-x-12 md:gap-x-28">
-          <div className="text-[#828282] text-[16px]">Coin type</div>
+          <div className="text-[#828282] text-base">Coin type</div>
           <div className="font-medium text-sm text-[#0E0F0C]">{coinType}</div>
         </section>
 
         <section className="flex items-center justify-between gap-x-12 md:gap-x-28">
-          <div className="text-[#828282] text-[16px]">Network type</div>
+          <div className="text-[#828282] text-base">Network type</div>
           <div className="font-medium text-sm text-[#0E0F0C]">
             {networkType}
           </div>

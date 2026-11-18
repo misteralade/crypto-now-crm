@@ -53,7 +53,7 @@ const ForgotPassword = () => {
           <h1 className="md:text-[40px] text-3xl md:leading-[48px] font-semibold text-[#0E0F0C] mb-1 md:mb-2">
             Forgot password
           </h1>
-          <p className="md:text-[18px] text-base md:leading-[24px] text-[#454745] font-normal">
+          <p className="md:text-lg text-base md:leading-[24px] text-[#454745] font-normal">
             Enter your email address and we'll send you a link to reset your password.
           </p>
         </div>
@@ -91,7 +91,7 @@ const ForgotPassword = () => {
         <div className="mt-6 text-center">
           <Link
             to={ROUTES.LOGIN}
-            className="text-[14px] text-[#6B7280] hover:text-[#1E1B4B] underline transition-colors duration-200"
+            className="text-sm text-[#6B7280] hover:text-[#1E1B4B] underline transition-colors duration-200"
           >
             Back to Sign In
           </Link>

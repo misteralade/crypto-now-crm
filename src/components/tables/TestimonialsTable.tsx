@@ -78,14 +78,14 @@ export const TestimonialDataColumn = (
     render: (_, row) => (
       <div className="flex items-center justify-start gap-2 lg:gap-x-[12px] whitespace-nowrap">
         <button
-          className="px-3 py-1 font-medium text-[12px] bg-[#03034D] text-white rounded-full hover:opacity-70 cursor-pointer"
+          className="px-3 py-1 font-medium text-xs bg-[#03034D] text-white rounded-full hover:opacity-70 cursor-pointer"
           onClick={() => handleEdit(row.original)}
         >
           Edit
         </button>
         
         <button
-          className={`px-2.5 md:px-3 py-1 rounded-full text-[11px] cursor-pointer hover:opacity-80 md:text-xs font-medium ${
+          className={`px-2.5 md:px-3 py-1 rounded-full text-2xs cursor-pointer hover:opacity-80 md:text-xs font-medium ${
             row.isPublished 
               ? 'bg-[#FCE8E8] text-[#EB5757]' 
               : 'bg-[#E8F5E9] text-[#4CAF50]'
@@ -96,7 +96,7 @@ export const TestimonialDataColumn = (
         </button>
         
         <button
-          className="px-3 py-1 font-medium text-[12px] bg-[#EF4444] text-white rounded-full hover:opacity-70 cursor-pointer"
+          className="px-3 py-1 font-medium text-xs bg-[#EF4444] text-white rounded-full hover:opacity-70 cursor-pointer"
           onClick={() => handleDelete(row.id)}
         >
           Delete

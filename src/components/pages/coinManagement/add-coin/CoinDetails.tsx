@@ -120,7 +120,7 @@ const CoinDetails = ({ onChangeInputField }: CoinDetailsProps) => {
         </div>
 
         <div className="space-y-3">
-          <label className="block text-[13px] font-medium text-[#454745]">
+          <label className="block text-sm font-medium text-[#454745]">
             Supported Networks
           </label>
           <div className="flex flex-wrap gap-4">
@@ -158,7 +158,7 @@ const CoinDetails = ({ onChangeInputField }: CoinDetailsProps) => {
         </div>
         <p className="text-xs text-gray-500">Sell support and address validation require separate backend configuration.</p>
         <div>
-          <label className="block text-[13px] font-semibold text-[#454745] mb-3">
+          <label className="block text-sm font-semibold text-[#454745] mb-3">
             Active Status
           </label>
           <Switch
@@ -169,7 +169,7 @@ const CoinDetails = ({ onChangeInputField }: CoinDetailsProps) => {
           />
         </div>
         <div>
-          <label className="block text-[13px] font-semibold text-[#454745] mb-3">
+          <label className="block text-sm font-semibold text-[#454745] mb-3">
             Stable Coin
           </label>
           <Switch

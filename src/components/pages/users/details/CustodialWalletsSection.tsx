@@ -122,19 +122,19 @@ const CustodialWalletsSection = ({ userId, supportedCryptos }: CustodialWalletsS
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <div className="font-medium text-[#0E0F0C] truncate">{title}</div>
-                      <span className="text-[12px] px-2 py-1 rounded-full bg-[#F2F4F7] text-[#344054]">
+                      <span className="text-xs px-2 py-1 rounded-full bg-[#F2F4F7] text-[#344054]">
                         {wallet.network}
                       </span>
-                      <span className={`text-[12px] px-2 py-1 rounded-full border ${env.badgeClass}`}>
+                      <span className={`text-xs px-2 py-1 rounded-full border ${env.badgeClass}`}>
                         {env.label}
                       </span>
                       {!wallet.isActive ? (
-                        <span className="text-[12px] px-2 py-1 rounded-full bg-[#FCE8E8] text-[#B42318]">
+                        <span className="text-xs px-2 py-1 rounded-full bg-[#FCE8E8] text-[#B42318]">
                           Inactive
                         </span>
                       ) : null}
                     </div>
-                    <div className="mt-2 font-mono text-[13px] text-[#475467] break-all">
+                    <div className="mt-2 font-mono text-sm text-[#475467] break-all">
                       {wallet.walletAddress}
                     </div>
                   </div>

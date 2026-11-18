@@ -214,7 +214,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                     <Icon
                       className={`w-4.5 h-4.5 flex-shrink-0 ${isActive ? "text-white" : "text-blue-200/80"}`}
                     />
-                    <span className="text-[13.5px] font-medium tracking-tight">
+                    <span className="text-sm font-medium tracking-tight">
                       {item.label}
                     </span>
                   </Link>
@@ -229,7 +229,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
               className="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-rose-300 hover:bg-rose-500/15 hover:text-rose-200 transition-colors w-full cursor-pointer touch-manipulation min-h-[40px]"
             >
               <LogOut size={16} className="flex-shrink-0" />
-              <span className="text-[13.5px]">Sign Out</span>
+              <span className="text-sm">Sign Out</span>
             </button>
           </div>
         </div>

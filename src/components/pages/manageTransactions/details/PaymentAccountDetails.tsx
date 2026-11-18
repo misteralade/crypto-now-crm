@@ -88,7 +88,7 @@ const PaymentAccountDetails = ({
             <div className="p-3 rounded-lg bg-slate-50 border border-slate-100/80">
               <p className="crm-label font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Wallet Address</p>
               <div className="flex items-center gap-2">
-                <CopyDetails text={walletAddress || ''} wrap={true} className="!max-w-full font-mono text-xs font-semibold text-slate-900" iconClassName="!w-4 !h-4" />
+                <CopyDetails text={walletAddress || ''} wrap={true} className="!max-w-full font-mono font-semibold text-slate-900" iconClassName="!w-4 !h-4" />
               </div>
             </div>
 

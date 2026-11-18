@@ -36,7 +36,7 @@ const TransactionOverview = ({
               {logoUrl ? <img src={logoUrl} alt={`${symbol} logo`} className="h-7 w-7 object-contain" /> : <Coins className="w-4 h-4" />}
             </div>
             <div>
-              <h2 className="text-xs sm:crm-section-heading font-bold text-slate-900 tracking-tight">Transaction Overview</h2>
+              <h2 className="crm-section-heading font-bold text-slate-900 tracking-tight">Transaction Overview</h2>
 
             </div>
           </div>
@@ -48,60 +48,60 @@ const TransactionOverview = ({
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {/* Card 1: Fiat Value */}
           <div className="p-3 rounded-lg bg-slate-50/90 border border-slate-100 flex flex-col justify-between">
-            <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider truncate mb-1">
+            <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wider truncate mb-1">
               Fiat Settlement
             </p>
             <p className="text-base sm:text-lg font-bold text-slate-900 tabular-nums truncate">
               ₦{formatCompact(amountFiatNGN, 'NGN', 2)}
             </p>
-            <p className="text-[10px] text-slate-400 mt-1">NGN Equivalent</p>
+            <p className="text-2xs text-slate-400 mt-1">NGN Equivalent</p>
           </div>
 
           {/* Card 2: Crypto Amount */}
           <div className="p-3 rounded-lg bg-slate-50/90 border border-slate-100 flex flex-col justify-between">
-            <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider truncate mb-1">
+            <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wider truncate mb-1">
               Crypto Amount
             </p>
             <p className="text-base sm:text-lg font-bold text-slate-900 tabular-nums truncate" title={`${amountCrypto} ${symbol}`}>
               {formatNumber(amountCrypto)} <span className="text-xs font-semibold text-slate-600">{symbol}</span>
             </p>
-            <p className="text-[10px] text-slate-400 mt-1">Asset Traded</p>
+            <p className="text-2xs text-slate-400 mt-1">Asset Traded</p>
           </div>
 
           {/* Card 3: Exchange Rate */}
           <div className="p-3 rounded-lg bg-slate-50/90 border border-slate-100 flex flex-col justify-between">
-            <div className="flex items-center gap-1 text-[11px] font-semibold text-slate-500 uppercase tracking-wider truncate mb-1">
+            <div className="flex items-center gap-1 text-2xs font-semibold text-slate-500 uppercase tracking-wider truncate mb-1">
               <ArrowLeftRight className="w-3 h-3 text-slate-400 shrink-0" />
               <span className="truncate">Rate</span>
             </div>
-            <p className="text-xs sm:crm-body font-bold text-slate-900 truncate" title={exchangeRateDisplay}>
+            <p className="crm-body font-bold text-slate-900 truncate" title={exchangeRateDisplay}>
               {exchangeRateDisplay || 'N/A'}
             </p>
-            <p className="text-[10px] text-slate-400 mt-1">Locked Rate</p>
+            <p className="text-2xs text-slate-400 mt-1">Locked Rate</p>
           </div>
 
           {/* Card 4: Confirmations or Type */}
           {type === 'SELL' ? (
             <div className="p-3 rounded-lg bg-slate-50/90 border border-slate-100 flex flex-col justify-between">
-              <div className="flex items-center gap-1 text-[11px] font-semibold text-slate-500 uppercase tracking-wider truncate mb-1">
+              <div className="flex items-center gap-1 text-2xs font-semibold text-slate-500 uppercase tracking-wider truncate mb-1">
                 <CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0" />
                 <span className="truncate">Confirmations</span>
               </div>
               <p className="text-base sm:text-lg font-bold text-slate-900 tabular-nums truncate">
                 {confirmationCount ?? 0}
               </p>
-              <p className="text-[10px] text-slate-400 mt-1">Block receipts</p>
+              <p className="text-2xs text-slate-400 mt-1">Block receipts</p>
             </div>
           ) : (
             <div className="p-3 rounded-lg bg-slate-50/90 border border-slate-100 flex flex-col justify-between">
-              <div className="flex items-center gap-1 text-[11px] font-semibold text-slate-500 uppercase tracking-wider truncate mb-1">
+              <div className="flex items-center gap-1 text-2xs font-semibold text-slate-500 uppercase tracking-wider truncate mb-1">
                 <TrendingUp className="w-3 h-3 text-blue-500 shrink-0" />
                 <span className="truncate">Order Type</span>
               </div>
               <p className="text-sm sm:text-base font-bold text-blue-600 truncate">
                 BUY ORDER
               </p>
-              <p className="text-[10px] text-slate-400 mt-1">Customer Purchasing</p>
+              <p className="text-2xs text-slate-400 mt-1">Customer Purchasing</p>
             </div>
           )}
         </div>

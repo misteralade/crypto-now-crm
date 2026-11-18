@@ -43,7 +43,7 @@ const Switch = React.forwardRef<
             <label
               htmlFor={switchId}
               className={cn(
-                "text-[15px] font-semibold text-[#454745] cursor-pointer select-none",
+                "text-base font-semibold text-[#454745] cursor-pointer select-none",
                 props.disabled && "cursor-not-allowed opacity-50",
               )}
             >
@@ -51,7 +51,7 @@ const Switch = React.forwardRef<
             </label>
           )}
           {description && (
-            <span className="text-[12px] text-[#9A9A9A]">{description}</span>
+            <span className="text-xs text-[#9A9A9A]">{description}</span>
           )}
         </div>
       )}

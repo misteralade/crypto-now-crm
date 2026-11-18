@@ -113,7 +113,7 @@ function KycStepBadge({ step }: { step: KycSessionStep }) {
   const style = STEP_STYLES[step] ?? STEP_STYLES["Not Started"];
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${style.bg} ${style.textColor} ${style.border}`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-2xs font-semibold border ${style.bg} ${style.textColor} ${style.border}`}
     >
       <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
       {STEP_LABELS[step]}
@@ -183,7 +183,7 @@ const KycSessions = () => {
       <div className="px-4 sm:px-6 pb-6 space-y-3">
         {userIdFilter && (
           <div className="flex items-center justify-between gap-3 rounded-xl border border-blue-100 bg-blue-50/60 px-4 py-2 text-xs text-blue-900">
-            <span>Filtered by: <strong className="font-semibold">{userIdFilter}</strong></span>
+            <span className="min-w-0 break-all">Filtered by: <strong className="font-semibold">{userIdFilter}</strong></span>
             <button
               onClick={() => {
                 setSearchInput("");
@@ -201,7 +201,7 @@ const KycSessions = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
-                <tr className="bg-[#F0F4FA] border-b border-slate-200 text-slate-600 font-semibold uppercase tracking-wider text-[11px]">
+                <tr className="bg-[#F0F4FA] border-b border-slate-200 text-slate-600 font-semibold uppercase tracking-wider text-2xs">
                   <th className="text-left px-4 py-3">Applicant</th>
                   <th className="text-left px-4 py-3">Status</th>
                   <th className="text-left px-4 py-3">Doc Result</th>
@@ -243,7 +243,7 @@ const KycSessions = () => {
                             ? `${session.user.profile.firstName} ${session.user.profile.lastName}`
                             : "User"}
                         </p>
-                        <p className="text-slate-500 text-[11px] truncate max-w-[180px]">
+                        <p className="text-slate-500 text-2xs truncate max-w-[180px]">
                           {session.user?.email ?? session.userId}
                         </p>
                       </div>
@@ -253,7 +253,7 @@ const KycSessions = () => {
                     </td>
                     <td className="px-4 py-3">
                       <span
-                        className={`font-semibold capitalize text-[11px] ${
+                        className={`font-semibold capitalize text-2xs ${
                           session.documentVerificationStatus === "approved"
                             ? "text-emerald-700"
                             : session.documentVerificationStatus === "rejected"
@@ -268,7 +268,7 @@ const KycSessions = () => {
                     </td>
                     <td className="px-4 py-3">
                       <span
-                        className={`font-semibold capitalize text-[11px] ${
+                        className={`font-semibold capitalize text-2xs ${
                           session.faceMatchStatus === "approved"
                             ? "text-emerald-700"
                             : session.faceMatchStatus === "rejected"

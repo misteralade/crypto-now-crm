@@ -601,7 +601,7 @@ export default function SweepConfigModal({
                       <h4 className="text-xs font-bold text-red-800">
                         Fueling Wallet Required
                       </h4>
-                      <p className="text-[11px] text-red-700 leading-normal mt-1">
+                      <p className="text-2xs text-red-700 leading-normal mt-1">
                         Sweeping {symbol} on {network} requires a platform-managed fueling wallet to fund gas/transaction fees. No active fueling wallet is currently configured.
                       </p>
                     </div>
@@ -833,7 +833,7 @@ export default function SweepConfigModal({
                     {symbol}
                   </span>
                 </div>
-                <p className="text-[11px] leading-5 text-[#667085]">
+                <p className="text-2xs leading-5 text-[#667085]">
                   {previewFeeExplanation}
                 </p>
 
@@ -842,11 +842,11 @@ export default function SweepConfigModal({
                     <p className="text-xs font-semibold text-[--color-text-primary]">
                       Destination
                     </p>
-                    <span className="rounded-full bg-[#DCDDFD] px-2 py-0.5 text-[10px] font-semibold text-[#03034D]">
+                    <span className="rounded-full bg-[#DCDDFD] px-2 py-0.5 text-2xs font-semibold text-[#03034D]">
                       Registered Admin Wallet
                     </span>
                   </div>
-                  <p className="break-all font-mono text-[11px] text-[#03034D]">
+                  <p className="break-all font-mono text-2xs text-[#03034D]">
                     {previewData.targetAdminWallet.address}
                   </p>
                 </div>
@@ -857,23 +857,23 @@ export default function SweepConfigModal({
                       <p className="text-xs font-semibold text-[--color-text-primary]">
                         Fueling Wallet
                       </p>
-                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${insufficientFuelBalance ? 'bg-red-100 text-red-700' : 'bg-[#DCDDFD] text-[#03034D]'}`}>
+                      <span className={`rounded-full px-2 py-0.5 text-2xs font-semibold ${insufficientFuelBalance ? 'bg-red-100 text-red-700' : 'bg-[#DCDDFD] text-[#03034D]'}`}>
                         {insufficientFuelBalance ? 'No Gas' : 'Gas Fees'}
                       </span>
                     </div>
                     {fuelingWalletStatus.address && (
-                      <p className="font-mono text-[11px] text-[#03034D]">
+                      <p className="font-mono text-2xs text-[#03034D]">
                         {formatWalletAddress(fuelingWalletStatus.address)}
                       </p>
                     )}
                     <div className="space-y-1 mt-2">
-                      <div className="flex justify-between text-[10px]">
+                      <div className="flex justify-between text-2xs">
                         <span className="text-[#667085]">Estimated required:</span>
                         <span className="text-[#03034D] font-semibold">
                           ~{fuelingWalletStatus.requiredEstimate.toFixed(6)} {previewData.feeAssetSymbol}
                         </span>
                       </div>
-                      <div className={`flex justify-between text-[10px] ${insufficientFuelBalance ? 'text-red-600' : 'text-[#667085]'}`}>
+                      <div className={`flex justify-between text-2xs ${insufficientFuelBalance ? 'text-red-600' : 'text-[#667085]'}`}>
                         <span>Available:</span>
                         <span className="font-semibold">
                           {fuelingWalletStatus.balance.toFixed(6)} {previewData.feeAssetSymbol}
@@ -881,7 +881,7 @@ export default function SweepConfigModal({
                       </div>
                     </div>
                     {insufficientFuelBalance && (
-                      <p className="text-[10px] text-red-700 font-semibold mt-2">
+                      <p className="text-2xs text-red-700 font-semibold mt-2">
                         {fuelingWalletStatus.address
                           ? `No ${previewData.feeAssetSymbol} in the fueling wallet to cover gas. Top it up before sweeping.`
                           : `No active fueling wallet configured for this network. Gas cannot be funded.`}
@@ -889,7 +889,7 @@ export default function SweepConfigModal({
                     )}
                   </div>
                 )}
-                <div className="flex items-center justify-between border-t border-[#ECEFFD] pt-2 text-[10px] font-medium leading-tight text-[#667085]">
+                <div className="flex items-center justify-between border-t border-[#ECEFFD] pt-2 text-2xs font-medium leading-tight text-[#667085]">
                   <span
                     className={
                       previewData.oldestRefreshedAt

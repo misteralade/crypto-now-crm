@@ -50,7 +50,7 @@ const TransactionHash = ({ cryptoTxHash, network, walletAddress }: TransactionHa
             <CopyDetails
               text={cryptoTxHash}
               wrap={true}
-              className="!max-w-full font-mono text-xs font-semibold text-slate-900"
+              className="!max-w-full font-mono font-semibold text-slate-900"
               iconClassName="!w-4 !h-4"
             />
           </div>

@@ -147,7 +147,7 @@ export default function WalletDetails() {
         >
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div className="space-y-2">
-              <p className="inline-flex items-center gap-2 rounded-full border border-[#D6D9FF] bg-white/85 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#575AE5]">
+              <p className="inline-flex items-center gap-2 rounded-full border border-[#D6D9FF] bg-white/85 px-3 py-1 text-2xs font-semibold uppercase tracking-[0.08em] text-[#575AE5]">
                 <Wallet className="h-3.5 w-3.5" />
                 Custodial Wallet
               </p>

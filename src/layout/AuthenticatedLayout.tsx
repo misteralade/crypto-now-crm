@@ -84,7 +84,7 @@ const AuthenticatedLayout = ({ children }: { children: ReactNode }) => {
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.25, ease: "easeOut" }}
-              className="flex-1 pb-10"
+              className="min-w-0 flex-1 pb-10"
             >
               {children}
             </motion.main>

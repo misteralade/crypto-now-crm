@@ -81,7 +81,7 @@ export default function TreasuryWalletsModal({
               <p className="font-mono text-xs font-semibold text-[#03034D]">
                 {shortAddress(row.wallet.walletAddress)}
               </p>
-              <p className="text-[11px] text-gray-500" title={row.wallet.walletAddress}>
+              <p className="text-2xs text-gray-500" title={row.wallet.walletAddress}>
                 {row.wallet.walletAddress}
               </p>
             </div>
@@ -97,9 +97,9 @@ export default function TreasuryWalletsModal({
             return (
               <div className="space-y-1">
                 <p className="text-sm font-semibold text-[#03034D]">{label}</p>
-                <p className="text-[11px] text-gray-500">{usage}</p>
+                <p className="text-2xs text-gray-500">{usage}</p>
                 {row.user?.email && row.user.email !== label && (
-                  <p className="text-[11px] text-gray-500">{row.user.email}</p>
+                  <p className="text-2xs text-gray-500">{row.user.email}</p>
                 )}
               </div>
             );
@@ -110,10 +110,10 @@ export default function TreasuryWalletsModal({
           header: "Purpose",
           render: (_, row) => (
             <div className="space-y-1">
-              <span className="inline-flex rounded-full bg-indigo-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-indigo-700">
+              <span className="inline-flex rounded-full bg-indigo-50 px-2.5 py-1 text-2xs font-semibold uppercase tracking-wide text-indigo-700">
                 {row.wallet.walletPurpose}
               </span>
-              <p className="text-[11px] text-gray-500">
+              <p className="text-2xs text-gray-500">
                 {row.wallet.isActive ? "Active" : "Inactive"}
               </p>
             </div>
@@ -127,7 +127,7 @@ export default function TreasuryWalletsModal({
               <p className="font-mono text-sm font-semibold text-[#03034D] tabular-nums">
                 {formatAmount(row.wallet.cachedBalance)}
               </p>
-              <p className="text-[11px] text-gray-500">{row.cryptocurrency?.symbol ?? row.wallet.network}</p>
+              <p className="text-2xs text-gray-500">{row.cryptocurrency?.symbol ?? row.wallet.network}</p>
             </div>
           ),
         },
@@ -136,10 +136,10 @@ export default function TreasuryWalletsModal({
           header: "Activity",
           render: (_, row) => (
             <div className="space-y-1">
-              <p className="text-[11px] text-gray-500">
+              <p className="text-2xs text-gray-500">
                 Deposits: {row.wallet.totalDepositsCount}
               </p>
-              <p className="text-[11px] text-gray-500">
+              <p className="text-2xs text-gray-500">
                 Last deposit: {formatDate(row.wallet.lastDepositAt)}
               </p>
             </div>
@@ -184,7 +184,7 @@ export default function TreasuryWalletsModal({
       <div className="flex max-h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-2xl">
         <div className="flex items-start justify-between gap-4 border-b border-slate-100 bg-slate-50/50 px-5 py-4">
           <div className="space-y-1">
-            <span className="inline-flex items-center rounded-md bg-blue-50 border border-blue-200/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-blue-700">
+            <span className="inline-flex items-center rounded-md bg-blue-50 border border-blue-200/60 px-2 py-0.5 text-2xs font-semibold uppercase tracking-wider text-blue-700">
               Treasury Wallets
             </span>
             <h2 className="text-lg font-bold text-slate-900">

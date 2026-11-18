@@ -27,13 +27,13 @@ const Signin = () => {
           <h1 className="md:text-[40px] text-3xl md:leading-[48px] font-semibold text-[#0E0F0C] mb-1 md:mb-2">
             Sign in
           </h1>
-          <p className="md:text-[18px] text-base text-[#454745] font-normal">
+          <p className="md:text-lg text-base text-[#454745] font-normal">
             Please login to continue to your account.
           </p>
         </div>
 
         {error && (
-          <div className="mb-5 px-4 py-3 rounded-xl bg-[#FEF2F2] border border-[#FECACA] text-[#EB5757] text-[14px] font-medium">
+          <div className="mb-5 px-4 py-3 rounded-xl bg-[#FEF2F2] border border-[#FECACA] text-[#EB5757] text-sm font-medium">
             {error}
           </div>
         )}
@@ -73,7 +73,7 @@ const Signin = () => {
           <div className="flex justify-end -mt-2">
             <Link
               to={ROUTES.FORGOT_PASSWORD}
-              className="text-[13px] text-[#948EEE] hover:text-[#03034D] font-medium transition-colors"
+              className="text-sm text-[#948EEE] hover:text-[#03034D] font-medium transition-colors"
             >
               Forgot password?
             </Link>
@@ -82,7 +82,7 @@ const Signin = () => {
           <div className="pt-2">
             <CustomButton
               type="submit"
-              className="w-full py-4 text-[16px]"
+              className="w-full py-4 text-base"
               buttonText={isLoading ? "Signing in..." : "Sign in"}
               disabled={isLoading}
             />

@@ -75,10 +75,10 @@ const UploadCoinIcon = ({
             <p className="text-xs sm:text-sm font-bold text-slate-900 leading-tight">
               Currency Logo
             </p>
-            <p className="text-[11px] text-slate-500 mt-0.5">
+            <p className="text-2xs text-slate-500 mt-0.5">
               PNG, SVG, or JPG (max 2MB). Displayed across trading feeds.
             </p>
-            {error && <p className="text-[11px] text-rose-600 mt-1">{error}</p>}
+            {error && <p className="text-2xs text-rose-600 mt-1">{error}</p>}
           </div>
         </div>
 

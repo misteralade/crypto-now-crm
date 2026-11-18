@@ -118,8 +118,8 @@ const TransactionDetails = () => {
 
               {(transaction.cryptoTxHash || transaction.depositAddress || transaction.bankTransferReference) && <div className="grid gap-5 xl:grid-cols-2">
                 {transaction.cryptoTxHash && <TransactionHash cryptoTxHash={transaction.cryptoTxHash} network={transaction.adminCryptoWallet?.network as CryptoNetworkType} walletAddress={transaction.adminCryptoWallet?.walletAddress || ""} />}
-                {transaction.type === "SELL" && transaction.depositAddress && <DetailCard title="Custodial Deposit Address" icon={<QrCode size={16} />}><CopyDetails text={transaction.depositAddress} wrap className="!max-w-full font-mono text-xs" /></DetailCard>}
-                {transaction.type === "BUY" && transaction.bankTransferReference && <DetailCard title="Bank Transfer Reference" icon={<FileText size={16} />}><CopyDetails text={transaction.bankTransferReference} wrap className="!max-w-full font-mono text-xs" /></DetailCard>}
+                {transaction.type === "SELL" && transaction.depositAddress && <DetailCard title="Custodial Deposit Address" icon={<QrCode size={16} />}><CopyDetails text={transaction.depositAddress} wrap className="!max-w-full font-mono" /></DetailCard>}
+                {transaction.type === "BUY" && transaction.bankTransferReference && <DetailCard title="Bank Transfer Reference" icon={<FileText size={16} />}><CopyDetails text={transaction.bankTransferReference} wrap className="!max-w-full font-mono" /></DetailCard>}
               </div>}
 
                 {transaction.type === TRANSACTION_STATUS_SCOPE.BUY && <TransactionReceipts receiptImageUrl={transaction.receiptImageUrl} adminPaymentReceiptUrl={transaction.adminPaymentReceiptUrl} />}

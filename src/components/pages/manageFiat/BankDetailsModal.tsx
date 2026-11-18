@@ -99,7 +99,7 @@ const BankDetailsModal = ({
   if (!shouldRender) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
       <div
         className={`absolute inset-0 bg-black/40 backdrop-blur-[2px] ${
           isClosing ? "animate-modal-backdrop-out" : "animate-modal-backdrop-in"
@@ -107,7 +107,7 @@ const BankDetailsModal = ({
         onClick={onClose}
       />
 
-      <div className={`relative w-full max-w-[480px] bg-white rounded-[24px] shadow-2xl border border-[#ECECEC] overflow-hidden ${
+      <div className={`relative w-full max-w-[480px] max-h-[calc(100dvh-2rem)] overflow-y-auto bg-white rounded-[24px] shadow-2xl border border-[#ECECEC] ${
             isClosing ? "animate-modal-content-out" : "animate-modal-content-in"
           }`}>
         <div className="px-8 pt-8 pb-4">
@@ -143,7 +143,7 @@ const BankDetailsModal = ({
 
           <div className="space-y-1">
             <div className={`relative rounded-xl border-[1.5px] px-4 py-3 transition-all duration-150 ${payload.accountHolderName ? 'bg-green-50/30 border-green-200' : 'bg-gray-50/50 border-[#E4E7EC]'}`}>
-              <legend className="px-2 text-[13px] font-medium text-[#454745] leading-none">Account Holder</legend>
+              <legend className="px-2 text-sm font-medium text-[#454745] leading-none">Account Holder</legend>
               <div className="flex items-center justify-between min-h-[24px]">
                 {isLookingUp ? (
                   <div className="flex items-center gap-2 text-sm text-[#948EEE]">
@@ -151,14 +151,14 @@ const BankDetailsModal = ({
                     <span>Verifying details...</span>
                   </div>
                 ) : (
-                  <span className={`text-[16px] font-medium ${payload.accountHolderName ? 'text-[#101828]' : 'text-[#9A9A9A] italic'}`}>
+                  <span className={`text-base font-medium ${payload.accountHolderName ? 'text-[#101828]' : 'text-[#9A9A9A] italic'}`}>
                     {payload.accountHolderName || "Account name will appear here"}
                   </span>
                 )}
               </div>
             </div>
             {lookupError && (
-              <p className="text-[12px] text-red-500 ml-2">{lookupError}</p>
+              <p className="text-xs text-red-500 ml-2">{lookupError}</p>
             )}
           </div>
         </div>

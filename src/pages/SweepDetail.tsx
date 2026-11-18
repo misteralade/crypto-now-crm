@@ -95,7 +95,7 @@ export default function SweepDetail() {
           <Wallet size={14} className="text-gray-400 group-hover:text-[#575AE5] transition-colors shrink-0" />
           <span className="font-mono text-xs font-medium text-gray-700 shrink-0">{shortAddress(val as string)}</span>
           {isBatchSweep && row.btcBatchIndex != null && (
-            <span className="inline-flex items-center justify-center rounded-full bg-amber-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-700 shrink-0 whitespace-nowrap min-w-fit w-max">
+            <span className="inline-flex items-center justify-center rounded-full bg-amber-100 px-2.5 py-0.5 text-2xs font-bold uppercase tracking-wider text-amber-700 shrink-0 whitespace-nowrap min-w-fit w-max">
               Batch {row.btcBatchIndex}
             </span>
           )}
@@ -120,7 +120,7 @@ export default function SweepDetail() {
             {val ? formatSweepAmount(Number(val)) : '-'}
           </span>
           {Number(row.allocatedFeeAmount ?? 0) > 0 && (
-            <p className="text-[10px] font-medium text-gray-500">
+            <p className="text-2xs font-medium text-gray-500">
               {isBatchSweep ? 'Allocated fee share:' : 'Fee deducted:'} {formatBtcFee(Number(row.allocatedFeeAmount))} BTC
             </p>
           )}
@@ -134,12 +134,12 @@ export default function SweepDetail() {
         const ws = WALLET_STATUS[val as string] ?? WALLET_STATUS.pending;
         return (
           <div className="space-y-1 max-w-[360px]">
-            <span className={cn("inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase border", ws.bg, ws.color.replace('text-', 'border-').replace('600', '200'))}>
+            <span className={cn("inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-2xs font-bold uppercase border", ws.bg, ws.color.replace('text-', 'border-').replace('600', '200'))}>
               <span className={cn("h-1.5 w-1.5 rounded-full", ws.dot)} />
               {ws.label}
             </span>
             {row.error && (
-              <p className="text-[10px] font-medium leading-tight whitespace-normal break-words text-red-500" title={row.error}>
+              <p className="text-2xs font-medium leading-tight whitespace-normal break-words text-red-500" title={row.error}>
                 {row.error}
               </p>
             )}
@@ -200,13 +200,13 @@ export default function SweepDetail() {
             <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2 rounded-xl bg-[#575AE5]/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-[#575AE5]">
+                  <div className="flex items-center gap-2 rounded-xl bg-[#575AE5]/10 px-3 py-1.5 text-2xs font-bold uppercase tracking-wider text-[#575AE5]">
                     <RefreshCcw size={12} className={cn(sweep?.status === 'IN_PROGRESS' && "animate-spin")} />
                     Sweep Execution
                   </div>
                   {sweep && <SweepStatusBadge status={sweep.status} />}
                   {isTestnetEnvironment(sweep?.blockchainEnvironment) && (
-                    <div className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-amber-700">
+                    <div className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-1.5 text-2xs font-bold uppercase tracking-wider text-amber-700">
                       Testnet only
                     </div>
                   )}
@@ -224,13 +224,13 @@ export default function SweepDetail() {
 
               <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:gap-12">
                 <div className="space-y-1">
-                  <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                  <p className="flex items-center gap-1.5 text-2xs font-bold uppercase tracking-widest text-gray-400">
                     <Globe size={12} /> Network
                   </p>
                   <p className="text-sm font-black text-[#03034D]">{sweep?.network ?? '-'}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                  <p className="flex items-center gap-1.5 text-2xs font-bold uppercase tracking-widest text-gray-400">
                     <Clock size={12} /> Started
                   </p>
                   <p className="text-sm font-bold text-[#03034D]">
@@ -238,10 +238,10 @@ export default function SweepDetail() {
                   </p>
                 </div>
                 <div className="col-span-2 space-y-1 sm:col-span-1">
-                  <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                  <p className="flex items-center gap-1.5 text-2xs font-bold uppercase tracking-widest text-gray-400">
                     <Target size={12} /> Target Wallet
                   </p>
-                  <p className="font-mono text-[11px] font-bold text-[#575AE5] break-all">
+                  <p className="font-mono text-2xs font-bold text-[#575AE5] break-all">
                     {shortAddress(sweep?.targetAddress ?? '')}
                   </p>
                 </div>
@@ -264,7 +264,7 @@ export default function SweepDetail() {
                     style={{ width: `${progress}%` }} 
                   />
                 </div>
-                <div className="flex justify-between items-center text-[10px] font-medium text-gray-500">
+                <div className="flex justify-between items-center text-2xs font-medium text-gray-500">
                   <p>{processedCount} of {sweep.totalWalletsFound} wallets completed</p>
                   <p className="flex items-center gap-1"><RefreshCcw size={10} className="animate-spin" /> Live updates every 3s</p>
                 </div>
@@ -278,7 +278,7 @@ export default function SweepDetail() {
             <div className="rounded-[1.8rem] bg-white p-5 md:p-6">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                 <div className="space-y-1">
-                  <div className="inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-amber-700">
+                  <div className="inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-2xs font-bold uppercase tracking-wider text-amber-700">
                     <Layers3 size={12} />
                     Batch transaction summary
                   </div>
@@ -288,7 +288,7 @@ export default function SweepDetail() {
                   </p>
                 </div>
                 <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-right">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-amber-700">Batches</p>
+                  <p className="text-2xs font-bold uppercase tracking-widest text-amber-700">Batches</p>
                   <p className="text-xl font-black text-amber-900 tabular-nums">{batchSummaries.length}</p>
                 </div>
               </div>
@@ -298,44 +298,44 @@ export default function SweepDetail() {
                   <div key={batch.batchIndex} className="rounded-2xl border border-amber-200 bg-white p-4 shadow-sm">
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-amber-600">
+                        <p className="text-2xs font-bold uppercase tracking-widest text-amber-600">
                           {getBatchLabel(batch.batchIndex)}
                         </p>
                         <p className="text-sm font-black text-[#03034D]">{batch.walletCount} wallets affected</p>
                       </div>
-                      <div className="rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-700">
+                      <div className="rounded-full bg-amber-50 px-2.5 py-1 text-2xs font-bold uppercase tracking-wider text-amber-700">
                         Shared tx
                       </div>
                     </div>
 
                     <div className="mt-4 grid grid-cols-2 gap-3">
                       <div className="rounded-xl bg-gray-50 p-3">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Batch amount sent</p>
+                        <p className="text-2xs font-bold uppercase tracking-widest text-gray-400">Batch amount sent</p>
                         <p className="mt-1 text-base font-black text-[#03034D] tabular-nums">
                           {formatSweepAmount(batch.netAmount)} BTC
                         </p>
                       </div>
                       <div className="rounded-xl bg-amber-50 p-3">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-amber-700">Fee incurred</p>
+                        <p className="text-2xs font-bold uppercase tracking-widest text-amber-700">Fee incurred</p>
                         <p className="mt-1 text-base font-black text-amber-900 tabular-nums">
                           {formatBtcFee(batch.feeAmount)} BTC
                         </p>
                       </div>
                       <div className="rounded-xl bg-gray-50 p-3">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Gross input</p>
+                        <p className="text-2xs font-bold uppercase tracking-widest text-gray-400">Gross input</p>
                         <p className="mt-1 text-sm font-bold text-[#03034D] tabular-nums">
                           {formatSweepAmount(batch.grossInputAmount)} BTC
                         </p>
                       </div>
                       <div className="rounded-xl bg-gray-50 p-3">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Inputs</p>
+                        <p className="text-2xs font-bold uppercase tracking-widest text-gray-400">Inputs</p>
                         <p className="mt-1 text-sm font-bold text-[#03034D] tabular-nums">
                           {batch.inputCount}
                         </p>
                       </div>
                     </div>
 
-                    <p className="mt-3 flex items-center gap-2 text-[11px] font-medium text-gray-500">
+                    <p className="mt-3 flex items-center gap-2 text-2xs font-medium text-gray-500">
                       <ReceiptText size={12} />
                       Tx hash {batch.txHash ? shortAddress(batch.txHash) : 'not available'}
                     </p>
@@ -410,7 +410,7 @@ export default function SweepDetail() {
             theadClassName="bg-gray-50/50 border-b border-gray-100"
           />
 
-          <p className="px-2 text-[11px] text-gray-500">
+          <p className="px-2 text-2xs text-gray-500">
             Wallets skipped during the sweep are hidden here when their balance is zero or invalid.
           </p>
         </div>
@@ -446,10 +446,10 @@ function StatMiniCard({ label, value, sub, icon, color }: { label: string; value
         </div>
       </div>
       <div className="space-y-0.5">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{label}</p>
+        <p className="text-2xs font-bold uppercase tracking-widest text-gray-400">{label}</p>
         <div className="flex items-baseline gap-1">
           <p className="text-xl font-black text-[#03034D] tabular-nums">{value}</p>
-          {sub && <span className="text-[10px] font-bold text-gray-400 uppercase">{sub}</span>}
+          {sub && <span className="text-2xs font-bold text-gray-400 uppercase">{sub}</span>}
         </div>
       </div>
     </div>

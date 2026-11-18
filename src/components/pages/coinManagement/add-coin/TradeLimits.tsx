@@ -8,7 +8,7 @@ interface TradeLimitsProps {
 const TradeLimits = ({ onChangeInputField }: TradeLimitsProps) => {
   return (
     <div className="mb-8">
-      <h3 className="text-[24px] font-medium text-[#0E0F0C] mb-6">Exchange Rate & Trade Limits</h3>
+      <h3 className="text-2xl font-medium text-[#0E0F0C] mb-6">Exchange Rate & Trade Limits</h3>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-x-8 mb-6">
         <PillInput

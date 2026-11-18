@@ -101,7 +101,7 @@ const EditTradeLimits = ({ cryptoId, symbol, buyAt, sellAt, minAmount, maxAmount
 
   return (
     <div className="mb-8">
-      <h3 className="text-[24px] font-medium text-[#0E0F0C] mb-6">
+      <h3 className="text-2xl font-medium text-[#0E0F0C] mb-6">
         Exchange Rate & Trade Limits ({symbol})
       </h3>
 

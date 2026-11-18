@@ -66,20 +66,20 @@ const ConfirmModal = ({ open, actionType, onClose, onConfirm, message = "Are you
           {config.icon}
         </div>
 
-        <h2 className="text-[18px] font-semibold text-[#0E0F0C] mb-2">{config.title}</h2>
-        <p className="text-[14px] text-[#9A9A9A] mb-6 leading-relaxed">{message}</p>
+        <h2 className="text-lg font-semibold text-[#0E0F0C] mb-2">{config.title}</h2>
+        <p className="text-sm text-[#9A9A9A] mb-6 leading-relaxed">{message}</p>
 
         <div className="flex items-center justify-center gap-3">
           <button
             onClick={onClose}
-            className="flex-1 px-5 py-2.5 rounded-full text-[14px] font-medium border border-[#ECECEC] text-[#454745] hover:bg-[#F5F5FF] transition-colors cursor-pointer"
+            className="flex-1 px-5 py-2.5 rounded-full text-sm font-medium border border-[#ECECEC] text-[#454745] hover:bg-[#F5F5FF] transition-colors cursor-pointer"
           >
             Cancel
           </button>
 
           <button
             onClick={onConfirm}
-            className={`flex-1 px-5 py-2.5 rounded-full text-[14px] font-semibold transition-colors cursor-pointer ${config.btnClass}`}
+            className={`flex-1 px-5 py-2.5 rounded-full text-sm font-semibold transition-colors cursor-pointer ${config.btnClass}`}
           >
             {confirmText || 'Proceed'}
           </button>

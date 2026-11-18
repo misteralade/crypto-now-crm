@@ -13,14 +13,14 @@ const TransactionContext = ({ transaction }: TransactionContextProps) => {
         {logo && <img src={logo} alt="" className="h-8 w-8 shrink-0 rounded-full object-contain" />}
         <div className="min-w-0">{bank && <div className="text-sm font-medium text-gray-900">{bank}</div>}{account && <div className="text-xs text-gray-600">{account}</div>}</div>
       </div>
-      {number && <div className="mt-2"><CopyDetails text={number} className="!max-w-full text-xs" iconClassName="!w-4 !h-4" /></div>}
+      {number && <div className="mt-2"><CopyDetails text={number} className="!max-w-full" iconClassName="!w-4 !h-4" /></div>}
     </div>
   );
 
   const WalletBlock = ({ title, address }: { title: string; address?: string }) => (
     <div className="pb-3 border-b border-gray-200 last:border-0 last:pb-0">
       <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">{title}</div>
-      {address && <CopyDetails text={address} wrap={true} className="!max-w-full" iconClassName="!w-5 !h-5" />}
+      {address && <CopyDetails text={address} wrap={true} className="!max-w-full" iconClassName="!w-4 !h-4" />}
     </div>
   );
 

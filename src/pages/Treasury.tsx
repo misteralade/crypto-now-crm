@@ -72,7 +72,7 @@ function StatCard({
     <div
       className={`bg-[--color-primary-taint] rounded-2xl p-5 md:p-6 flex flex-col gap-1.5 border border-[#DDE0FF] ${className}`}
     >
-      <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-[0.08em]">
+      <p className="text-2xs font-semibold text-gray-500 uppercase tracking-[0.08em]">
         {label}
       </p>
       <p className="text-2xl md:text-[30px] font-semibold leading-none text-gray-900">
@@ -127,7 +127,7 @@ function TokenSummaryCard({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-[0.08em]">
+          <p className="text-2xs font-semibold text-gray-500 uppercase tracking-[0.08em]">
             TOTAL AMOUNT SWEPT
           </p>
           <p className="text-xs text-gray-500">
@@ -146,20 +146,20 @@ function TokenSummaryCard({
             className="rounded-xl border border-white/70 bg-white/75 px-3 py-2 shadow-[0_1px_0_rgba(255,255,255,0.8)]"
           >
             <div className="flex items-center justify-between gap-2">
-              <p className="truncate text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-600">
+              <p className="truncate text-2xs font-semibold uppercase tracking-[0.08em] text-gray-600">
                 {token.symbol}
               </p>
-              <p className="text-[10px] font-medium text-gray-500 tabular-nums whitespace-nowrap">
+              <p className="text-2xs font-medium text-gray-500 tabular-nums whitespace-nowrap">
                 {token.sweepCount} run{token.sweepCount === 1 ? "" : "s"}
               </p>
             </div>
             <p className="mt-1 font-mono text-sm font-semibold tabular-nums leading-none text-gray-900">
               {formatTokenAmount(token.symbol, token.totalAmount)}{" "}
-              <span className="text-[11px] font-medium text-gray-500">
+              <span className="text-2xs font-medium text-gray-500">
                 {token.symbol}
               </span>
             </p>
-            <p className="mt-1 truncate text-[10px] text-gray-500">
+            <p className="mt-1 truncate text-2xs text-gray-500">
               {token.name}
             </p>
           </div>
@@ -167,10 +167,10 @@ function TokenSummaryCard({
 
         {hiddenCount > 0 && (
           <div className="rounded-xl border border-dashed border-[#C7CAFB] bg-white/50 px-3 py-2">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-600">
+            <p className="text-2xs font-semibold uppercase tracking-[0.08em] text-gray-600">
               +{hiddenCount} more
             </p>
-            <p className="mt-1 text-[10px] text-gray-500">
+            <p className="mt-1 text-2xs text-gray-500">
               Additional tokens are included in the page totals.
             </p>
           </div>
@@ -293,7 +293,7 @@ export default function Treasury() {
         key: "network",
         header: "Network",
         render: (value) => (
-          <span className="rounded-full bg-indigo-50 px-2.5 py-1 font-mono text-[11px] font-semibold text-indigo-700">
+          <span className="rounded-full bg-indigo-50 px-2.5 py-1 font-mono text-2xs font-semibold text-indigo-700">
             {String(value)}
           </span>
         ),

@@ -26,7 +26,7 @@ const OptionalFields = ({ onChangeInputField }: OptionalFieldsProps) => {
             <p className="text-xs sm:text-sm font-bold text-slate-900 leading-tight">
               Advanced Configuration & Optional Details
             </p>
-            <p className="text-[11px] text-slate-500">
+            <p className="text-2xs text-slate-500">
               Whitepaper, project links, coin description, and stablecoin flags
             </p>
           </div>

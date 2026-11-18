@@ -35,7 +35,7 @@ export const SearchAdminDataColumn = (
       <div className="min-w-0">
         <p className="overflow-hidden text-ellipsis whitespace-nowrap text-sm font-medium text-[#101828]">
           {value}{' '}
-          {row.id === currentAdminId && <span className="ml-1 rounded-full bg-blue-100 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-blue-700">You</span>}
+          {row.id === currentAdminId && <span className="ml-1 rounded-full bg-blue-100 px-1.5 py-0.5 text-2xs font-bold uppercase tracking-wider text-blue-700">You</span>}
         </p>
       </div>
     ),
@@ -86,7 +86,7 @@ export const SearchAdminDataColumn = (
     render: (_, row) => (
       <div className="flex items-center justify-start gap-2 lg:gap-x-[16px] whitespace-nowrap">
         <button
-          className={`px-2.5 md:px-3 py-1 rounded-full text-[11px] cursor-pointer hover:opacity-80 md:text-xs font-medium ${row.status === true ? 'bg-[#FCE8E8] text-[#EB5757]' : 'bg-[#FDF2E7] text-[#F2994A]'} disabled:opacity-50 disabled:cursor-not-allowed`}
+          className={`px-2.5 md:px-3 py-1 rounded-full text-2xs cursor-pointer hover:opacity-80 md:text-xs font-medium ${row.status === true ? 'bg-[#FCE8E8] text-[#EB5757]' : 'bg-[#FDF2E7] text-[#F2994A]'} disabled:opacity-50 disabled:cursor-not-allowed`}
           onClick={(event) => {
             event.stopPropagation()
             handleUpdateAdminStatus(row.id, !row.status)
@@ -98,7 +98,7 @@ export const SearchAdminDataColumn = (
         </button>
         
         <button
-          className="px-3 py-1 font-medium text-[12px] bg-[#EF4444] text-white rounded-full hover:opacity-70 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-3 py-1 font-medium text-xs bg-[#EF4444] text-white rounded-full hover:opacity-70 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={(event) => {
             event.stopPropagation()
             handleDeleteUser(row.id)

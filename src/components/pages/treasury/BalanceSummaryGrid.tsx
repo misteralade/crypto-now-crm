@@ -70,14 +70,14 @@ function BalanceCard({ row, onRefresh, onWalletCountClick, refreshing }: Balance
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-2.5">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[--color-primary-taint] text-[13px] font-bold text-[#03034D]">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[--color-primary-taint] text-sm font-bold text-[#03034D]">
             {row.symbol.toUpperCase().slice(0, 4)}
           </div>
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-[--color-text-primary]">
               {row.name}
             </p>
-            <p className="text-[11px] font-medium uppercase tracking-wide text-[#667085]">
+            <p className="text-2xs font-medium uppercase tracking-wide text-[#667085]">
               {networkLabel}
             </p>
           </div>
@@ -108,7 +108,7 @@ function BalanceCard({ row, onRefresh, onWalletCountClick, refreshing }: Balance
       </div>
 
       <div className="mt-5">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#667085]">
+        <p className="text-2xs font-semibold uppercase tracking-[0.08em] text-[#667085]">
           Total Balance
         </p>
         <p className="mt-1 font-mono text-2xl font-semibold tabular-nums text-[--color-text-primary]">
@@ -149,7 +149,7 @@ function BalanceCard({ row, onRefresh, onWalletCountClick, refreshing }: Balance
           )}
         </div>
         <span
-          className={`flex min-w-0 shrink items-center justify-end gap-1 text-[10px] font-medium tabular-nums leading-tight tracking-tight ${everRefreshed ? "text-[#667085]" : "text-amber-600"}`}
+          className={`flex min-w-0 shrink items-center justify-end gap-1 text-2xs font-medium tabular-nums leading-tight tracking-tight ${everRefreshed ? "text-[#667085]" : "text-amber-600"}`}
           title={freshnessTitle}
         >
           {!everRefreshed && (
@@ -160,7 +160,7 @@ function BalanceCard({ row, onRefresh, onWalletCountClick, refreshing }: Balance
       </div>
 
       {row.neverRefreshedCount > 0 && everRefreshed && (
-        <p className="mt-2 text-[11px] text-amber-600">
+        <p className="mt-2 text-2xs text-amber-600">
           {row.neverRefreshedCount} wallet
           {row.neverRefreshedCount === 1 ? "" : "s"} not yet refreshed
         </p>
@@ -218,7 +218,7 @@ export default function BalanceSummaryGrid({ onWalletCountClick }: BalanceSummar
     <section className="space-y-3">
       <div className="flex items-end justify-between">
         <div>
-          <h3 className="text-[16px] font-semibold text-[--color-text-primary]">
+          <h3 className="text-base font-semibold text-[--color-text-primary]">
             Custodial Balances
           </h3>
           <p className="mt-1 text-xs text-[--color-text-muted]">

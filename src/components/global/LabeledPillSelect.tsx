@@ -140,7 +140,7 @@ export const MFLabeledPillSearchSelect = ({ label, options, onChange, labelClass
           className={cn(
             "absolute left-7 px-2 font-medium transition-all duration-200 pointer-events-none z-10 bg-white rounded-sm",
             isLabelFloating
-              ? "-top-[9px] text-[12px] text-gray-600 scale-90 origin-left"
+              ? "-top-[9px] text-xs text-gray-600 scale-90 origin-left"
               : "top-1/2 -translate-y-1/2 text-sm text-gray-400",
             isOpen && "text-blue-600",
             labelClass

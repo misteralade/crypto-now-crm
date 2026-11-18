@@ -66,7 +66,7 @@ const DisputeStatusUpdateModal = ({ selectedStatus, statusNotes, selectedResolut
   
   return (
     <Fragment>
-      <div className={`fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm ${isClosing ? 'animate-modal-backdrop-out' : 'animate-modal-backdrop-in'}`}>
+      <div className={`fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm ${isClosing ? 'animate-modal-backdrop-out' : 'animate-modal-backdrop-in'}`}>
         <div className={`bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto ${isClosing ? 'animate-modal-content-out' : 'animate-modal-content-in'}`}>
           {/* Modal Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200">

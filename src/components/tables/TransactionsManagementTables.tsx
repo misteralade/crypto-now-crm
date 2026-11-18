@@ -195,7 +195,7 @@ export const TransactionsManagementColumn = (
       const asset = String(value).replace(/^(BUY|SELL)\s*[-–]?\s*/i, '').trim()
       return (
         <div className="py-2 flex items-center gap-1.5 whitespace-nowrap">
-          <span className={`px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider ${isBuy ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60' : 'bg-blue-50 text-blue-700 border border-blue-200/60'}`}>
+          <span className={`px-2 py-0.5 rounded text-2xs font-bold uppercase tracking-wider ${isBuy ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60' : 'bg-blue-50 text-blue-700 border border-blue-200/60'}`}>
             {isBuy ? 'BUY' : 'SELL'}
           </span>
           {asset && <span className="text-xs font-semibold text-slate-700">{asset}</span>}

@@ -59,7 +59,7 @@ const UsersFilterModal = ({ open, createdAtFrom, createdAtTo, statusFilter, hasD
 
         <div className="space-y-4">
           <div>
-            <p className="text-[11px] font-semibold text-slate-500 mb-2 uppercase tracking-wide">Registration Date</p>
+            <p className="text-2xs font-semibold text-slate-500 mb-2 uppercase tracking-wide">Registration Date</p>
             <div className="grid grid-cols-2 gap-2.5">
               <DateInput value={createdAtFrom} onChange={handleChangeCreatedAtFrom} placeholder="From" />
               <DateInput value={createdAtTo} onChange={handleChangeCreatedAtTo} placeholder="To" />
@@ -74,7 +74,7 @@ const UsersFilterModal = ({ open, createdAtFrom, createdAtTo, statusFilter, hasD
           />
 
           <div>
-            <p className="text-[11px] font-semibold text-slate-500 mb-2 uppercase tracking-wide">Disputes</p>
+            <p className="text-2xs font-semibold text-slate-500 mb-2 uppercase tracking-wide">Disputes</p>
             <div className="flex items-center gap-2.5 rounded-lg bg-slate-50 border border-slate-200/60 px-3 py-2.5">
               <Checkbox
                 id="has-dispute"

@@ -37,21 +37,21 @@ const AccountCard = ({
           {account.isDefault ? 'â€“ Default' : ''}
         </div>
         <div className="mt-4 space-y-3 text-xs">
-          <div className="flex items-center justify-between">
+          <div className="flex items-start justify-between gap-3">
             <div className="text-[#828282]">Account Name</div>
-            <div className="text-[#101828] font-medium">
+            <div className="min-w-0 break-words text-right text-[#101828] font-medium">
               {account.accountHolderName || '--'}
             </div>
           </div>
-          <div className="flex items-center justify-between">
+          <div className="flex items-start justify-between gap-3">
             <div className="text-[#828282]">Account Number</div>
             <div className="text-[#101828] font-medium">
               {account.accountNumber || '--'}
             </div>
           </div>
-          <div className="flex items-center justify-between">
+          <div className="flex items-start justify-between gap-3">
             <div className="text-[#828282]">Bank Name</div>
-            <div className="text-[#101828] font-medium">
+            <div className="min-w-0 break-words text-right text-[#101828] font-medium">
               {account.bank?.name || '--'}
             </div>
           </div>

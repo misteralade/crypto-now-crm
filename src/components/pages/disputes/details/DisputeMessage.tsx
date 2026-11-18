@@ -345,7 +345,7 @@ const DisputeMessage = ({
                         >
                           {isAdmin ? "Support (You)" : msg.email ? `User (${msg.email})` : "Customer"}
                         </p>
-                        <span className="text-[11px] text-gray-400 flex items-center gap-1">
+                        <span className="text-2xs text-gray-400 flex items-center gap-1">
                           <Clock className="w-3 h-3" />
                           {new Date(msg.createdAt).toLocaleString([], {
                             month: "short",
@@ -398,7 +398,7 @@ const DisputeMessage = ({
                                 <p className="text-xs font-medium text-gray-900 truncate">
                                   {attachment.filename}
                                 </p>
-                                <p className="text-[11px] text-gray-500">
+                                <p className="text-2xs text-gray-500">
                                   {formatFileSize(attachment.size)}
                                 </p>
                               </div>
@@ -538,7 +538,7 @@ const DisputeMessage = ({
               </button>
             </div>
             
-            <p className="text-[11px] text-gray-500 mt-2 px-1">
+            <p className="text-2xs text-gray-500 mt-2 px-1">
               Press Enter to send, Shift+Enter for a new line.
               {uploadingFiles.length > 0 && (
                 <span className="text-blue-600 ml-2 font-medium">Files uploading...</span>

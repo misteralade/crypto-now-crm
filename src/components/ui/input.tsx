@@ -62,7 +62,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               initial={{ opacity: 0, y: -3 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -3 }}
-              className="text-[11px] text-rose-600 font-medium"
+              className="text-2xs text-rose-600 font-medium"
             >
               {error}
             </motion.p>
@@ -132,7 +132,7 @@ const PillInput = React.forwardRef<HTMLInputElement, PillInputProps>(
               initial={{ opacity: 0, y: -3 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -3 }}
-              className="text-[11px] text-rose-600 font-medium"
+              className="text-2xs text-rose-600 font-medium"
             >
               {error}
             </motion.p>

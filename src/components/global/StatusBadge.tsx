@@ -17,7 +17,7 @@ export const StatusBadge = ({ status }: StatusBadgeProps) => {
   return (
     <span
       className={clsx(
-        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-semibold",
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-2xs font-semibold",
         variant.bg,
         variant.textColor
       )}
@@ -39,7 +39,7 @@ export const DisputeStatusBadge = ({ status }: StatusBadgeProps) => {
   return (
     <span
       className={clsx(
-        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-semibold",
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-2xs font-semibold",
         variant.bg,
         variant.textColor
       )}
@@ -61,7 +61,7 @@ export const DisputeResolutionBadge = ({ resolution }: { resolution: string }) =
   return (
     <span
       className={clsx(
-        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-semibold",
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-2xs font-semibold",
         variant.bg,
         variant.textColor
       )}
@@ -83,7 +83,7 @@ export const DisputePriorityBadge = ({ priority }: { priority: string }) => {
   return (
     <span
       className={clsx(
-        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-semibold",
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-2xs font-semibold",
         variant.bg,
         variant.textColor
       )}

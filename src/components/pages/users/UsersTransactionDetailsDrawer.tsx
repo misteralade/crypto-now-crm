@@ -108,7 +108,7 @@ const UserTransactionDetailsDrawer = ({ open, onClose, loading, data }: UserTran
                 ORDER DETAILS
               </div>
 
-              <div className="mt-4 flex items-center justify-between text-[16px]">
+              <div className="mt-4 flex items-center justify-between text-base">
                 <div className="text-[#828282]">Name</div>
                 <div className="text-[#0E0F0C] text-sm">
                   {data?.user.profile?.firstName || '-'}{' '}
@@ -116,7 +116,7 @@ const UserTransactionDetailsDrawer = ({ open, onClose, loading, data }: UserTran
                 </div>
               </div>
 
-              <div className="mt-4 flex items-center justify-between text-[16px]">
+              <div className="mt-4 flex items-center justify-between text-base">
                 <div className="text-[#667085]">Email</div>
                 <div className="text-[#0E0F0C] text-base">
                   {data?.user.email ?? '-'}
@@ -136,7 +136,7 @@ const UserTransactionDetailsDrawer = ({ open, onClose, loading, data }: UserTran
                     ) => (
                       <Fragment key={`${bankDetail.accountNumber}-${index}`}>
                         <div
-                          className={`mt-4 gap-y-1 text-[14px] border-dotted ${index === 0 ? 'border-t' : ''} ${index === data.bankDetails.length - 1 ? 'border-y' : 'border-t'} py-4 relative`}
+                          className={`mt-4 gap-y-1 text-sm border-dotted ${index === 0 ? 'border-t' : ''} ${index === data.bankDetails.length - 1 ? 'border-y' : 'border-t'} py-4 relative`}
                         >
                           <div className="flex justify-end gap-1 mb-2">
                             {bankDetail.isDefault && (
@@ -150,21 +150,21 @@ const UserTransactionDetailsDrawer = ({ open, onClose, loading, data }: UserTran
                               </span>
                             )}
                           </div>
-                          <div className="my-0.5 flex items-center justify-between text-[16px]">
+                          <div className="my-0.5 flex items-center justify-between text-base">
                             <div className="text-[#667085]">Account name</div>
                             <div className={`font-medium w-fit ${bankDetail.isDeleted ? 'text-red-700' : 'text-[#101828]'}`}>
                               {bankDetail.accountName}
                             </div>
                           </div>
 
-                          <div className="my-0.5 flex items-center justify-between text-[16px]">
+                          <div className="my-0.5 flex items-center justify-between text-base">
                             <div className="text-[#667085]">Bank name</div>
                             <div className={`font-medium w-fit ${bankDetail.isDeleted ? 'text-red-700' : 'text-[#101828]'}`}>
                               {bankDetail.bank?.name}
                             </div>
                           </div>
 
-                          <div className="my-0.5 flex items-center justify-between text-[16px]">
+                          <div className="my-0.5 flex items-center justify-between text-base">
                             <div className="text-[#667085]">Account number</div>
                             <div className={`font-medium w-fit ${bankDetail.isDeleted ? 'text-red-700' : 'text-[#101828]'}`}>
                               {bankDetail.accountNumber}
@@ -189,7 +189,7 @@ const UserTransactionDetailsDrawer = ({ open, onClose, loading, data }: UserTran
               <div className="mt-3">
                 {cryptToBalances.length > 0 ? (
                   cryptToBalances.map(({ crypto, sumTotal }) => (
-                    <div className="mt-4 flex items-center justify-between text-[16px]" key={`${crypto}-${sumTotal}`}>
+                    <div className="mt-4 flex items-center justify-between text-base" key={`${crypto}-${sumTotal}`}>
                       <div className="text-[#667085]">Total {crypto}</div>
                       <div className="text-[#101828] font-medium">
                         {Number(sumTotal)}
@@ -202,14 +202,14 @@ const UserTransactionDetailsDrawer = ({ open, onClose, loading, data }: UserTran
                   </div>
                 )}
 
-                <div className="mt-4 flex items-center justify-between text-[16px]">
+                <div className="mt-4 flex items-center justify-between text-base">
                   <div className="text-[#667085]">Total Buys</div>
                   <div className="text-[#101828] font-medium">
                     <div className="text-[#101828] font-medium">₦{formatCompact(totalBuys, "NGN")}</div>
                   </div>
                 </div>
 
-                <div className="mt-4 flex items-center justify-between text-[16px]">
+                <div className="mt-4 flex items-center justify-between text-base">
                   <div className="text-[#667085]">Total Sells</div>
                   <div className="text-[#101828] font-medium">
                     <div className="text-[#101828] font-medium">₦{formatCompact(totalSells, "NGN")}</div>

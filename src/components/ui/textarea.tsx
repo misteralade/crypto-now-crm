@@ -36,7 +36,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
               initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -5 }}
-              className="text-[12px] text-red-500 ml-2 font-medium"
+              className="text-xs text-red-500 ml-2 font-medium"
             >
               {error}
             </motion.p>
@@ -72,7 +72,7 @@ const PillTextarea = React.forwardRef<HTMLTextAreaElement, PillTextareaProps>(
             className={cn(
               "absolute left-7 px-2 font-medium transition-all duration-200 pointer-events-none z-10 bg-white rounded-sm",
               isLabelFloating
-                ? "-top-[9px] text-[12px] text-gray-600 scale-90 origin-left"
+                ? "-top-[9px] text-xs text-gray-600 scale-90 origin-left"
                 : "top-5 text-sm text-gray-400",
               error && "text-red-500",
               isFocused && !error && "text-blue-600"
@@ -109,7 +109,7 @@ const PillTextarea = React.forwardRef<HTMLTextAreaElement, PillTextareaProps>(
               initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -5 }}
-              className="text-[12px] text-red-500 ml-8 font-medium"
+              className="text-xs text-red-500 ml-8 font-medium"
             >
               {error}
             </motion.p>

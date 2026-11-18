@@ -42,15 +42,15 @@ const WalletCard = ({
     <div className="bg-[#F8F8FF] rounded-xl p-3 border border-[#ECECEC]">
       <div className="flex items-center justify-between mb-1.5">
         <div className="flex items-center gap-2">
-          <span className="text-[11px] font-semibold text-[#03034D] uppercase tracking-wide">
+          <span className="text-2xs font-semibold text-[#03034D] uppercase tracking-wide">
             {wallet.network}
           </span>
-          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium ${environment.className}`}>
+          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-medium ${environment.className}`}>
             {environment.label}
           </span>
         </div>
         <span
-          className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full ${
+          className={`inline-flex items-center gap-1 text-2xs font-medium px-2 py-0.5 rounded-full ${
             isActive
               ? "bg-[#ECFDF3] text-[#037847]"
               : "bg-[#F2F4F7] text-[#6C778B]"
@@ -65,7 +65,7 @@ const WalletCard = ({
         </span>
       </div>
       <div className="flex items-center gap-2">
-        <code className="flex-1 text-[11px] text-[#667085] font-mono truncate">
+        <code className="flex-1 text-2xs text-[#667085] font-mono truncate">
           {wallet.walletAddress}
         </code>
         <button
@@ -88,17 +88,17 @@ const InfoRow = ({
   value: React.ReactNode;
 }) => (
   <div className="flex items-start justify-between gap-4 py-2.5 border-b border-[#F5F5FF] last:border-0">
-    <span className="text-[12px] text-[#9A9A9A] font-medium flex-shrink-0">
+    <span className="text-xs text-[#9A9A9A] font-medium flex-shrink-0">
       {label}
     </span>
-    <span className="text-[13px] text-[#0E0F0C] font-medium text-right">
+    <span className="text-sm text-[#0E0F0C] font-medium text-right">
       {value}
     </span>
   </div>
 );
 
 const SectionHeader = ({ label }: { label: string }) => (
-  <h4 className="text-[11px] font-semibold text-[#9A9A9A] uppercase tracking-widest mb-3 mt-5 first:mt-0">
+  <h4 className="text-2xs font-semibold text-[#9A9A9A] uppercase tracking-widest mb-3 mt-5 first:mt-0">
     {label}
   </h4>
 );
@@ -166,7 +166,7 @@ export const CoinDetailsModal = ({
             />
           ) : (
             <div className="w-10 h-10 rounded-full bg-[#D3D4F8] flex items-center justify-center">
-              <span className="text-[14px] font-bold text-[#03034D]">
+              <span className="text-sm font-bold text-[#03034D]">
                 {coin?.symbol?.charAt(0)}
               </span>
             </div>
@@ -180,16 +180,16 @@ export const CoinDetailsModal = ({
             ) : (
               <>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-[17px] font-bold text-[#0E0F0C] truncate">
+                  <h2 className="text-lg font-bold text-[#0E0F0C] truncate">
                     {coin?.name}
                   </h2>
-                  <span className="text-[11px] font-semibold text-[#948EEE] bg-[#F5F5FF] px-2 py-0.5 rounded-full">
+                  <span className="text-2xs font-semibold text-[#948EEE] bg-[#F5F5FF] px-2 py-0.5 rounded-full">
                     {coin?.symbol}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 mt-0.5">
                   <span
-                    className={`inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full ${
+                    className={`inline-flex items-center gap-1.5 text-2xs font-medium px-2 py-0.5 rounded-full ${
                       coin?.isActive
                         ? "bg-[#ECFDF3] text-[#037847]"
                         : "bg-[#F2F4F7] text-[#6C778B]"
@@ -203,7 +203,7 @@ export const CoinDetailsModal = ({
                     {coin?.isActive ? "Active" : "Inactive"}
                   </span>
                   {coin?.isStableCoin && (
-                    <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-[#EFF6FF] text-[#2563EB]">
+                    <span className="text-2xs font-medium px-2 py-0.5 rounded-full bg-[#EFF6FF] text-[#2563EB]">
                       Stablecoin
                     </span>
                   )}
@@ -224,14 +224,14 @@ export const CoinDetailsModal = ({
           {loading && (
             <div className="flex flex-col items-center justify-center py-16 gap-3">
               <Loader2 className="w-8 h-8 text-[#948EEE] animate-spin" />
-              <span className="text-[13px] text-[#9A9A9A]">
+              <span className="text-sm text-[#9A9A9A]">
                 Loading coin details…
               </span>
             </div>
           )}
           {!loading && !coin && (
             <div className="flex flex-col items-center justify-center py-16 gap-2">
-              <span className="text-[14px] text-[#9A9A9A]">
+              <span className="text-sm text-[#9A9A9A]">
                 Failed to load coin details.
               </span>
             </div>
@@ -244,11 +244,11 @@ export const CoinDetailsModal = ({
                 <div className="bg-[#F5F5FF] rounded-xl p-3">
                   <div className="flex items-center gap-1.5 mb-1">
                     <TrendingUp className="w-3.5 h-3.5 text-[#03034D]" />
-                    <span className="text-[11px] font-semibold text-[#9A9A9A] uppercase tracking-wide">
+                    <span className="text-2xs font-semibold text-[#9A9A9A] uppercase tracking-wide">
                       Buy Rate
                     </span>
                   </div>
-                  <span className="text-[20px] font-bold text-[#03034D]">
+                  <span className="text-xl font-bold text-[#03034D]">
                     {coin.buyRate
                       ? `₦${Number(coin.buyRate).toLocaleString()}`
                       : "-"}
@@ -257,11 +257,11 @@ export const CoinDetailsModal = ({
                 <div className="bg-[#F5F5FF] rounded-xl p-3">
                   <div className="flex items-center gap-1.5 mb-1">
                     <TrendingDown className="w-3.5 h-3.5 text-[#03034D]" />
-                    <span className="text-[11px] font-semibold text-[#9A9A9A] uppercase tracking-wide">
+                    <span className="text-2xs font-semibold text-[#9A9A9A] uppercase tracking-wide">
                       Sell Rate
                     </span>
                   </div>
-                  <span className="text-[20px] font-bold text-[#03034D]">
+                  <span className="text-xl font-bold text-[#03034D]">
                     {coin.sellRate
                       ? `₦${Number(coin.sellRate).toLocaleString()}`
                       : "-"}
@@ -317,14 +317,14 @@ export const CoinDetailsModal = ({
                   {coin.networks.map((n) => (
                     <span
                       key={n}
-                      className="inline-block px-3 py-1 rounded-full text-[12px] font-semibold bg-[#D3D4F8] text-[#03034D]"
+                      className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-[#D3D4F8] text-[#03034D]"
                     >
                       {n}
                     </span>
                   ))}
                 </div>
               ) : (
-                <p className="text-[13px] text-[#9A9A9A]">
+                <p className="text-sm text-[#9A9A9A]">
                   No networks configured.
                 </p>
               )}
@@ -338,10 +338,10 @@ export const CoinDetailsModal = ({
                       <div key={network}>
                         <div className="flex items-center gap-2 mb-2">
                           <Wallet className="w-3.5 h-3.5 text-[#948EEE]" />
-                          <span className="text-[12px] font-semibold text-[#03034D]">
+                          <span className="text-xs font-semibold text-[#03034D]">
                             {network}
                           </span>
-                          <span className="text-[11px] text-[#9A9A9A]">
+                          <span className="text-2xs text-[#9A9A9A]">
                             ({wallets.length} address
                             {wallets.length !== 1 ? "es" : ""})
                           </span>
@@ -356,7 +356,7 @@ export const CoinDetailsModal = ({
                   )}
                 </div>
               ) : (
-                <p className="text-[13px] text-[#9A9A9A]">
+                <p className="text-sm text-[#9A9A9A]">
                   No admin wallets configured.
                 </p>
               )}
@@ -365,7 +365,7 @@ export const CoinDetailsModal = ({
               {coin.description && (
                 <>
                   <SectionHeader label="Description" />
-                  <p className="text-[13px] text-[#667085] leading-relaxed bg-[#F8F8FF] rounded-xl p-3 border border-[#ECECEC]">
+                  <p className="text-sm text-[#667085] leading-relaxed bg-[#F8F8FF] rounded-xl p-3 border border-[#ECECEC]">
                     {coin.description}
                   </p>
                 </>
@@ -381,7 +381,7 @@ export const CoinDetailsModal = ({
                         href={coin.websiteUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F5F5FF] text-[12px] font-medium text-[#03034D] hover:bg-[#D3D4F8] transition-colors"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F5F5FF] text-xs font-medium text-[#03034D] hover:bg-[#D3D4F8] transition-colors"
                       >
                         <Globe className="w-3.5 h-3.5" />
                         Website
@@ -393,7 +393,7 @@ export const CoinDetailsModal = ({
                         href={coin.whitepaperUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F5F5FF] text-[12px] font-medium text-[#03034D] hover:bg-[#D3D4F8] transition-colors"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F5F5FF] text-xs font-medium text-[#03034D] hover:bg-[#D3D4F8] transition-colors"
                       >
                         <FileText className="w-3.5 h-3.5" />
                         Whitepaper
@@ -410,7 +410,7 @@ export const CoinDetailsModal = ({
                 <InfoRow
                   label="Coin ID"
                   value={
-                    <code className="text-[11px] font-mono">{coin.id}</code>
+                    <code className="text-2xs font-mono">{coin.id}</code>
                   }
                 />
                 <InfoRow

@@ -47,7 +47,7 @@ interface CopyDetailsProps {
 const CopyDetails = ({ text, className = '', iconClassName, wrap }: CopyDetailsProps) => {
   return (
     <div
-      className={`flex w-full min-w-0 max-w-full gap-2 items-center ${className}`}
+      className={`crm-body flex w-full min-w-0 max-w-full gap-2 items-center ${className}`}
       style={!wrap ? { maxWidth: 'min(400px, 100%)' } : undefined}
     >
       <p className={`text-slate-900 min-w-0 flex-1 ${wrap ? 'break-all' : ''}`}>
