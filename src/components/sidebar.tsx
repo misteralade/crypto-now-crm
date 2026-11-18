@@ -222,18 +222,6 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
               })}
           </nav>
 
-          {/* Operational Status Pill Widget */}
-          <div className="p-3 mx-3 mb-2 rounded-xl bg-white/5 border border-white/10">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-              </span>
-              <span className="text-[11px] font-semibold text-white/90">Node Network Live</span>
-            </div>
-            <p className="text-[10px] text-blue-200/60 leading-tight">Automated liquidity &amp; payout engines active.</p>
-          </div>
-
           {/* Logout */}
           <div className="px-3 py-3 border-t border-white/10">
             <button

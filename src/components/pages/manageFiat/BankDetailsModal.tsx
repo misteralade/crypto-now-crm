@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { useSelector } from "react-redux";
 import { PillInput } from "../../ui/input";
 import { MFLabeledPillSearchSelect } from "../../global/LabeledPillSelect";
@@ -10,6 +10,7 @@ import { Loader2 } from "lucide-react";
 
 interface BankDetailsModalProps {
   open: boolean;
+  isEditing?: boolean;
   onClose: () => void;
   onConfirm: () => void;
   supportedBanks:
@@ -24,6 +25,7 @@ interface BankDetailsModalProps {
 
 const BankDetailsModal = ({
   open,
+  isEditing = false,
   onClose,
   onConfirm,
   supportedBanks,
@@ -34,6 +36,7 @@ const BankDetailsModal = ({
   const [shouldRender, setShouldRender] = useState(open);
   const [isLookingUp, setIsLookingUp] = useState(false);
   const [lookupError, setLookupError] = useState<string | null>(null);
+  const lookupSequence = useRef(0);
 
   const bankOptions = useMemo(() => {
     return supportedBanks && supportedBanks.length
@@ -46,10 +49,12 @@ const BankDetailsModal = ({
   }, [supportedBanks]);
 
   const handleLookup = useCallback(async (accountNumber: string, bankId: string) => {
+    const sequence = ++lookupSequence.current;
     setIsLookingUp(true);
     setLookupError(null);
     try {
       const { data, success, message } = await bankServiceApi.lookupAccountName(accountNumber, bankId);
+      if (sequence !== lookupSequence.current) return;
       if (success && data.accountName) {
         handleCreateBankField("accountHolderName", data.accountName);
       } else {
@@ -57,10 +62,11 @@ const BankDetailsModal = ({
         handleCreateBankField("accountHolderName", "");
       }
     } catch (e) {
+      if (sequence !== lookupSequence.current) return;
       setLookupError("Verification failed. Please try again.");
       handleCreateBankField("accountHolderName", "");
     } finally {
-      setIsLookingUp(false);
+      if (sequence === lookupSequence.current) setIsLookingUp(false);
     }
   }, [handleCreateBankField]);
 
@@ -82,10 +88,13 @@ const BankDetailsModal = ({
 
   // Trigger lookup when account number is 10 digits and bank is selected
   useEffect(() => {
-    if (payload.accountNumber?.length === 10 && payload.bankId) {
+    if (open && payload.accountNumber?.length === 10 && payload.bankId) {
       handleLookup(payload.accountNumber, payload.bankId);
+    } else {
+      setIsLookingUp(false);
     }
-  }, [payload.accountNumber, payload.bankId, handleLookup]);
+    return () => { lookupSequence.current += 1; };
+  }, [open, payload.accountNumber, payload.bankId, handleLookup]);
 
   if (!shouldRender) return null;
 
@@ -103,7 +112,7 @@ const BankDetailsModal = ({
           }`}>
         <div className="px-8 pt-8 pb-4">
           <h2 className="text-2xl font-bold text-[#0E0F0C] text-center">
-            Bank Details
+            {isEditing ? 'Edit Bank Details' : 'Bank Details'}
           </h2>
           <p className="text-[#667085] text-center text-sm mt-1">
             Fill in the platform bank account information
@@ -114,7 +123,7 @@ const BankDetailsModal = ({
           <MFLabeledPillSearchSelect
             label="Select Bank"
             value={payload.bankId || ""}
-            onChange={(value) => handleCreateBankField("bankId", value)}
+            onChange={(value) => { handleCreateBankField("accountHolderName", ""); handleCreateBankField("bankId", value); }}
             options={bankOptions as any}
           />
 
@@ -125,6 +134,7 @@ const BankDetailsModal = ({
               value={payload.accountNumber || ""}
               onChange={(e) => {
                 const val = e.target.value.replace(/\D/g, '').slice(0, 10);
+                handleCreateBankField("accountHolderName", "");
                 handleCreateBankField("accountNumber", val);
               }}
               inputMode="numeric"
@@ -170,7 +180,7 @@ const BankDetailsModal = ({
             }
             onClick={onConfirm}
           >
-            Confirm Details
+            {isEditing ? 'Save changes' : 'Confirm Details'}
           </button>
         </div>
       </div>

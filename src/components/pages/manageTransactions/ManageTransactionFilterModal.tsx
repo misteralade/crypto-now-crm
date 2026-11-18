@@ -7,19 +7,22 @@ import { DateInput } from "../../ui/date-input";
 import { Input } from "../../ui/input";
 import { LabeledSelect } from "../../ui/select";
 import { cn } from "../../../lib/utils";
+import { z } from "zod";
 
 interface FilterModalProps {
   isOpen: boolean;
   onClose: () => void;
   onReset: () => void;
+  userEmail: string;
+  onApplyEmail: (email: string) => void;
   fromDate: Date | undefined;
   toDate: Date | undefined;
   minAmountRange: number | undefined;
   maxAmountRange: number | undefined;
   handleFromDate: (date: Date) => void;
   handleToDate: (date: Date) => void;
-  handleMinAmountRange: (amount: number) => void;
-  handleMaxAmountRange: (amount: number) => void;
+  handleMinAmountRange: (amount: number | undefined) => void;
+  handleMaxAmountRange: (amount: number | undefined) => void;
   supportedCryptos: Array<SearchSupportedCryptoData> | null | undefined;
   selectedCryptoId: string | undefined;
   handleSelectedCryptoId: (selectedCryptoId: string) => void;
@@ -31,6 +34,8 @@ const ManageTransactionFilterModal = ({
   isOpen,
   onClose,
   onReset,
+  userEmail,
+  onApplyEmail,
   fromDate,
   toDate,
   minAmountRange,
@@ -47,9 +52,11 @@ const ManageTransactionFilterModal = ({
 }: FilterModalProps) => {
   const [isClosing, setIsClosing] = useState(false);
   const [shouldRender, setShouldRender] = useState(isOpen);
+  const [emailDraft, setEmailDraft] = useState(userEmail);
 
   useEffect(() => {
     if (isOpen) {
+      setEmailDraft(userEmail);
       setShouldRender(true);
       setIsClosing(false);
     } else if (shouldRender) {
@@ -60,7 +67,7 @@ const ManageTransactionFilterModal = ({
       }, 150);
       return () => window.clearTimeout(timer);
     }
-  }, [isOpen, shouldRender]);
+  }, [isOpen, shouldRender, userEmail]);
 
   const cryptoOptions = useMemo(() => {
     const list =
@@ -111,6 +118,8 @@ const ManageTransactionFilterModal = ({
 
         {/* Form Body */}
         <div className="space-y-4">
+          <Input label="User email" type="email" value={emailDraft} onChange={(event) => setEmailDraft(event.target.value)} placeholder="name@example.com" className="mb-0" />
+          {emailDraft.trim() && !z.string().email().safeParse(emailDraft.trim()).success && <p className="text-xs text-red-600">Enter a valid email address.</p>}
           {/* Date Range */}
           <div>
             <label className="text-xs font-semibold text-slate-700 tracking-tight flex items-center gap-1.5 mb-1.5">
@@ -144,14 +153,14 @@ const ManageTransactionFilterModal = ({
                 placeholder="Min ₦"
                 type="number"
                 value={minAmountRange !== undefined ? minAmountRange : ""}
-                onChange={(e) => handleMinAmountRange(Number(e.target.value))}
+                onChange={(e) => handleMinAmountRange(e.target.value === "" ? undefined : Number(e.target.value))}
                 className="h-9.5 text-xs rounded-lg border-slate-300 mb-0"
               />
               <Input
                 placeholder="Max ₦"
                 type="number"
                 value={maxAmountRange !== undefined ? maxAmountRange : ""}
-                onChange={(e) => handleMaxAmountRange(Number(e.target.value))}
+                onChange={(e) => handleMaxAmountRange(e.target.value === "" ? undefined : Number(e.target.value))}
                 className="h-9.5 text-xs rounded-lg border-slate-300 mb-0"
               />
             </div>
@@ -194,8 +203,9 @@ const ManageTransactionFilterModal = ({
 
           <button
             type="button"
-            onClick={onClose}
-            className="h-9 px-4.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer touch-manipulation"
+            onClick={() => { onApplyEmail(emailDraft.trim()); onClose(); }}
+            disabled={!!emailDraft.trim() && !z.string().email().safeParse(emailDraft.trim()).success}
+            className="h-9 px-4.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer touch-manipulation disabled:opacity-50"
           >
             Apply Filters
           </button>

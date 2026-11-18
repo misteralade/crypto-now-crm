@@ -11,6 +11,7 @@ const ManageFiat = () => {
   const {
     // 🧩 Values
     openBankModal,
+    editingAccount,
     platformSupportedBanks,
     loadingPlatformSupportedBanks,
     searchQuery,
@@ -22,6 +23,7 @@ const ManageFiat = () => {
 
     // ⚙️ Functions
     handleOpenBankModal,
+    handleEditBank,
     handleCloseBankModal,
     handleMakeDefault,
     handleDeleteBank,
@@ -122,6 +124,7 @@ const ManageFiat = () => {
                 index={index}
                 onMakeDefault={handleMakeDefault}
                 onDelete={handleDeleteBank}
+                onEdit={handleEditBank}
               />
             ))}
 
@@ -144,6 +147,7 @@ const ManageFiat = () => {
         {/* Modals */}
         <BankDetailsModal
           open={openBankModal}
+          isEditing={!!editingAccount}
           supportedBanks={
             !loadingPlatformSupportedBanks ? platformSupportedBanks : []
           }

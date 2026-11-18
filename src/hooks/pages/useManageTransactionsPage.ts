@@ -27,6 +27,7 @@ import type {AxiosServerError} from "../../types/response.payload.types";
 export const useManageTransactionsPage = () => {
   const dispatch = useDispatch()
   const sortModel = useSelector((state: RootState) => state.transactionManagement.search.transactions.sortModel)
+  const activeFilters = useSelector((state: RootState) => state.transactionManagement.search.transactions)
   const navigate = useNavigate()
   const [selectedStatsTimeline, setSelectedStatsTimeline] =
     useState<TimelineFilter>('all')
@@ -211,6 +212,7 @@ export const useManageTransactionsPage = () => {
     searchTransactions,
     loadingSearchTransactions,
     sortModel,
+    activeFilters,
     allSupportedCrypto,
     loadingAllSupportedCrypto,
     transactionDetail,

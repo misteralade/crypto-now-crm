@@ -148,12 +148,12 @@ export const useTransactionsTable = (options?: TransactionsTableOptions) => {
     handleSearchTransactionFieldUpdate("createdAtTo", momentClient.toISOStringFromDateWithDayBoundary(date, false))
   }
 
-  const handleMinAmountRange = (amount: number) => {
+  const handleMinAmountRange = (amount: number | undefined) => {
     setMinAmountRange(amount)
     handleSearchTransactionFieldUpdate("minUsdAmount", amount)
   }
 
-  const handleMaxAmountRange = (amount: number) => {
+  const handleMaxAmountRange = (amount: number | undefined) => {
     setMaxAmountRange(amount)
     handleSearchTransactionFieldUpdate("maxUsdAmount", amount)
   }
@@ -217,6 +217,10 @@ export const useTransactionsTable = (options?: TransactionsTableOptions) => {
     toggleApplyAction,
     toggleApplyFilter,
     handleSearchQuery,
+    handleUserEmail: (email: string) => {
+      handleSearchTransactionFieldUpdate('userEmail', email || undefined);
+      handleSearchTransactionFieldUpdate('page', 1);
+    },
     handlePageChange,
     handlePageSizeChange,
     resetSearchFilter,

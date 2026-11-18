@@ -44,6 +44,10 @@ class BankServiceApi {
   async adminCreateBankAccount(payload: CreateBankAccountRequestType) {
     return await axiosPostRequestHandler(`/bank/platform/create`, payload) as BaseApiResponse<null>;
   }
+
+  async adminUpdatePlatformBankAccount(id: string, payload: { bankId: string; accountNumber: string }) {
+    return await axiosPatchRequestHandler(`/bank/admin/${id}/update`, payload) as BaseApiResponse<null>;
+  }
   
   async adminSearchSupportedBanks(payload: AdminSearchSupportedBankRequestType) {
     return await axiosPostRequestHandler(`/bank/admin/supported-bank/search`, payload) as SearchSupportedBanksAPIResponse;

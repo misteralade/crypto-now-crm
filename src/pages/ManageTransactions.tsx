@@ -19,6 +19,7 @@ const ManageTransactions = () => {
     // 🧩 Values
     searchTransactions,
     sortModel,
+    activeFilters,
     loadingSearchTransactions,
     allSupportedCrypto,
     loadingAllSupportedCrypto,
@@ -49,6 +50,7 @@ const ManageTransactions = () => {
     handlePageSizeChange,
     toggleApplyFilter,
     handleSearchQuery,
+    handleUserEmail,
     handleFromDate,
     handleToDate,
     handleMinAmountRange,
@@ -75,6 +77,15 @@ const ManageTransactions = () => {
   const handleRefreshTransactions = () => {
     resetSearchFilter();
   };
+
+  const filterLabels = [
+    (activeFilters.userEmail || activeFilters.userId) && 'User',
+    (activeFilters.createdAtFrom || activeFilters.createdAtTo) && 'Date',
+    (activeFilters.minUsdAmount !== undefined || activeFilters.maxUsdAmount !== undefined) && 'Amount',
+    activeFilters.cryptoCurrencyId && 'Asset',
+    activeFilters.status && 'Status',
+    activeFilters.priority && 'Priority',
+  ].filter(Boolean);
 
   const columns = useMemo(
     () =>
@@ -106,10 +117,10 @@ const ManageTransactions = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={toggleApplyFilter}
-              className="inline-flex h-8.5 items-center justify-center gap-1.5 rounded-lg border border-slate-200/90 bg-white px-3 text-xs font-semibold text-slate-700 shadow-2xs transition-all hover:bg-slate-50 active:scale-98 cursor-pointer touch-manipulation"
+              className={cn("inline-flex h-8.5 items-center justify-center gap-1.5 rounded-lg border px-3 text-xs font-semibold shadow-2xs transition-all cursor-pointer touch-manipulation", filterLabels.length ? "border-blue-600 bg-blue-50 text-blue-700" : "border-slate-200/90 bg-white text-slate-700 hover:bg-slate-50")}
             >
               <Filter className="h-3.5 w-3.5 text-slate-500" />
-              <span>Filter</span>
+              <span>{filterLabels.length ? `Filter: ${filterLabels[0]}${filterLabels.length > 1 ? ` +${filterLabels.length - 1}` : ''}` : 'Filter'}</span>
             </button>
 
             <button
@@ -173,7 +184,9 @@ const ManageTransactions = () => {
         <ManageTransactionFilterModal
           isOpen={showFilter}
           onClose={toggleApplyFilter}
-          onReset={resetSearchFilter}
+          onReset={() => { resetSearchFilter(); if (filteredUserId) clearUserFilter(); }}
+          userEmail={activeFilters.userEmail || ''}
+          onApplyEmail={(email) => { if (email && filteredUserId) clearUserFilter(); handleUserEmail(email); }}
           fromDate={fromDate}
           toDate={toDate}
           minAmountRange={minAmountRange}
