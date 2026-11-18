@@ -6,8 +6,18 @@ import BankDetailsModal from "../components/pages/manageFiat/BankDetailsModal.ts
 import AuthenticatedLayout from "../layout/AuthenticatedLayout.tsx";
 import { useNavbarSearch } from "../layout/navbar-search-context.tsx";
 import { Input } from "../components/ui/input";
+import { Link } from "@tanstack/react-router";
+import { useOwnAdminProfileQuery } from "../queries/auth.query";
+import { PERMISSIONS } from "../util/permissions.util";
+import { ROUTES } from "../util/constants.util";
 
-const ManageFiat = () => {
+const CurrencyLink = () => (
+  <Link to={ROUTES.SUPPORTED_CURRENCIES} className="inline-flex h-8.5 items-center justify-center rounded-lg border border-slate-200 bg-white px-3.5 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50">
+    Manage currencies
+  </Link>
+);
+
+const ManageFiatBankPage = ({ canViewCurrencies }: { canViewCurrencies: boolean }) => {
   const {
     // 🧩 Values
     openBankModal,
@@ -48,6 +58,8 @@ const ManageFiat = () => {
         title="Manage Fiat"
         subtitle="Commercial settlement accounts and automated payout approval ceilings"
         actions={
+          <div className="flex flex-wrap items-center gap-2">
+          {canViewCurrencies && <CurrencyLink />}
           <button
             onClick={handleOpenBankModal}
             className="h-8.5 px-3.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-2xs inline-flex items-center gap-1.5 transition-colors cursor-pointer touch-manipulation"
@@ -55,6 +67,7 @@ const ManageFiat = () => {
             <Plus className="w-3.5 h-3.5" />
             <span>Add Bank Account</span>
           </button>
+          </div>
         }
       />
 
@@ -158,5 +171,15 @@ const ManageFiat = () => {
       </div>
     </AuthenticatedLayout>
   );
+};
+
+const ManageFiat = () => {
+  const { data: profile, isLoading } = useOwnAdminProfileQuery();
+  if (isLoading) return <AuthenticatedLayout><PageHeader title="Manage Fiat" /></AuthenticatedLayout>;
+  const canViewCurrencies = profile?.permissions.includes(PERMISSIONS.CURRENCY.VIEW) === true;
+  if (profile?.permissions.includes(PERMISSIONS.BANK_ACCOUNT.VIEW) !== true) {
+    return <AuthenticatedLayout><PageHeader title="Manage Fiat" actions={canViewCurrencies ? <CurrencyLink /> : undefined} /></AuthenticatedLayout>;
+  }
+  return <ManageFiatBankPage canViewCurrencies={canViewCurrencies} />;
 };
 export default ManageFiat;

@@ -1,5 +1,6 @@
 import CopyDetails from '../../../global/CopyDetails';
 import type { SearchTransactionsResponse } from '../../../../types/response.payload.types';
+import { TRANSACTION_STATUS_SCOPE } from '../../../../util/constants.util';
 
 interface TransactionContextProps {
   transaction: SearchTransactionsResponse;
@@ -24,7 +25,12 @@ const TransactionContext = ({ transaction }: TransactionContextProps) => {
     </div>
   );
 
-  const isBuy = transaction.type === 'BUY';
+  const isBuy = transaction.type === TRANSACTION_STATUS_SCOPE.BUY;
+  const hasContext = isBuy
+    ? transaction.userBankAccount || transaction.adminBankAccount || transaction.walletAddress
+    : transaction.walletAddress || transaction.userBankAccount;
+
+  if (!hasContext) return null;
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">

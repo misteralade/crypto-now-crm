@@ -10,9 +10,6 @@ import {
   ArrowRightLeft,
   Coins,
   Banknote,
-  UserCheck,
-  FileCheck,
-  Globe,
   MessageSquareQuote,
   AlertCircle,
   Bell,
@@ -73,21 +70,6 @@ const navItems = [
     path: ROUTES.TREASURY,
     label: "Treasury",
     icon: Wallet,
-  },
-  {
-    path: ROUTES.KYC_TIER_LIMITS,
-    label: "KYC Tier Limits",
-    icon: UserCheck,
-  },
-  {
-    path: ROUTES.KYC_SESSIONS,
-    label: "KYC Sessions",
-    icon: FileCheck,
-  },
-  {
-    path: ROUTES.SUPPORTED_CURRENCIES,
-    label: "Currencies",
-    icon: Globe,
   },
   {
     path: ROUTES.REVIEWS,
@@ -200,7 +182,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                 const isActive =
                   item.path === ROUTES.DASHBOARD
                     ? currentPath === item.path
-                    : currentPath === item.path ||
+                    : (item.path === ROUTES.MANAGE_FIAT && currentPath === ROUTES.SUPPORTED_CURRENCIES) || currentPath === item.path ||
                       currentPath.startsWith(item.path + "/");
 
                 return (
