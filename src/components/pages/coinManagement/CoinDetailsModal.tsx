@@ -11,6 +11,7 @@ import {
   CheckCircle,
   XCircle,
   Loader2,
+  Pencil,
 } from "lucide-react";
 import type {
   SearchSupportedCryptoData,
@@ -22,6 +23,7 @@ interface CoinDetailsModalProps {
   open: boolean;
   loading?: boolean;
   onClose: () => void;
+  onEdit?: (id: string) => void;
 }
 
 const copyToClipboard = (text: string) => {
@@ -108,6 +110,7 @@ export const CoinDetailsModal = ({
   open,
   loading,
   onClose,
+  onEdit,
 }: CoinDetailsModalProps) => {
   const [isClosing, setIsClosing] = useState(false);
   const [shouldRender, setShouldRender] = useState(open);
@@ -211,8 +214,21 @@ export const CoinDetailsModal = ({
               </>
             )}
           </div>
+          {coin && !loading && onEdit && (
+            <button
+              type="button"
+              onClick={() => onEdit(coin.id)}
+              aria-label={`Edit ${coin.name}`}
+              title="Edit coin"
+              className="shrink-0 rounded-xl p-2 text-[#03034D] transition-colors hover:bg-[#F5F5FF]"
+            >
+              <Pencil className="h-4 w-4" />
+            </button>
+          )}
           <button
+            type="button"
             onClick={onClose}
+            aria-label="Close coin details"
             className="p-2 rounded-xl hover:bg-[#F5F5FF] transition-colors flex-shrink-0"
           >
             <X className="w-5 h-5 text-[#9A9A9A]" />

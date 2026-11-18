@@ -11,8 +11,11 @@ import AuthenticatedLayout from "../layout/AuthenticatedLayout.tsx";
 import { useNavbarSearch } from "../layout/navbar-search-context.tsx";
 import ConfirmModal from "../components/global/ConfirmModal.tsx";
 import CoinDetailsModal from "../components/pages/coinManagement/CoinDetailsModal.tsx";
+import { useAdminAuth } from "../hooks/useAdminAuth";
+import { PERMISSIONS } from "../util/permissions.util";
 
 const CoinManagement = () => {
+  const { hasPermission } = useAdminAuth();
   const {
     // 🧩 Values
     query,
@@ -98,6 +101,7 @@ const CoinManagement = () => {
         coin={selectedCoin}
         open={selectedCoin !== null}
         onClose={handleCloseCoinDetails}
+        onEdit={hasPermission(PERMISSIONS.CRYPTO_WALLETS.WRITE) ? handleViewCoinDetails : undefined}
       />
     </AuthenticatedLayout>
   );
