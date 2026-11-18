@@ -45,7 +45,6 @@ export const ROUTES = {
   RESET_PASSWORD: '/reset-password',
   VERIFY_TWO_FACTOR: '/verify-2fa',
   DASHBOARD: '/dashboard',
-  SECURITY: '/dashboard/security',
   TRANSACTIONS: '/dashboard/transactions',
   TRANSACTIONS_DETAILS: '/dashboard/transaction/$id',
   DISPUTES: '/dashboard/disputes',

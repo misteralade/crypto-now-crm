@@ -16,7 +16,6 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardTestimonialsRouteImport } from './routes/dashboard/testimonials'
 import { Route as DashboardSupportedCurrenciesRouteImport } from './routes/dashboard/supported-currencies'
-import { Route as DashboardSecurityRouteImport } from './routes/dashboard/security'
 import { Route as DashboardReviewsRouteImport } from './routes/dashboard/reviews'
 import { Route as DashboardNotificationsRouteImport } from './routes/dashboard/notifications'
 import { Route as DashboardManageFiatRouteImport } from './routes/dashboard/manage-fiat'
@@ -80,11 +79,6 @@ const DashboardSupportedCurrenciesRoute =
     path: '/dashboard/supported-currencies',
     getParentRoute: () => rootRouteImport,
   } as any)
-const DashboardSecurityRoute = DashboardSecurityRouteImport.update({
-  id: '/dashboard/security',
-  path: '/dashboard/security',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DashboardReviewsRoute = DashboardReviewsRouteImport.update({
   id: '/dashboard/reviews',
   path: '/dashboard/reviews',
@@ -239,7 +233,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/manage-fiat': typeof DashboardManageFiatRoute
   '/dashboard/notifications': typeof DashboardNotificationsRoute
   '/dashboard/reviews': typeof DashboardReviewsRoute
-  '/dashboard/security': typeof DashboardSecurityRoute
   '/dashboard/supported-currencies': typeof DashboardSupportedCurrenciesRoute
   '/dashboard/testimonials': typeof DashboardTestimonialsRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -275,7 +268,6 @@ export interface FileRoutesByTo {
   '/dashboard/manage-fiat': typeof DashboardManageFiatRoute
   '/dashboard/notifications': typeof DashboardNotificationsRoute
   '/dashboard/reviews': typeof DashboardReviewsRoute
-  '/dashboard/security': typeof DashboardSecurityRoute
   '/dashboard/supported-currencies': typeof DashboardSupportedCurrenciesRoute
   '/dashboard/testimonials': typeof DashboardTestimonialsRoute
   '/dashboard': typeof DashboardIndexRoute
@@ -312,7 +304,6 @@ export interface FileRoutesById {
   '/dashboard/manage-fiat': typeof DashboardManageFiatRoute
   '/dashboard/notifications': typeof DashboardNotificationsRoute
   '/dashboard/reviews': typeof DashboardReviewsRoute
-  '/dashboard/security': typeof DashboardSecurityRoute
   '/dashboard/supported-currencies': typeof DashboardSupportedCurrenciesRoute
   '/dashboard/testimonials': typeof DashboardTestimonialsRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -350,7 +341,6 @@ export interface FileRouteTypes {
     | '/dashboard/manage-fiat'
     | '/dashboard/notifications'
     | '/dashboard/reviews'
-    | '/dashboard/security'
     | '/dashboard/supported-currencies'
     | '/dashboard/testimonials'
     | '/dashboard/'
@@ -386,7 +376,6 @@ export interface FileRouteTypes {
     | '/dashboard/manage-fiat'
     | '/dashboard/notifications'
     | '/dashboard/reviews'
-    | '/dashboard/security'
     | '/dashboard/supported-currencies'
     | '/dashboard/testimonials'
     | '/dashboard'
@@ -422,7 +411,6 @@ export interface FileRouteTypes {
     | '/dashboard/manage-fiat'
     | '/dashboard/notifications'
     | '/dashboard/reviews'
-    | '/dashboard/security'
     | '/dashboard/supported-currencies'
     | '/dashboard/testimonials'
     | '/dashboard/'
@@ -459,7 +447,6 @@ export interface RootRouteChildren {
   DashboardManageFiatRoute: typeof DashboardManageFiatRoute
   DashboardNotificationsRoute: typeof DashboardNotificationsRoute
   DashboardReviewsRoute: typeof DashboardReviewsRoute
-  DashboardSecurityRoute: typeof DashboardSecurityRoute
   DashboardSupportedCurrenciesRoute: typeof DashboardSupportedCurrenciesRoute
   DashboardTestimonialsRoute: typeof DashboardTestimonialsRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
@@ -533,13 +520,6 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/supported-currencies'
       fullPath: '/dashboard/supported-currencies'
       preLoaderRoute: typeof DashboardSupportedCurrenciesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/security': {
-      id: '/dashboard/security'
-      path: '/dashboard/security'
-      fullPath: '/dashboard/security'
-      preLoaderRoute: typeof DashboardSecurityRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/reviews': {
@@ -751,7 +731,6 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardManageFiatRoute: DashboardManageFiatRoute,
   DashboardNotificationsRoute: DashboardNotificationsRoute,
   DashboardReviewsRoute: DashboardReviewsRoute,
-  DashboardSecurityRoute: DashboardSecurityRoute,
   DashboardSupportedCurrenciesRoute: DashboardSupportedCurrenciesRoute,
   DashboardTestimonialsRoute: DashboardTestimonialsRoute,
   DashboardIndexRoute: DashboardIndexRoute,

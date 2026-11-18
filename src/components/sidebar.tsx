@@ -5,7 +5,6 @@ import {
   LogOut,
   Wallet,
   Landmark,
-  ShieldCheck,
   LayoutDashboard,
   ArrowRightLeft,
   Coins,
@@ -92,11 +91,6 @@ const navItems = [
     icon: Bell,
   },
   {
-    path: ROUTES.AUDIT_TRAILS,
-    label: "Audit trails",
-    icon: History,
-  },
-  {
     path: ROUTES.USERS,
     label: "Users",
     icon: Users,
@@ -107,9 +101,9 @@ const navItems = [
     icon: UserCog,
   },
   {
-    path: ROUTES.SECURITY,
-    label: "Security",
-    icon: ShieldCheck,
+    path: ROUTES.AUDIT_TRAILS,
+    label: "Audit trails",
+    icon: History,
   },
 ];
 

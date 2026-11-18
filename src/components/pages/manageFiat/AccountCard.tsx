@@ -34,7 +34,7 @@ const AccountCard = ({
         <button type="button" onClick={() => onEdit(account)} aria-label="Edit bank account" className="absolute right-0 top-0 rounded-lg p-2 text-blue-700 hover:bg-blue-50"><Pencil size={16} /></button>
         <div className="pr-8 text-base font-semibold text-[#0E0F0C]">
           {account.label || `Account ${index + 1}`}{' '}
-          {account.isDefault ? 'â€“ Default' : ''}
+          {account.isDefault ? '(Default)' : ''}
         </div>
         <div className="mt-4 space-y-3 text-xs">
           <div className="flex items-start justify-between gap-3">

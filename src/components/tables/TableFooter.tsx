@@ -7,11 +7,12 @@ interface TableFooterProps {
   pageSize: number;
   totalItems: number;
   onPageChange: (page: number) => void;
-  onPageSizeChange: (size: number) => void;
+  onPageSizeChange?: (size: number) => void;
+  showPageSize?: boolean;
   maxVisible?: number;
 }
 
-const TableFooter = ({ currentPage, totalPages, pageSize, totalItems, onPageChange, onPageSizeChange, maxVisible = 5 }: TableFooterProps) => {
+const TableFooter = ({ currentPage, totalPages, pageSize, totalItems, onPageChange, onPageSizeChange, showPageSize = true, maxVisible = 5 }: TableFooterProps) => {
   const getVisiblePages = () => {
     const pages = []
 
@@ -46,7 +47,7 @@ const TableFooter = ({ currentPage, totalPages, pageSize, totalItems, onPageChan
 
   const handlePageSizeChange = (value: string) => {
     const newSize = value === 'all' ? totalItems : Number(value)
-    onPageSizeChange(newSize)
+    onPageSizeChange?.(newSize)
     onPageChange(1)
   }
 
@@ -102,7 +103,7 @@ const TableFooter = ({ currentPage, totalPages, pageSize, totalItems, onPageChan
       </div>
 
       {/* Right side - Rows per page */}
-      <div className="flex items-center gap-2">
+      {showPageSize && <div className="flex items-center gap-2">
         <span className="text-xs text-slate-500 font-medium">Rows per page</span>
         <Select value={pageSize === totalItems ? 'all' : String(pageSize)} onValueChange={handlePageSizeChange}>
           <SelectTrigger className="h-7.5 w-[70px] rounded-md border-slate-200 text-xs text-slate-800 font-semibold shadow-2xs px-2">
@@ -116,7 +117,7 @@ const TableFooter = ({ currentPage, totalPages, pageSize, totalItems, onPageChan
             <SelectItem value="all">All</SelectItem>
           </SelectContent>
         </Select>
-      </div>
+      </div>}
     </div>
   )
 }

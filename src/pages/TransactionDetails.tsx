@@ -140,7 +140,7 @@ const TransactionDetails = () => {
                   <label className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-blue-700"><Upload size={16} />Upload admin payment receipt<input type="file" accept="image/png,image/jpeg,application/pdf" className="sr-only" onChange={(event) => { void uploadReceipt(event.target.files?.[0]); event.currentTarget.value = ""; }} /></label>
                   {receiptPreviewUrl ? <ReceiptViewer url={receiptPreviewUrl} label={receiptName || "New payment receipt"} /> : transaction.adminPaymentReceiptUrl ? <ReceiptViewer url={transaction.adminPaymentReceiptUrl} label="Admin payment receipt" /> : null}
                 </div>}
-                {lockingTransaction && <p className="mt-3 text-xs text-slate-500">Preparing transaction controlsâ€¦</p>}
+                {lockingTransaction && <p className="mt-3 text-xs text-slate-500">Preparing transaction controls...</p>}
               </section>
 
               {(transaction.userNotes || transaction.adminNotes || transaction.internalNotes || transaction.failureReason) && <div className="grid gap-5 xl:grid-cols-2">
