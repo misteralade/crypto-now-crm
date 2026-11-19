@@ -1,81 +1,98 @@
-import { useState } from 'react'
-import { Copy } from 'lucide-react'
-// import Copy from "../../assets/img/fluent_copy-16-regular.svg"
+import { useState, type MouseEvent } from 'react'
+import { Copy, Check } from 'lucide-react'
+import ResponsiveText from './ResponsiveText.tsx'
 
-interface CopyDetailsProps {
-  text: string;
-    className?: string;
-  iconClassName?: string;
+interface CopyButtonProps {
+  text: string
+  className?: string
+  iconClassName?: string
+  ariaLabel?: string
 }
 
-const CopyDetails = ({text, className, iconClassName}: CopyDetailsProps) => {
-    const [response, setResponse] = useState<string>("");
-    const handleCopy = () => {
-        navigator.clipboard.writeText(text)
-            .then(() => {
-                setResponse("Copied!");
+export const CopyButton = ({ text, className = '', iconClassName = 'w-3.5 h-3.5', ariaLabel = 'Copy' }: CopyButtonProps) => {
+  const [copied, setCopied] = useState(false)
 
-                setTimeout(() => setResponse(""), 2000);
-            })
-            .catch(err => {
-                setResponse(`Error!: ${err}`);
-            });
-    };
-    return (
-      <div
-        className={`flex gap-2 items-center relative max-w-[400px] w-3/4 md:w-fit ${className}`}
-      >
-        <p
-          className={`text-black overflow-hidden whitespace-nowrap text-ellipsis`}
-        >
-          {text}
-        </p>
+  const handleCopy = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1800)
+    })
+  }
 
-        <Copy
-          className={`text-purple-600 hover:cursor-pointer h-18 w-1 ${iconClassName}`}
-          onClick={handleCopy}
-        />
+  return (
+    <button
+      type="button"
+      onClick={handleCopy}
+      className={`p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 active:scale-95 transition-all shrink-0 cursor-pointer inline-flex items-center justify-center ${className}`}
+      title={copied ? 'Copied!' : 'Copy to clipboard'}
+      aria-label={ariaLabel}
+    >
+      {copied ? (
+        <Check className={`${iconClassName} text-emerald-600`} />
+      ) : (
+        <Copy className={iconClassName} />
+      )}
+    </button>
+  )
+}
 
-        <p
-          className={`text-accent2 text-sm absolute -top-5 right-0 transition-all duration-500`}
-        >
-          {response}
-        </p>
-      </div>
-    )
+interface CopyDetailsProps {
+  text: string
+  className?: string
+  iconClassName?: string
+  wrap?: boolean
+}
+
+const CopyDetails = ({ text, className = '', iconClassName, wrap }: CopyDetailsProps) => {
+  return (
+    <div
+      className={`crm-body flex w-full min-w-0 max-w-full gap-2 items-center ${className}`}
+      style={!wrap ? { maxWidth: 'min(400px, 100%)' } : undefined}
+    >
+      <p className={`text-slate-900 min-w-0 flex-1 ${wrap ? 'break-all' : ''}`}>
+        {wrap ? text : <ResponsiveText text={text} />}
+      </p>
+
+      <CopyButton text={text} iconClassName={iconClassName || 'w-3.5 h-3.5'} />
+    </div>
+  )
 }
 
 interface ClickableDetailsProps {
-  text: string;
-  onClick: (value: any) => void;
-  className?: string;
+  text: string
+  onClick: (value: string) => void
+  className?: string
 }
 
-export const ClickableDetails = ({ text, onClick, className }: ClickableDetailsProps) => {
-  const [clicked, setClicked] = useState(false);
-  
-  const handleClick = () => {
-    setClicked(true);
-    onClick(text);
-    setTimeout(() => setClicked(false), 1500);
-  };
-  
+export const ClickableDetails = ({ text, onClick, className = '' }: ClickableDetailsProps) => {
+  const [clicked, setClicked] = useState(false)
+
+  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault()
+    event.stopPropagation()
+    setClicked(true)
+    onClick(text)
+    setTimeout(() => setClicked(false), 1500)
+  }
+
   return (
     <div className={`relative flex items-center gap-2 max-w-[200px] w-3/4 md:w-fit ${className}`}>
       <a
+        href="#"
         onClick={handleClick}
-        className={`text-blue-600 overflow-hidden whitespace-nowrap text-ellipsis hover:underline cursor-pointer`}
+        className="text-blue-600 overflow-hidden whitespace-nowrap text-ellipsis hover:underline cursor-pointer text-xs sm:text-sm font-medium"
       >
         {text}
       </a>
-      
+
       {clicked && (
-        <span className="text-green-500 text-sm absolute -top-5 left-0 transition-all duration-300">
-          Clicked!
+        <span className="text-emerald-600 text-xs absolute -top-5 left-0 transition-all duration-300 font-medium">
+          Copied!
         </span>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default CopyDetails;
+export default CopyDetails

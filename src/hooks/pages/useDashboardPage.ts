@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
+import { setSearchTransactionsField } from '../../redux/transaction-management.slice'
 import { useTransactionQuery } from '../../queries/transaction.query'
 import { useUserQuery } from '../../queries/user.query'
 import { setSelectedTimeline as reduxSetSelectedTimeline } from '../../redux/dashboard.slice'
@@ -22,6 +23,9 @@ export const useDashboardPage = () => {
     loadingTransactionVolumeTrend,
     usersWithTopTransactionVolume,
     loadingUsersWithTopTransactionVolume,
+    adminTransactionStats,
+    loadingAdminTransactionStats,
+    adminRetryPendingPayoutsMutation,
   } = useTransactionQuery()
 
   const { weeklyUserSummary, loadingWeeklyUserSummary } = useUserQuery()
@@ -34,7 +38,40 @@ export const useDashboardPage = () => {
     dispatch(reduxSetSelectedTimeline(timeline))
   }
   
-  const handleViewTransactionDetails = (sessionId: string) => navigate( { to: `${ROUTES.TRANSACTIONS}/${sessionId}` })
+  const handleViewTransactionDetails = (sessionId: string) => navigate( { to: `/dashboard/transaction/${sessionId}` as any })
+
+  const handleRetryAllPendingPayouts = () => {
+    adminRetryPendingPayoutsMutation.mutate(undefined);
+  }
+
+  const handleViewPendingPayouts = () => {
+    dispatch(setSearchTransactionsField({
+      field: 'status',
+      value: 'PENDING_PAYOUT',
+    }))
+    dispatch(setSearchTransactionsField({
+      field: 'page',
+      value: 1,
+    }))
+    navigate({ 
+      to: ROUTES.TRANSACTIONS,
+      search: { status: 'PENDING_PAYOUT' } as any 
+    });
+  }
+
+  const handleViewInReviewTransactions = () => {
+    dispatch(setSearchTransactionsField({
+      field: 'status',
+      value: 'IN_REVIEW',
+    }))
+    dispatch(setSearchTransactionsField({
+      field: 'page',
+      value: 1,
+    }))
+    navigate({
+      to: ROUTES.TRANSACTIONS,
+    })
+  }
 
   return {
     // 🧩 Values
@@ -51,9 +88,15 @@ export const useDashboardPage = () => {
     loadingTransactionVolumeTrend,
     usersWithTopTransactionVolume,
     loadingUsersWithTopTransactionVolume,
+    adminTransactionStats,
+    loadingAdminTransactionStats,
+    retryingPayouts: adminRetryPendingPayoutsMutation.isPending,
 
     // ⚙️ Functions
     handleSelectedTimelineChange,
     handleViewTransactionDetails,
+    handleRetryAllPendingPayouts,
+    handleViewPendingPayouts,
+    handleViewInReviewTransactions,
   }
 }

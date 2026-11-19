@@ -40,7 +40,7 @@ export const useBankQuery = () => {
 
       return null;
     },
-    enabled: !!(matchRoute({ to: ROUTES.MANAGE_FIAT })),
+    enabled: !!(matchRoute({ to: ROUTES.MANAGE_FIAT }) || matchRoute({ to: ROUTES.USERS_DETAILS })),
   });
   
   const { data: searchedSupportedBanks, isLoading: loadingSearchedSupportedBanks } = useQuery({

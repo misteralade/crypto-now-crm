@@ -1,7 +1,7 @@
 import {Fragment} from "react";
 import {useEditCoinPage} from "../hooks/pages/useEditCoinPage";
 import {LoadingSpinner} from "../components/global/LoadingSpinner.tsx";
-import CoinManagementHeader from "../components/pages/coinManagement/CoinManagementHeader.tsx";
+import PageHeader from "../components/global/pageHeader.tsx";
 import UploadCoinIcon from "../components/pages/coinManagement/UploadCoinIcon.tsx";
 import EditCoinDetails from "../components/pages/coinManagement/edit-coin/CoinDetails.tsx";
 import EditTradeLimits from "../components/pages/coinManagement/edit-coin/EditTradeLimits.tsx";
@@ -32,14 +32,12 @@ const EditCoin = () => {
           </Fragment>
         ) : (
           <Fragment>
-            {/* Header */}
-            <CoinManagementHeader />
+            <PageHeader
+              title={`Edit ${adminCryptoDetails?.name || 'Coin'}`}
+              subtitle="Update network parameters, trade limits, and market details"
+            />
 
-            <div>
-              <h2 className="text-2xl lg:text-4xl font-medium text-[#0E0F0C] mb-8 mt-4">
-                Edit {adminCryptoDetails?.name}
-              </h2>
-
+            <div className="px-4 sm:px-6 pb-8 max-w-4xl">
               <UploadCoinIcon
                 oldImgUrl={adminCryptoDetails?.logoUrl}
                 onChangeInputField={handleEditCoinInputChange}
@@ -47,22 +45,29 @@ const EditCoin = () => {
               />
 
               <EditCoinDetails
+                key={adminCryptoDetails?.id}
+                cryptoId={adminCryptoDetails?.id || ''}
                 onChangeInputField={handleEditCoinInputChange}
                 name={adminCryptoDetails?.name || ''}
                 symbol={adminCryptoDetails?.symbol || ''}
-                network={adminCryptoDetails?.adminCryptoWallets && adminCryptoDetails?.adminCryptoWallets.length > 0 ? adminCryptoDetails?.adminCryptoWallets[0].network : ''}
+                networks={adminCryptoDetails?.networks ?? []}
                 active={adminCryptoDetails?.isActive || false}
-                walletAddress={adminCryptoDetails?.adminCryptoWallets && adminCryptoDetails?.adminCryptoWallets.length > 0 ? adminCryptoDetails?.adminCryptoWallets[0].walletAddress : ''}
+                buyEnabled={adminCryptoDetails?.buyEnabled ?? false}
+                sellEnabled={adminCryptoDetails?.sellEnabled ?? false}
+                buyPrecision={adminCryptoDetails?.buyPrecision ?? null}
+                adminCryptoWallets={adminCryptoDetails?.adminCryptoWallets ?? []}
+                blockchainEnvironment={adminCryptoDetails?.blockchainEnvironment as "testnet" | "mainnet"}
               />
 
               <EditTradeLimits
+                cryptoId={adminCryptoDetails?.id || ''}
                 symbol={adminCryptoDetails?.symbol || ''}
-                buyAt={Number(adminCryptoDetails?.buyRate) || 0}
-                sellAt={Number(adminCryptoDetails?.sellRate) || 0}
-                minAmount={Number(adminCryptoDetails?.minTransactionLimit) || 0}
-                maxAmount={Number(adminCryptoDetails?.maxTransactionLimit) || 0}
-                minAmountAnonymous={Number(adminCryptoDetails?.minTradeAmountForAnonymous) || 0}
-                maxAmountAnonymous={Number(adminCryptoDetails?.maxTradeAmountForAnonymous) || 0}
+                buyAt={adminCryptoDetails?.buyRate}
+                sellAt={adminCryptoDetails?.sellRate}
+                minAmount={adminCryptoDetails?.minTransactionLimit}
+                maxAmount={adminCryptoDetails?.maxTransactionLimit}
+                minAmountAnonymous={adminCryptoDetails?.minTradeAmountForAnonymous}
+                maxAmountAnonymous={adminCryptoDetails?.maxTradeAmountForAnonymous}
                 onChangeInputField={handleEditCoinInputChange}
               />
               
@@ -77,16 +82,16 @@ const EditCoin = () => {
         )}
 
         {/* Action buttons */}
-        <div className="flex flex-col sm:flex-row justify-end items-center gap-4 mt-8 pt-6">
+        <div className="flex flex-col sm:flex-row justify-end items-center gap-3 mt-6 pt-5 border-t border-slate-200">
           <button
             onClick={goBack}
-            className="px-4 py-2 text-lg font-medium text-[#03034D] hover:opacity-70 transition-colors w-full sm:w-auto cursor-pointer"
+            className="h-9 px-4 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold text-xs w-full sm:w-auto transition-colors cursor-pointer touch-manipulation"
           >
-            Go back
+            Cancel
           </button>
           <button
             onClick={handleUpdateCrypto}
-            className="px-12 py-[16px] bg-[#03034D] text-lg font-medium text-white rounded-full hover:bg-[#FF8B5A] transition-colors w-full sm:w-auto cursor-pointer"
+            className="h-9 px-5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-xs w-full sm:w-auto transition-colors cursor-pointer touch-manipulation"
           >
             Update Coin
           </button>

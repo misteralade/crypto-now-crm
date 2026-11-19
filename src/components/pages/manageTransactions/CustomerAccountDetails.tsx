@@ -1,6 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import CopyIcon from "../../../assets/img/fluent_copy-16-regular.svg"
+import { Copy } from 'lucide-react'
 
 interface CustomerAccountDetailsProps {
   address: string
@@ -25,7 +23,7 @@ export default function CustomerAccountDetails({
     <div className="">
       <div className="space-y-4">
         <section className="flex items-center justify-between gap-x-12 md:gap-x-28">
-          <div className="text-[#828282] text-[16px]">Address</div>
+          <div className="text-[#828282] text-base">Address</div>
           <div className="flex items-center gap-2 break-all">
             <span className="font-medium text-sm text-[#0E0F0C]">
               {address}
@@ -33,22 +31,22 @@ export default function CustomerAccountDetails({
             <button
               type="button"
               onClick={handleCopy}
-              className="p-1 rounded hover:text-black/5 cursor-pointer"
+              className="p-1 rounded text-purple-600 hover:bg-purple-50 active:scale-95 transition-all cursor-pointer"
               aria-label="Copy address"
               title="Copy address"
             >
-              <img src={CopyIcon} alt={CopyIcon} width={15} height={18}/>
+              <Copy className="h-4 w-4" />
             </button>
           </div>
         </section>
 
         <section className="flex items-center justify-between gap-x-12 md:gap-x-28">
-          <div className="text-[#828282] text-[16px]">Coin type</div>
+          <div className="text-[#828282] text-base">Coin type</div>
           <div className="font-medium text-sm text-[#0E0F0C]">{coinType}</div>
         </section>
 
         <section className="flex items-center justify-between gap-x-12 md:gap-x-28">
-          <div className="text-[#828282] text-[16px]">Network type</div>
+          <div className="text-[#828282] text-base">Network type</div>
           <div className="font-medium text-sm text-[#0E0F0C]">
             {networkType}
           </div>

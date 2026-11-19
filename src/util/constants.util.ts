@@ -24,27 +24,50 @@ export const LOCAL_STORAGE_KEYS = {
   ACCESS_TOKEN: 'accessToken',
 }
 
+export const TRANSACTION_STATUS_SCOPE = {
+  BUY: 'BUY',
+  SELL: 'SELL',
+  SHARED: 'BOTH',
+} as const;
+
+export const TRANSACTION_ACTIVITY_ACTIONS = {
+  ADMIN_LOCK_TRANSACTION: 'ADMIN_LOCK_TRANSACTION',
+  ADMIN_VIEW_TRANSACTION: 'ADMIN_VIEW_TRANSACTION',
+  UPDATE_TRANSACTION_STATUS: 'UPDATE_TRANSACTION_STATUS',
+  FORCE_TRIGGER_PAYOUT: 'FORCE_TRIGGER_PAYOUT',
+  ADMIN_RETRY_PENDING_PAYOUT: 'ADMIN_RETRY_PENDING_PAYOUT',
+  RETRY_DEPOSIT_CONFIRMATION: 'RETRY_DEPOSIT_CONFIRMATION',
+} as const;
+
 export const ROUTES = {
   LOGIN: '/',
   FORGOT_PASSWORD: '/forgot-password',
   RESET_PASSWORD: '/reset-password',
+  VERIFY_TWO_FACTOR: '/verify-2fa',
   DASHBOARD: '/dashboard',
   TRANSACTIONS: '/dashboard/transactions',
-  TRANSACTIONS_DETAILS: '/dashboard/transactions/$id',
+  TRANSACTIONS_DETAILS: '/dashboard/transaction/$id',
   DISPUTES: '/dashboard/disputes',
   EDIT_DISPUTE: '/dashboard/disputes/edit/$id',
-  DISPUTE_DETAILS: `/dashboard/disputes/$id`,
+  DISPUTE_DETAILS: `/dashboard/dispute/$id`,
   COIN_MANAGEMENT: '/dashboard/coin-management',
   ADD_COIN: '/dashboard/coin-management/add-coin',
   EDIT_COIN: '/dashboard/coin-management/$coinId',
+  ADMIN_WALLETS: '/dashboard/admin-wallets',
   MANAGE_FIAT: '/dashboard/manage-fiat',
+  TREASURY: '/dashboard/treasury',
   AUDIT_TRAILS: '/dashboard/audit-trails',
   USERS: '/dashboard/users',
-  USERS_DETAILS: '/dashboard/users/$userId',
-  USER_TRANSACTIONS: '/dashboard/users/transaction-history/$userId',
+  USERS_DETAILS: '/dashboard/user/$userId',
   NOTIFICATIONS: '/dashboard/notifications',
   MANAGE_ADMINS: '/dashboard/manage-admins',
+  ADMIN_DETAILS: '/dashboard/manage-admins/$adminId',
   TESTIMONIALS: '/dashboard/testimonials',
+  REVIEWS: '/dashboard/reviews',
+  KYC_TIER_LIMITS: '/dashboard/kyc-tier-limits',
+  SUPPORTED_CURRENCIES: '/dashboard/supported-currencies',
+  KYC_SESSIONS: '/dashboard/kyc-sessions',
+  KYC_SESSION_DETAIL: '/dashboard/kyc-session/$id',
 }
 
 export const CRYPTO_NETWORK_OPTIONS = [
@@ -79,47 +102,155 @@ export const CRYPTO_NETWORK_OPTIONS = [
   // { value: CRYPTO_NETWORK.OKEX, label: 'OKEx Chain' },
 ] as const
 
+export const BLOCKCHAIN_ENVIRONMENT_OPTIONS = [
+  { value: "testnet", label: "Testnet" },
+  { value: "mainnet", label: "Mainnet" },
+] as const
+
 export const TRANSACTION_STATUS_OPTIONS = [
   { value: undefined, label: 'All' },
   { value: TRANSACTION_STATUS.INITIATED, label: 'Initiated' },
-  { value: TRANSACTION_STATUS.PENDING, label: 'Pending' },
   { value: TRANSACTION_STATUS.AWAITING_PAYMENT, label: 'Awaiting Payment' },
-  { value: TRANSACTION_STATUS.PAYMENT_RECEIVED, label: 'Payment Received' },
-  { value: TRANSACTION_STATUS.PAYMENT_CONFIRMED, label: 'Payment Confirmed' },
-  { value: TRANSACTION_STATUS.PROCESSING, label: 'Processing' },
+  { value: TRANSACTION_STATUS.IN_REVIEW, label: 'In Review' },
   { value: TRANSACTION_STATUS.AWAITING_CRYPTO, label: 'Awaiting Crypto' },
-  { value: TRANSACTION_STATUS.CRYPTO_SENT, label: 'Crypto Sent' },
-  { value: TRANSACTION_STATUS.CRYPTO_RECEIVED, label: 'Crypto Received' },
-  { value: TRANSACTION_STATUS.CRYPTO_CONFIRMED, label: 'Crypto Confirmed' },
+  { value: TRANSACTION_STATUS.DEPOSIT_PENDING_MINIMUM, label: 'Deposit Pending Minimum' },
   { value: TRANSACTION_STATUS.COMPLETED, label: 'Completed' },
   { value: TRANSACTION_STATUS.FAILED, label: 'Failed' },
   { value: TRANSACTION_STATUS.EXPIRED, label: 'Expired' },
   { value: TRANSACTION_STATUS.CANCELLED, label: 'Cancelled' },
   { value: TRANSACTION_STATUS.DISPUTED, label: 'Disputed' },
-  { value: TRANSACTION_STATUS.REFUNDING, label: 'Refunding' },
+  { value: TRANSACTION_STATUS.DEPOSIT_DETECTED, label: 'Deposit Detected' },
+  { value: TRANSACTION_STATUS.PENDING_CONFIRMATION, label: 'Pending Confirmation' },
+  { value: TRANSACTION_STATUS.DEPOSIT_CONFIRMED, label: 'Deposit Confirmed' },
+  { value: TRANSACTION_STATUS.PAYOUT_INITIATED, label: 'Payout Initiated' },
+  { value: TRANSACTION_STATUS.PROCESSING, label: 'Processing' },
+  { value: TRANSACTION_STATUS.PAYOUT_FAILED, label: 'Payout Failed' },
+  { value: TRANSACTION_STATUS.PENDING_PAYOUT, label: 'Pending Payout' },
   { value: TRANSACTION_STATUS.REFUNDED, label: 'Refunded' },
-  {
-    value: TRANSACTION_STATUS.PAYMENT_ACCOUNT_CONFIRMED,
-    label: 'Payment Account Confirmed',
-  },
 ]
+
+export const TRANSACTION_STATUS_UPDATE_OPTIONS = [
+  {
+    value: TRANSACTION_STATUS.PENDING_PAYOUT,
+    label: 'Awaiting Payout',
+    description: 'Payout is paused until funds or review clear.',
+    scope: TRANSACTION_STATUS_SCOPE.SELL,
+  },
+  {
+    value: TRANSACTION_STATUS.PROCESSING,
+    label: 'Processing',
+    description: 'The transaction is being handled now.',
+    scope: TRANSACTION_STATUS_SCOPE.SELL,
+  },
+  {
+    value: TRANSACTION_STATUS.AWAITING_PAYMENT,
+    label: 'Awaiting Payment',
+    description: 'Waiting for the customer to send fiat.',
+    scope: TRANSACTION_STATUS_SCOPE.BUY,
+  },
+  {
+    value: TRANSACTION_STATUS.IN_REVIEW,
+    label: 'In Review',
+    description: 'Receipt is uploaded and waiting for review.',
+    scope: TRANSACTION_STATUS_SCOPE.BUY,
+  },
+  {
+    value: TRANSACTION_STATUS.AWAITING_CRYPTO,
+    label: 'Awaiting Bank Details',
+    description: 'Waiting for the customer bank details.',
+    scope: TRANSACTION_STATUS_SCOPE.SELL,
+  },
+  {
+    value: TRANSACTION_STATUS.DEPOSIT_DETECTED,
+    label: 'Deposit Detected',
+    description: 'Deposit is visible and waiting for confirmations.',
+    scope: TRANSACTION_STATUS_SCOPE.SELL,
+  },
+  {
+    value: TRANSACTION_STATUS.PENDING_CONFIRMATION,
+    label: 'Pending Confirmation',
+    description: 'Deposit was detected but is still awaiting blockchain confirmation.',
+    scope: TRANSACTION_STATUS_SCOPE.SELL,
+  },
+  {
+    value: TRANSACTION_STATUS.DEPOSIT_PENDING_MINIMUM,
+    label: 'Deposit Pending Minimum',
+    description: 'Deposit is confirmed but still below minimum.',
+    scope: TRANSACTION_STATUS_SCOPE.SELL,
+  },
+  {
+    value: TRANSACTION_STATUS.DEPOSIT_CONFIRMED,
+    label: 'Deposit Confirmed',
+    description: 'Deposit confirmations are complete.',
+    scope: TRANSACTION_STATUS_SCOPE.SELL,
+  },
+  {
+    value: TRANSACTION_STATUS.PAYOUT_INITIATED,
+    label: 'Payout Initiated',
+    description: 'Fiat payout has been sent to the rail.',
+    scope: TRANSACTION_STATUS_SCOPE.SELL,
+  },
+  {
+    value: TRANSACTION_STATUS.COMPLETED,
+    label: 'Completed',
+    description: 'Transaction finished successfully.',
+    scope: TRANSACTION_STATUS_SCOPE.SHARED,
+  },
+  {
+    value: TRANSACTION_STATUS.INITIATED,
+    label: 'Initiated',
+    description: 'The transaction has just been created.',
+    scope: TRANSACTION_STATUS_SCOPE.SELL,
+  },
+  {
+    value: TRANSACTION_STATUS.FAILED,
+    label: 'Failed',
+    description: 'The transaction stopped because of an error.',
+    scope: TRANSACTION_STATUS_SCOPE.SHARED,
+  },
+  {
+    value: TRANSACTION_STATUS.PAYOUT_FAILED,
+    label: 'Payout Failed',
+    description: 'The fiat payout failed and may need a retry.',
+    scope: TRANSACTION_STATUS_SCOPE.SELL,
+  },
+  {
+    value: TRANSACTION_STATUS.EXPIRED,
+    label: 'Expired',
+    description: 'The payment window timed out.',
+    scope: TRANSACTION_STATUS_SCOPE.BUY,
+  },
+  {
+    value: TRANSACTION_STATUS.CANCELLED,
+    label: 'Cancelled',
+    description: 'The transaction was stopped.',
+    scope: TRANSACTION_STATUS_SCOPE.SHARED,
+  },
+  {
+    value: TRANSACTION_STATUS.DISPUTED,
+    label: 'Disputed',
+    description: 'The transaction is under dispute.',
+    scope: TRANSACTION_STATUS_SCOPE.SHARED,
+  },
+  {
+    value: TRANSACTION_STATUS.REFUNDED,
+    label: 'Refunded',
+    description: 'The refund has been completed.',
+    scope: TRANSACTION_STATUS_SCOPE.BUY,
+  },
+] as const
 
 export const ALLOWED_ADMIN_TRANSACTION_STATUS = [
   TRANSACTION_STATUS.AWAITING_PAYMENT,
-  TRANSACTION_STATUS.PAYMENT_RECEIVED,
-  TRANSACTION_STATUS.PAYMENT_CONFIRMED,
+  TRANSACTION_STATUS.IN_REVIEW,
   TRANSACTION_STATUS.PROCESSING,
   TRANSACTION_STATUS.AWAITING_CRYPTO,
-  TRANSACTION_STATUS.CRYPTO_SENT,
-  TRANSACTION_STATUS.CRYPTO_RECEIVED,
-  TRANSACTION_STATUS.CRYPTO_CONFIRMED,
+  TRANSACTION_STATUS.PENDING_CONFIRMATION,
   TRANSACTION_STATUS.COMPLETED,
   TRANSACTION_STATUS.FAILED,
   TRANSACTION_STATUS.CANCELLED,
   TRANSACTION_STATUS.DISPUTED,
-  TRANSACTION_STATUS.REFUNDING,
   TRANSACTION_STATUS.REFUNDED,
-  TRANSACTION_STATUS.PAYMENT_ACCOUNT_CONFIRMED,
 ]
 
 export const transactionStatusStyles: Record<
@@ -132,29 +263,17 @@ export const transactionStatusStyles: Record<
     dot: 'bg-orange-400',
     textColor: 'text-orange-600',
   },
-  PENDING: {
-    text: 'Pending',
-    bg: 'bg-orange-50',
-    dot: 'bg-orange-400',
-    textColor: 'text-orange-600',
-  },
   AWAITING_PAYMENT: {
     text: 'Awaiting Payment',
     bg: 'bg-yellow-50',
     dot: 'bg-yellow-400',
     textColor: 'text-yellow-600',
   },
-  PAYMENT_RECEIVED: {
-    text: 'Payment Received',
-    bg: 'bg-blue-50',
-    dot: 'bg-blue-400',
-    textColor: 'text-blue-600',
-  },
-  PAYMENT_CONFIRMED: {
-    text: 'Payment Confirmed',
-    bg: 'bg-blue-50',
-    dot: 'bg-blue-400',
-    textColor: 'text-blue-600',
+  IN_REVIEW: {
+    text: 'In Review',
+    bg: 'bg-amber-50',
+    dot: 'bg-amber-500',
+    textColor: 'text-amber-700',
   },
   PROCESSING: {
     text: 'Processing',
@@ -164,24 +283,6 @@ export const transactionStatusStyles: Record<
   },
   AWAITING_CRYPTO: {
     text: 'Awaiting Crypto',
-    bg: 'bg-blue-50',
-    dot: 'bg-blue-400',
-    textColor: 'text-blue-600',
-  },
-  CRYPTO_SENT: {
-    text: 'Crypto Sent',
-    bg: 'bg-blue-50',
-    dot: 'bg-blue-400',
-    textColor: 'text-blue-600',
-  },
-  CRYPTO_RECEIVED: {
-    text: 'Crypto Received',
-    bg: 'bg-blue-50',
-    dot: 'bg-blue-400',
-    textColor: 'text-blue-600',
-  },
-  CRYPTO_CONFIRMED: {
-    text: 'Crypto Confirmed',
     bg: 'bg-blue-50',
     dot: 'bg-blue-400',
     textColor: 'text-blue-600',
@@ -216,20 +317,50 @@ export const transactionStatusStyles: Record<
     dot: 'bg-red-400',
     textColor: 'text-red-600',
   },
-  REFUNDING: {
-    text: 'Refunding',
+  REFUNDED: {
+    text: 'Refunded',
+    bg: 'bg-emerald-50',
+    dot: 'bg-emerald-500',
+    textColor: 'text-emerald-600',
+  },
+  PENDING_PAYOUT: {
+    text: 'Pending Payout',
     bg: 'bg-yellow-50',
     dot: 'bg-yellow-400',
     textColor: 'text-yellow-600',
   },
-  REFUNDED: {
-    text: 'Refunded',
-    bg: 'bg-green-50',
-    dot: 'bg-green-400',
-    textColor: 'text-green-600',
+  PAYOUT_INITIATED: {
+    text: 'Payout Initiated',
+    bg: 'bg-indigo-50',
+    dot: 'bg-indigo-400',
+    textColor: 'text-indigo-600',
   },
-  PAYMENT_ACCOUNT_CONFIRMED: {
-    text: 'Payment Account Confirmed',
+  PAYOUT_FAILED: {
+    text: 'Payout Failed',
+    bg: 'bg-red-50',
+    dot: 'bg-red-400',
+    textColor: 'text-red-600',
+  },
+  DEPOSIT_DETECTED: {
+    text: 'Deposit Detected',
+    bg: 'bg-blue-50',
+    dot: 'bg-blue-400',
+    textColor: 'text-blue-600',
+  },
+  PENDING_CONFIRMATION: {
+    text: 'Pending Confirmation',
+    bg: 'bg-sky-50',
+    dot: 'bg-sky-400',
+    textColor: 'text-sky-600',
+  },
+  DEPOSIT_PENDING_MINIMUM: {
+    text: 'Deposit Pending Minimum',
+    bg: 'bg-sky-50',
+    dot: 'bg-sky-400',
+    textColor: 'text-sky-600',
+  },
+  DEPOSIT_CONFIRMED: {
+    text: 'Deposit Confirmed',
     bg: 'bg-blue-50',
     dot: 'bg-blue-400',
     textColor: 'text-blue-600',

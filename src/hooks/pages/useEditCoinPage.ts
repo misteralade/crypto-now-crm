@@ -14,6 +14,7 @@ import type { EditSupportedCryptoAndAdminWalletRequestType } from "../../schemas
 export const useEditCoinPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate()
+  const { coinId } = useParams({ from: '/dashboard/coin-management/$coinId' })
   const {
     // 🧩 Values
     adminCryptoDetails,
@@ -22,9 +23,7 @@ export const useEditCoinPage = () => {
     // ⚙️ Mutation Functions
     uploadCryptoLogoIconMutation,
     updateCryptoCurrencyMutation,
-  } = useCryptoQuery();
-  
-  const { coinId } = useParams({ from: '/dashboard/coin-management/$coinId' })
+  } = useCryptoQuery(coinId);
   
   useEffect(() => {
     if (coinId) {
@@ -34,7 +33,7 @@ export const useEditCoinPage = () => {
   
   const goBack = () => navigate({ to: ROUTES.COIN_MANAGEMENT })
 
-  const handleEditCoinInputChange = (field: keyof EditSupportedCryptoAndAdminWalletRequestType, value: any ) => {
+  const handleEditCoinInputChange = (field: keyof EditSupportedCryptoAndAdminWalletRequestType, value: unknown ) => {
     dispatch(setEditCoinPayloadField({
       field,
       value: value === '' ? undefined : value,
@@ -43,7 +42,7 @@ export const useEditCoinPage = () => {
 
   const handleUpdateCrypto = async () => {
     const { success } = await updateCryptoCurrencyMutation.mutateAsync()
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+     
     if (success) {
       dispatch(clearEditCoinPayload())
       dispatch(clearEditCoinId())

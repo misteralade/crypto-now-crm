@@ -12,10 +12,28 @@ export const TransactionAction = z.preprocess(
 export const TransactionStatus = z.preprocess(
   (val) => {
     if (typeof val === "string") return val.toUpperCase();
-
     return val;
   },
-  z.enum(['INITIATED', 'PENDING', 'AWAITING_PAYMENT', 'PAYMENT_RECEIVED', 'PAYMENT_CONFIRMED', 'PROCESSING', 'AWAITING_CRYPTO', 'CRYPTO_SENT', 'CRYPTO_RECEIVED', 'CRYPTO_CONFIRMED', 'COMPLETED', 'FAILED', 'EXPIRED', 'CANCELLED', 'DISPUTED', 'REFUNDING', 'REFUNDED', 'PAYMENT_ACCOUNT_CONFIRMED']),
+  z.enum([
+    'INITIATED',
+    'AWAITING_PAYMENT',
+    'IN_REVIEW',
+    'AWAITING_CRYPTO',
+    'DEPOSIT_PENDING_MINIMUM',
+    'COMPLETED',
+    'FAILED',
+    'EXPIRED',
+    'CANCELLED',
+    'DISPUTED',
+    'REFUNDED',
+    'DEPOSIT_DETECTED',
+    'PENDING_CONFIRMATION',
+    'DEPOSIT_CONFIRMED',
+    'PAYOUT_INITIATED',
+    'PROCESSING',
+    'PAYOUT_FAILED',
+    'PENDING_PAYOUT',
+  ])
 );
 
 export const TransactionPriority = z.preprocess(
@@ -52,7 +70,13 @@ export const BankAndCryptoType = z.preprocess((val) => {
   if (typeof val === "string") return val.toUpperCase();
 
   return val;
-}, z.enum(["RECEIVING", "SENDING", "BOTH"]));
+}, z.enum(["RECEIVING", "SENDING", "FUELING"]));
+
+export const BlockchainEnvironmentType = z.preprocess((val) => {
+  if (typeof val === "string") return val.toLowerCase();
+
+  return val;
+}, z.enum(["testnet", "mainnet"]));
 
 export const CryptoNetworkType = z.preprocess((val) => {
   if (typeof val === "string") return val.toUpperCase();

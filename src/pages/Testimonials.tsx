@@ -7,7 +7,6 @@ import PageHeader from '../components/global/pageHeader';
 import AuthenticatedLayout from "../layout/AuthenticatedLayout";
 import ConfirmModal from "../components/global/ConfirmModal";
 import TestimonialFormModal from "../components/pages/testimonials/TestimonialFormModal";
-import CustomButton from "../components/global/Button";
 import type { TestimonialResponsePayload } from "../types/response.payload.types";
 import type { UpdateTestimonialRequestType } from "../schemas/testimonial.schema";
 
@@ -68,30 +67,31 @@ const Testimonials = () => {
 
   return (
     <AuthenticatedLayout>
-      <div className="p-6 min-h-screen container">
-        <PageHeader title="Testimonial Management" />
-        
-        {/* Controls */}
-        <div className="flex mt-8 w-full flex-col md:flex-row items-center justify-end gap-4 mb-6">
-          <div className="flex items-center gap-3">
-            <CustomButton
-              buttonText="Add Testimonial"
-              onClick={openCreateModal}
-              className="px-6 py-2 bg-[#03034D] text-white rounded-full hover:bg-[#FF8B5A] transition-colors"
-            />
-          </div>
+      <PageHeader 
+        title="Testimonials" 
+        actions={
+          <button
+            onClick={openCreateModal}
+            className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-xs transition-colors"
+          >
+            Add Testimonial
+          </button>
+        }
+      />
+      
+      <div className="px-4 sm:px-6 pb-6 space-y-4">
+        <div className="bg-white rounded-xl border border-slate-200/80 shadow-xs overflow-hidden">
+          <Table data={data} columns={columns} loading={loadingTestimonials} />
+          
+          <TableFooter
+            currentPage={testimonials?.page || 1}
+            totalPages={testimonials?.totalPages || 1}
+            pageSize={testimonials?.limit || 10}
+            totalItems={testimonials?.count || 0}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+          />
         </div>
-        
-        <Table data={data} columns={columns} loading={loadingTestimonials} />
-        
-        <TableFooter
-          currentPage={testimonials?.page || 1}
-          totalPages={testimonials?.totalPages || 1}
-          pageSize={testimonials?.limit || 10}
-          totalItems={testimonials?.count || 0}
-          onPageChange={handlePageChange}
-          onPageSizeChange={handlePageSizeChange}
-        />
         
         {/* Create Testimonial Modal */}
         <TestimonialFormModal

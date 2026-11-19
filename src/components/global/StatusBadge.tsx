@@ -17,12 +17,12 @@ export const StatusBadge = ({ status }: StatusBadgeProps) => {
   return (
     <span
       className={clsx(
-        "inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium",
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-2xs font-semibold",
         variant.bg,
         variant.textColor
       )}
     >
-      <span className={clsx("h-2 w-2 rounded-full", variant.dot)} />
+      <span className={clsx("h-1.5 w-1.5 rounded-full", variant.dot)} />
       {variant.text}
     </span>
   );
@@ -39,12 +39,12 @@ export const DisputeStatusBadge = ({ status }: StatusBadgeProps) => {
   return (
     <span
       className={clsx(
-        "inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium",
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-2xs font-semibold",
         variant.bg,
         variant.textColor
       )}
     >
-      <span className={clsx("h-2 w-2 rounded-full", variant.dot)} />
+      <span className={clsx("h-1.5 w-1.5 rounded-full", variant.dot)} />
       {variant.text}
     </span>
   );
@@ -61,12 +61,12 @@ export const DisputeResolutionBadge = ({ resolution }: { resolution: string }) =
   return (
     <span
       className={clsx(
-        "inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium",
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-2xs font-semibold",
         variant.bg,
         variant.textColor
       )}
     >
-      <span className={clsx("h-2 w-2 rounded-full", variant.dot)} />
+      <span className={clsx("h-1.5 w-1.5 rounded-full", variant.dot)} />
       {variant.text}
     </span>
   );
@@ -83,12 +83,12 @@ export const DisputePriorityBadge = ({ priority }: { priority: string }) => {
   return (
     <span
       className={clsx(
-        "inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium",
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-2xs font-semibold",
         variant.bg,
         variant.textColor
       )}
     >
-      <span className={clsx("h-2 w-2 rounded-full", variant.dot)} />
+      <span className={clsx("h-1.5 w-1.5 rounded-full", variant.dot)} />
       {variant.text}
     </span>
   );

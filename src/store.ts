@@ -1,3 +1,4 @@
+import { ENVIRONMENTS } from "./config/index.config";
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import storageSession from 'redux-persist/lib/storage/session'
 import {
@@ -20,6 +21,9 @@ import notificationSlice from './redux/notification.slice';
 import adminSlice from './redux/admin.slice';
 import disputeSlice from './redux/dispute.slice.ts';
 import testimonialSlice from './redux/testimonial.slice';
+import kycTierLimitSlice from './redux/kyc-tier-limit.slice';
+import currencySlice from './redux/currency.slice';
+import kycSessionSlice from './redux/kyc-session.slice';
 import { BASIC } from './config/index.config'
 // (To persist to localStorage instead: import storage from 'redux-persist/lib/storage')
 
@@ -34,6 +38,9 @@ const rootReducer = combineReducers({
   admin: adminSlice,
   dispute: disputeSlice,
   testimonial: testimonialSlice,
+  kycTierLimit: kycTierLimitSlice,
+  currency: currencySlice,
+  kycSession: kycSessionSlice,
 })
 
 const persistConfig = {
@@ -42,7 +49,6 @@ const persistConfig = {
   whitelist: [
     'dashboard',
     'coinManagement',
-    'transactionManagement',
     'user',
     'fiat',
     'auditLog',
@@ -50,6 +56,9 @@ const persistConfig = {
     'admin',
     'dispute',
     'testimonial',
+    'kycTierLimit',
+    'currency',
+    'kycSession',
   ],
 }
 
@@ -64,7 +73,7 @@ export const store = configureStore({
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
     }),
-  devTools: BASIC.NODE_ENV !== 'production',
+  devTools: BASIC.NODE_ENV !== ENVIRONMENTS.PRODUCTION,
 })
 
 // persistor for PersistGate

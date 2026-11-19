@@ -1,5 +1,54 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
 @import 'tailwindcss';
+
+/* Shared type scale. Tailwind text utilities use these values throughout the CRM. */
+@theme {
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1rem;
+}
+
+:root {
+  --crm-page-title: 1.25rem;
+  --crm-section-title: 0.8125rem;
+  --crm-body: 0.8125rem;
+  --crm-label: 0.6875rem;
+  --color-primary: #03034D;
+  --color-primary-taint: #F0F1FF;
+  --color-primary-hover: #050568;
+  --color-accent: #948EEE;
+  --color-accent-light: #D3D4F8;
+  --color-accent-mid: #575AE5;
+  --color-danger: #EB5757;
+  --color-success: #037847;
+  --color-success-bg: #ECFDF3;
+  --color-warning: #F2994A;
+  --color-border: #ECECEC;
+  --color-border-input: #E4E7EC;
+  --color-bg-light: #F8F8FF;
+  --color-bg-page: #F5F5FF;
+  --color-text-primary: #0E0F0C;
+  --color-text-secondary: #454745;
+  --color-text-muted: #9A9A9A;
+  --color-text-placeholder: #98A2B3;
+}
+
+@media (max-width: 639px) {
+  :root {
+    --text-sm: 0.8125rem;
+    --text-base: 0.875rem;
+    --text-lg: 1rem;
+    --text-xl: 1.125rem;
+  }
+}
+
+@media (min-width: 640px) {
+  :root {
+    --crm-page-title: 1.5rem;
+    --crm-section-title: 0.875rem;
+    --crm-body: 0.875rem;
+    --crm-label: 0.75rem;
+  }
+}
 
 @layer base {
   html,
@@ -13,17 +62,172 @@
       Roboto,
       'Helvetica Neue',
       Arial;
+    background-color: #F5F5FF;
+    color: #0E0F0C;
+  }
+
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Override Vite/default dark mode */
+  :root {
+    color-scheme: light;
+    color: #0E0F0C;
+    background-color: #F5F5FF;
+  }
+
+  /* Reset browser button defaults that may conflict with Tailwind classes */
+  button, [type='button'], [type='submit'], [type='reset'] {
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: transparent;
+    background-image: none;
+    border: 0;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
   }
 }
 
 @layer components {
   .icon-base {
-    color: #858585; /* inactive color */
+    color: #858585;
     transition: color 0.2s ease-in-out;
   }
 
   .icon-active {
-    color: #323232; /* active color */
+    color: #03034D;
+  }
+
+  /* Card styles */
+  .cn-card {
+    background: #ffffff;
+    border: 1px solid #ECECEC;
+    border-radius: 16px;
+  }
+
+  /* Page section heading */
+  .cn-section-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #0E0F0C;
+    margin-bottom: 24px;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #D3D4F8;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #948EEE;
+  }
+}
+
+@layer utilities {
+  .crm-page-title { font-size: var(--crm-page-title); line-height: 1.25; }
+  .crm-section-heading { font-size: var(--crm-section-title); line-height: 1.35; }
+  .crm-body { font-size: var(--crm-body); line-height: 1.45; }
+  .crm-label { font-size: var(--crm-label); line-height: 1.35; }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes scaleOut {
+    from {
+      opacity: 1;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+  }
+
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slideOutRight {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(100%);
+    }
+  }
+
+  .animate-modal-backdrop-in {
+    animation: fadeIn 200ms ease-out;
+  }
+
+  .animate-modal-backdrop-out {
+    animation: fadeOut 150ms ease-in;
+  }
+
+  .animate-modal-content-in {
+    animation: scaleIn 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .animate-modal-content-out {
+    animation: scaleOut 200ms cubic-bezier(0.5, 0, 0.84, 0);
+  }
+
+  .animate-modal-slide-in {
+    animation: slideInRight 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .animate-modal-slide-out {
+    animation: slideOutRight 200ms cubic-bezier(0.5, 0, 0.84, 0);
+  }
+}
+
+/* Custom react-toastify overrides for mobile viewports */
+@media (max-width: 640px) {
+  .Toastify__toast {
+    font-size: 12px !important;
+    padding: 10px 14px !important;
+    min-height: 44px !important;
   }
 }
 

@@ -4,7 +4,7 @@ import { ChevronDown } from "lucide-react";
 import {DisputeStatusBadge} from "../global/StatusBadge.tsx";
 import type { TableColumn } from "../table.tsx";
 import type {AdminSearchDisputes} from "../../types/response.payload.types.ts";
-import {convertToMillify} from "../../util/index.util.ts";
+import {formatCompact} from "../../util/asset-precision";
 import momentClient from "../../util/moment.ts";
 
 export const DisputeManagementColumn = (
@@ -17,7 +17,7 @@ export const DisputeManagementColumn = (
     key: 'id',
     header: (
       <Fragment>
-        <div className="py-3 text-left text-sm font-medium text-gray-500">
+        <div className="py-2.5 text-left text-xs font-semibold text-slate-600">
           <span className="flex items-center gap-2">
             <span>Dispute ID</span>
           </span>
@@ -25,8 +25,8 @@ export const DisputeManagementColumn = (
       </Fragment>
     ),
     render: (value) => (
-      <div className="px-4 py-5 text-sm text-[14px] text-[#101828]">
-        <CopyDetails text={value} className="!max-w-[200px]" iconClassName="h-6 w-6"/>
+      <div className="py-2.5 text-xs text-slate-900 font-mono">
+        <CopyDetails text={value} className="!max-w-[180px]" iconClassName="h-4 w-4"/>
       </div>
     ),
   },
@@ -34,52 +34,52 @@ export const DisputeManagementColumn = (
     key: 'initiator',
     header: (
       <div
-        className="py-3 text-left text-sm font-medium text-gray-500 hover:cursor-pointer"
+        className="py-2.5 text-left text-xs font-semibold text-slate-600 hover:cursor-pointer"
       >
         <span className="flex items-center gap-2">
-          <span>User(Initiator)</span>
+          <span>User (Initiator)</span>
         </span>
       </div>
     ),
-    render: (value) => <span className="py-3 text-sm text-[#667085]">{value}</span>,
+    render: (value) => <span className="py-2.5 text-xs text-slate-700 font-medium">{value}</span>,
   },
   {
     key: 'transactionId',
     header: (
-      <div className="py-3 text-left text-sm font-medium text-gray-500">
+      <div className="py-2.5 text-left text-xs font-semibold text-slate-600">
         <span className="flex items-center gap-2">
           <span>Transaction ID</span>
         </span>
       </div>
     ),
     render: (value) => (
-      <div className="px-4 py-5 text-sm text-[14px] text-[#101828]">
-        <ClickableDetails text={value} className="!max-w-[150px]" onClick={handleNavigateToTransactionPage}/>
+      <div className="py-2.5 text-xs text-slate-900 font-mono">
+        <ClickableDetails text={value} className="!max-w-[140px]" onClick={handleNavigateToTransactionPage}/>
       </div>
     ),
   },
   {
     key: 'amount',
     header: (
-      <div className="py-3 text-left text-sm font-medium text-gray-500">
+      <div className="py-2.5 text-left text-xs font-semibold text-slate-600">
         <span className="flex items-center gap-2">
           <span>Amount</span>
         </span>
       </div>
     ),
     render: (value) => (
-      <span className="py-3 text-sm text-[14px] text-[#667085]">₦ {value}</span>
+      <span className="py-2.5 text-xs font-semibold text-slate-900 tabular-nums">₦ {value}</span>
     ),
   },
   {
     key: 'date',
     header: (
       <Fragment>
-        <div className="py-3 text-left text-sm font-medium !min-w-[150px] text-gray-500">
+        <div className="py-2.5 text-left text-xs font-semibold !min-w-[140px] text-slate-600">
           <span className="flex items-center gap-2">
             <span>Date</span>
             <ChevronDown
-              className="text-gray-400"
+              className="text-slate-400 h-3.5 w-3.5 cursor-pointer"
               onClick={() => handleSortBy('createdAt')}
             />
           </span>
@@ -88,7 +88,7 @@ export const DisputeManagementColumn = (
     ),
     render: (value) => (
       <Fragment>
-        <span className="py-3 text-sm text-[14px] text-[#667085] !min-w-[150px]">{value}</span>
+        <span className="py-2.5 text-xs text-slate-500 !min-w-[140px]">{value}</span>
       </Fragment>
     ),
   },
@@ -96,11 +96,11 @@ export const DisputeManagementColumn = (
     key: 'status',
     header: (
       <Fragment>
-        <div className="py-3 text-left text-sm font-medium text-gray-500">
+        <div className="py-2.5 text-left text-xs font-semibold text-slate-600">
           <span className="flex items-center gap-2">
             <span>Status</span>
             <ChevronDown
-              className="text-gray-400"
+              className="text-slate-400 h-3.5 w-3.5 cursor-pointer"
               onClick={() => handleSortBy('status')}
             />
           </span>
@@ -115,23 +115,23 @@ export const DisputeManagementColumn = (
     key: 'action',
     header: (
       <Fragment>
-        <div className="py-3 text-left text-sm font-medium text-gray-500">
-          <span className="flex items-center gap-2">Action</span>
+        <div className="py-2.5 text-right text-xs font-semibold text-slate-600">
+          <span>Action</span>
         </div>
       </Fragment>
     ),
     render: (_, row) => (
       <Fragment>
-        <div className="flex items-center justify-start gap-2 lg:gap-x-[16px] whitespace-nowrap">
+        <div className="flex items-center justify-end gap-1.5 whitespace-nowrap">
           <button
-            className="px-2.5 md:px-3 py-1 rounded-full bg-[#E6E6FE] cursor-pointer hover:opacity-80 text-[#03034D] text-xs md:text-xs font-medium"
+            className="h-7 px-2.5 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-semibold transition-colors"
             onClick={() => handleViewDisputeDetails(row.id)}
           >
             View
           </button>
           
           <button
-            className="px-2.5 md:px-3 py-1 rounded-full bg-[#03034D] cursor-pointer hover:opacity-80 text-white text-xs md:text-xs font-medium"
+            className="h-7 px-2.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors"
             onClick={() => handleNavigateToEditDisputePage(row.id)}
           >
             Edit
@@ -156,7 +156,7 @@ export const DisputeManagementDataRow = (
       id: item.id,
       initiator: item?.creator ? `${item.creator.profile?.firstName} ${item.creator.profile?.lastName}` : 'Anonymous',
       transactionId: item.transaction.sessionId,
-      amount: convertToMillify(Number(item.transaction.amountFiat)),
+      amount: formatCompact(Number(item.transaction.amountFiatNGN), "NGN"),
       date: momentClient.formatToTransactionInitiationDate(item.createdAt),
       status: item.status,
     })

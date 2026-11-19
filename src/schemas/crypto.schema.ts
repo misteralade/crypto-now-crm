@@ -1,6 +1,28 @@
 import { z } from "zod";
 import {BasicSearchQuerySchema} from "./common.schema";
-import { BankAndCryptoType, CryptoNetworkType } from './enum.schema'
+import { BankAndCryptoType, BlockchainEnvironmentType, CryptoNetworkType } from './enum.schema'
+
+const optionalNumberSchema = z.preprocess((value) => {
+  if (value === "" || value === null || typeof value === "undefined") {
+    return undefined;
+  }
+
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : undefined;
+  }
+
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (trimmed === "") {
+      return undefined;
+    }
+
+    const parsed = Number(trimmed);
+    return Number.isFinite(parsed) ? parsed : undefined;
+  }
+
+  return value;
+}, z.number().min(0).optional());
 
 export const SearchSupportedCryptoWalletRequestSchema = BasicSearchQuerySchema.extend({
   createdBy: z.string().uuid().optional().describe("Optional UUID of the admin who created the cryptocurrency"),
@@ -14,10 +36,10 @@ export const SearchSupportedCryptoWalletRequestSchema = BasicSearchQuerySchema.e
   // additionalInfo: z.record(z.any()).optional().describe("Optional additional information as key-value pairs"),
   additionalInfo: z.string().max(100).optional().describe(`Optional filter where additionalInfo contains this substring, case-insensitively`),
   isStableCoin: z.coerce.boolean().optional().describe("Optional filter by whether the cryptocurrency is a stablecoin"),
-  maxTransactionLimit: z.number().min(0).optional().describe("Optional maximum transaction limit in USD for this cryptocurrency"),
-  minTransactionLimit: z.number().min(0).optional().describe("Optional minimum transaction limit in USD for this cryptocurrency"),
-  maxTradeAmountForAnonymous: z.number().min(0).optional().describe("Optional maximum trade amount in USD for anonymous users"),
-  minTradeAmountForAnonymous: z.number().min(0).optional().describe("Optional minimum trade amount in USD for anonymous users"),
+  maxTransactionLimit: optionalNumberSchema.describe("Optional maximum transaction limit in token units for this cryptocurrency"),
+  minTransactionLimit: optionalNumberSchema.describe("Optional minimum transaction limit in token units for this cryptocurrency"),
+  maxTradeAmountForAnonymous: optionalNumberSchema.describe("Optional maximum trade amount in token units for anonymous users"),
+  minTradeAmountForAnonymous: optionalNumberSchema.describe("Optional minimum trade amount in token units for anonymous users"),
   
   // Include Related Entities
   includeAdmin: z.coerce.boolean().default(false).optional(),
@@ -28,6 +50,14 @@ export const SearchSupportedCryptoWalletRequestSchema = BasicSearchQuerySchema.e
   includeUserCryptoWallets: z.coerce.boolean().default(false).optional(),
 });
 
+export const WalletEntrySchema = z.object({
+  network: CryptoNetworkType,
+  walletAddress: z.string().min(1).max(255),
+  walletLabel: z.string().min(1).max(100).optional(),
+  walletType: BankAndCryptoType.default("RECEIVING").optional(),
+  blockchainEnvironment: BlockchainEnvironmentType.default("testnet").optional(),
+});
+
 export const CreateSupportedCryptoAndAdminWalletRequestSchema = z.object({
   // Supported Cryptocurrency
   name: z.string().min(1).max(100).describe("Name of the cryptocurrency, e.g., Bitcoin"),
@@ -35,50 +65,61 @@ export const CreateSupportedCryptoAndAdminWalletRequestSchema = z.object({
   description: z.string().max(500).optional().describe("Optional description of the cryptocurrency"),
   isStableCoin: z.boolean().default(false).optional().describe("Optional isStableCoin"),
   logoUrl: z.string().url().optional().describe("Optional URL to the cryptocurrency's logo image"),
-  maxTransactionLimit: z.coerce.number().min(0).optional().describe("Optional maximum transaction limit in USD for this cryptocurrency"),
-  minTransactionLimit: z.coerce.number().min(0).optional().describe("Optional minimum transaction limit in USD for this cryptocurrency"),
-  maxTradeAmountForAnonymous: z.coerce.number().min(0).optional().describe("Optional maximum trade amount in USD for anonymous users"),
-  minTradeAmountForAnonymous: z.coerce.number().min(0).optional().describe("Optional minimum trade amount in USD for anonymous users"),
-  buyRate: z.coerce.number().min(0).optional().describe("Optional buy rate for the cryptocurrency").optional(),
-  sellRate: z.coerce.number().min(0).optional().describe("Optional sell rate for the cryptocurrency").optional(),
-  websiteUrl: z.string().url().optional().describe("Optional URL to the cryptocurrency's official website").transform((val) => val === '' ? undefined : val),
-  whitepaperUrl: z.string().url().optional().describe("Optional URL to the cryptocurrency's whitepaper").transform((val) => val === '' ? undefined : val),
-  additionalInfo: z.record(z.any()).optional().describe("Optional additional information as key-value pairs"),
-  
-  // Wallet 
-  walletAddress: z.string().min(1).max(255).describe("Public address of the cryptocurrency wallet"),
-  walletLabel: z.string().min(1).max(100).optional().describe("Optional label for the wallet"),
-  walletType: BankAndCryptoType.default("BOTH"),
-  network: CryptoNetworkType.describe(`The blockchain network of the cryptocurrency wallet, e.g., 'ETHEREUM', 'BITCOIN'`).optional(),
-  isPrimary: z.coerce.boolean().default(false).describe("Indicates if this wallet is the primary wallet for the user").optional(),
-  isVerified: z.coerce.boolean().default(true).describe("Indicates if the wallet has been verified").optional(),
-
-  // Common
-  isActive: z.boolean().default(true).describe("Indicates if the cryptocurrency is active").optional(),
+  maxTransactionLimit: optionalNumberSchema,
+  minTransactionLimit: optionalNumberSchema,
+  maxTradeAmountForAnonymous: optionalNumberSchema,
+  minTradeAmountForAnonymous: optionalNumberSchema,
+  buyRate: z.coerce.number().min(0).optional(),
+  sellRate: z.coerce.number().min(0).optional(),
+  websiteUrl: z.string().url().optional().transform((val) => val === '' ? undefined : val),
+  whitepaperUrl: z.string().url().optional().transform((val) => val === '' ? undefined : val),
+  additionalInfo: z.record(z.any()).optional(),
+  networks: z.array(z.string()).min(1, "Select at least one network"),
+  wallets: z.array(WalletEntrySchema).optional(),
+  isActive: z.boolean().default(true).optional(),
+  buyEnabled: z.boolean().default(true),
+  sellEnabled: z.boolean().default(false),
+  coinGeckoId: z.string().min(1, "Select a coin"),
+  buyPrecision: z.number().int().min(0).max(8),
+  blockchainEnvironment: BlockchainEnvironmentType.default("testnet").optional(),
 });
 
 export const EditSupportedCryptoAndAdminWalletRequestSchema = z.object({
-  // Supported Cryptocurrency
-  name: z.string().min(1).max(100).describe("Name of the cryptocurrency, e.g., Bitcoin").optional(),
-  symbol: z.string().min(1).max(20).describe("Symbol of the cryptocurrency, e.g., BTC").transform((val) => val.toUpperCase()).optional(),
-  description: z.string().max(500).optional().describe("Optional description of the cryptocurrency").optional(),
-  isStableCoin: z.boolean().default(false).optional().describe("Optional isStableCoin").optional(),
-  logoUrl: z.string().url().optional().describe("Optional URL to the cryptocurrency's logo image").optional(),
-  maxTransactionLimit: z.coerce.number().min(0).optional().describe("Optional maximum transaction limit in USD for this cryptocurrency").optional(),
-  minTransactionLimit: z.coerce.number().min(0).optional().describe("Optional minimum transaction limit in USD for this cryptocurrency").optional(),
-  maxTradeAmountForAnonymous: z.coerce.number().min(0).optional().describe("Optional maximum trade amount in USD for anonymous users").optional(),
-  minTradeAmountForAnonymous: z.coerce.number().min(0).optional().describe("Optional minimum trade amount in USD for anonymous users").optional(),
-  buyRate: z.coerce.number().min(0).optional().describe("Optional buy rate for the cryptocurrency").optional(),
-  sellRate: z.coerce.number().min(0).optional().describe("Optional sell rate for the cryptocurrency").optional(),
-  websiteUrl: z.string().url().optional().describe("Optional URL to the cryptocurrency's official website").optional(),
-  whitepaperUrl: z.string().url().optional().describe("Optional URL to the cryptocurrency's whitepaper").optional(),
-  additionalInfo: z.record(z.any()).optional().describe("Optional additional information as key-value pairs").optional(),
-  walletAddress: z.string().min(1).max(255).describe("Public address of the cryptocurrency wallet").optional(),
-  network: CryptoNetworkType.describe(`The blockchain network of the cryptocurrency wallet, e.g., 'ETHEREUM', 'BITCOIN'`).optional(),
-
-  // Common
-  isActive: z.boolean().default(true).describe("Indicates if the cryptocurrency is active").optional(),
+  name: z.string().min(1).max(100).optional(),
+  symbol: z.string().min(1).max(20).transform((val) => val.toUpperCase()).optional(),
+  description: z.string().max(500).optional(),
+  isStableCoin: z.boolean().optional(),
+  logoUrl: z.string().url().optional(),
+  maxTransactionLimit: optionalNumberSchema,
+  minTransactionLimit: optionalNumberSchema,
+  maxTradeAmountForAnonymous: optionalNumberSchema,
+  minTradeAmountForAnonymous: optionalNumberSchema,
+  buyRate: z.coerce.number().min(0).optional(),
+  sellRate: z.coerce.number().min(0).optional(),
+  websiteUrl: z.string().url().optional(),
+  whitepaperUrl: z.string().url().optional(),
+  additionalInfo: z.record(z.any()).optional(),
+  networks: z.array(z.string()).optional(),
+  wallets: z.array(WalletEntrySchema).optional(),
+  isActive: z.boolean().optional(),
+  buyEnabled: z.boolean().optional(),
+  sellEnabled: z.boolean().optional(),
+  buyPrecision: z.number().int().min(0).max(8).optional(),
+  blockchainEnvironment: BlockchainEnvironmentType.default("testnet").optional(),
 });
+
+export const CreateAdminWalletRequestSchema = z.object({
+  cryptoId: z.string().uuid().describe("UUID of the cryptocurrency to create a wallet for"),
+  walletAddress: z.string().min(1).max(255).describe("Public address of the cryptocurrency wallet"),
+  walletLabel: z.string().min(1).max(100).optional().describe("Optional label for the wallet"),
+  walletType: z.enum(["SENDING", "RECEIVING"]),
+  blockchainEnvironment: BlockchainEnvironmentType.default("testnet").optional(),
+  isActive: z.boolean().default(true).optional(),
+  network: CryptoNetworkType,
+});
+
+export type WalletEntryType = z.infer<typeof WalletEntrySchema>;
+export type CreateAdminWalletRequestType = z.infer<typeof CreateAdminWalletRequestSchema>;
 
 export type SearchSupportedCryptoWalletRequestSchema = z.infer<typeof SearchSupportedCryptoWalletRequestSchema>;
 export type CreateSupportedCryptoAndAdminWalletRequestType = z.infer<typeof CreateSupportedCryptoAndAdminWalletRequestSchema>;

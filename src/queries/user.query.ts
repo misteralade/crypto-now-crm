@@ -7,36 +7,39 @@ import { userServiceApi } from '../api/user.api'
 import {  store } from '../store'
 import { QUERY_KEYS } from './querries.keys'
 import type {RootState} from '../store';
+import { bankServiceApi } from '../api/bank.api';
 
 export const useUserQuery = () => {
   const queryClient = useQueryClient()
   const matchRoute = useMatchRoute()
   const search = useSelector((state: RootState) => state.user.search.users)
+  const dashboardTimelineFilter = useSelector(
+    (state: RootState) => state.dashboard.timelineFilter,
+  )
 
   const { data: weeklyUserSummary, isLoading: loadingWeeklyUserSummary } =
     useQuery({
       queryKey: [
         QUERY_KEYS.USER.GET_WEEKLY_USER_STATS_SUMMARY,
-        (store.getState() as RootState).dashboard.timelineFilter,
+        dashboardTimelineFilter,
       ],
       queryFn: async () => {
-        const timeline = (store.getState() as RootState).dashboard
-          .timelineFilter
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if (!timeline) return null
+        if (!dashboardTimelineFilter) return null
 
-        const { data, success } =
-          await userServiceApi.getDashboardUserSummaryData({ timeline })
+        try {
+          const { data, success } =
+            await userServiceApi.getDashboardUserSummaryData({ timeline: dashboardTimelineFilter })
 
-        if (success) {
-          return data
+          if (success) {
+            return data
+          }
+        } catch {
+          return { activeUsersCount: 0, newUsersCount: 0, pendingPayoutsCount: 0 }
         }
 
         return null
       },
-      enabled:
-        !!matchRoute({ to: ROUTES.DASHBOARD }) &&
-        !!(store.getState() as RootState).dashboard.timelineFilter,
+      enabled: !!dashboardTimelineFilter,
     })
 
   const { data: adminSearchUsers, isLoading: loadingAdminSearchUsers } = useQuery({
@@ -96,7 +99,7 @@ export const useUserQuery = () => {
         return null
       },
       enabled:
-        (!!matchRoute({ to: ROUTES.USERS_DETAILS }) || !!matchRoute({ to: ROUTES.USER_TRANSACTIONS })) &&
+        !!matchRoute({ to: ROUTES.USERS_DETAILS }) &&
         !!(store.getState() as RootState).user.details.userId,
   });
 
@@ -192,6 +195,27 @@ export const useUserQuery = () => {
     },
   })
 
+  const adminUpdateUserBankAccountMutation = useMutation({
+    mutationKey: [QUERY_KEYS.BANK.UPDATE_USER_BANK_ACCOUNT],
+    mutationFn: async ({ userId, accountId, payload }: { userId: string; accountId: string; payload: { bankId: string; accountNumber: string } }) => {
+      return bankServiceApi.adminUpdateUserBankAccount(userId, accountId, payload)
+    },
+    onSuccess: (res, variables) => {
+      if (res?.success) {
+        toast.success('Bank account updated successfully.')
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.USER.GET_USER_PROFILE_SUMMARY, variables.userId],
+        })
+      } else if (res?.message) {
+        toast.error(res.message)
+      }
+      return res
+    },
+    onError: () => {
+      toast.error('Could not update this bank account. Check the details and try again.')
+    },
+  })
+
   return {
     // 🧩 Values
     weeklyUserSummary,
@@ -207,5 +231,6 @@ export const useUserQuery = () => {
     patchUserStatusMutation,
     adminResetPasswordMutation,
     adminUpdateUserProfileMutation,
+    adminUpdateUserBankAccountMutation,
   }
 }

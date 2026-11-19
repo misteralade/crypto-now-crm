@@ -1,5 +1,6 @@
 import {Fragment} from "react";
 import momentClient from "../../../../util/moment.ts";
+import { GitCommit, Clock, CheckCircle } from "lucide-react";
 
 interface TransactionDetailsPipelineProps {
   createdAt: Date;
@@ -9,46 +10,67 @@ interface TransactionDetailsPipelineProps {
   processedByLastName?: string;
 }
 
-const TransactionDetailsPipeline = ({ createdAt, updatedAt, processedAt, processedByFirstName, processedByLastName }: TransactionDetailsPipelineProps) => {
+const TransactionDetailsPipeline = ({
+  createdAt,
+  updatedAt,
+  processedAt,
+  processedByFirstName,
+  processedByLastName,
+}: TransactionDetailsPipelineProps) => {
   return (
     <Fragment>
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Timeline</h2>
-        <div className="space-y-4">
-          <div className="flex gap-3">
-            <div className="flex flex-col items-center">
-              <div className="w-3 h-3 rounded-full bg-indigo-600"></div>
-              <div className="w-0.5 h-full bg-gray-200"></div>
+      <div className="bg-white rounded-xl border border-slate-200/80 shadow-xs p-4">
+        <div className="flex items-center gap-2.5 pb-2.5 mb-3 border-b border-slate-100">
+          <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+            <Clock className="w-4 h-4" />
+          </div>
+          <div>
+            <h2 className="text-xs font-bold text-slate-900 tracking-tight">Timeline & Processing</h2>
+
+          </div>
+        </div>
+
+        <div className="relative pl-5 space-y-3 before:absolute before:left-1.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
+          <div className="relative">
+            <div className="absolute -left-5 top-0.5 w-3 h-3 rounded-full bg-blue-600 text-white flex items-center justify-center ring-4 ring-white">
+              <div className="w-1.5 h-1.5 rounded-full bg-white" />
             </div>
-            <div className="flex-1 pb-4">
-              <p className="text-sm font-medium text-gray-900">Created</p>
-              <p className="text-xs text-gray-500">{momentClient.formatToNormalisedDateAndTime(createdAt)}</p>
+            <div>
+              <p className="text-2xs font-semibold text-slate-900">Order Initiated</p>
+              <p className="text-2xs text-slate-500 mt-0.5">
+                {momentClient.formatToNormalisedDateAndTime(createdAt)}
+              </p>
             </div>
           </div>
-          
+
           {processedAt && (
-            <div className="flex gap-3">
-              <div className="flex flex-col items-center">
-                <div className="w-3 h-3 rounded-full bg-green-600"></div>
-                <div className="w-0.5 h-full bg-gray-200"></div>
+            <div className="relative">
+              <div className="absolute -left-5 top-0.5 w-3 h-3 rounded-full bg-emerald-600 text-white flex items-center justify-center ring-4 ring-white">
+                <CheckCircle className="w-2.5 h-2.5" />
               </div>
-              <div className="flex-1 pb-4">
-                <p className="text-sm font-medium text-gray-900">Processed</p>
-                <p className="text-xs text-gray-500">{momentClient.formatToNormalisedDateAndTime(processedAt)}</p>
-                {processedByFirstName || processedByLastName && (
-                  <p className="text-xs text-gray-400 mt-1">By: {processedByFirstName} {processedByLastName}</p>
+              <div>
+                <p className="text-2xs font-semibold text-slate-900">Settlement Processed</p>
+                <p className="text-2xs text-slate-500 mt-0.5">
+                  {momentClient.formatToNormalisedDateAndTime(processedAt)}
+                </p>
+                {(processedByFirstName || processedByLastName) && (
+                  <p className="text-2xs text-blue-600 font-medium mt-0.5">
+                    Operator: {processedByFirstName} {processedByLastName}
+                  </p>
                 )}
               </div>
             </div>
           )}
-          
-          <div className="flex gap-3">
-            <div className="flex flex-col items-center">
-              <div className="w-3 h-3 rounded-full bg-gray-400"></div>
+
+          <div className="relative">
+            <div className="absolute -left-5 top-0.5 w-3 h-3 rounded-full bg-slate-400 text-white flex items-center justify-center ring-4 ring-white">
+              <GitCommit className="w-2.5 h-2.5" />
             </div>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-gray-900">Last Updated</p>
-              <p className="text-xs text-gray-500">{momentClient.formatToNormalisedDateAndTime(updatedAt)}</p>
+            <div>
+              <p className="text-2xs font-semibold text-slate-900">Latest Status Update</p>
+              <p className="text-2xs text-slate-500 mt-0.5">
+                {momentClient.formatToNormalisedDateAndTime(updatedAt)}
+              </p>
             </div>
           </div>
         </div>
@@ -58,3 +80,5 @@ const TransactionDetailsPipeline = ({ createdAt, updatedAt, processedAt, process
 }
 
 export default TransactionDetailsPipeline;
+
+

@@ -1,6 +1,7 @@
 import {useNavigate, useParams} from "@tanstack/react-router";
 import {useEffect, useState} from "react";
 import {
+  clearEditDisputeId,
   clearEditDisputeStatusModalNote, clearEditDisputeStatusModalResolution, clearEditDisputeStatusModalStatus,
   setEditDisputeId,
   setEditDisputeStatusModalNote, setEditDisputeStatusModalResolution, setEditDisputeStatusModalStatus,
@@ -19,10 +20,11 @@ export const useEditDisputesPage = () => {
     loadingEditDisputeDetails,
     transactionDetails,
     loadingTransactionDetails,
-    
-    // Mutation
+    disputeMessages,
+    loadingDisputeMessages,
+    adminSendDisputeMutation,
     updateDisputeStatusMutation,
-  } = useDisputeQuery()
+  } = useDisputeQuery();
   
   const [statusNotes, setStatusNotes] = useState("");
   const [adminNotes, setAdminNotes] = useState("");
@@ -37,8 +39,11 @@ export const useEditDisputesPage = () => {
   
   useEffect(() => {
     if (id) {
-      dispatch(setEditDisputeId(id))
+      dispatch(setEditDisputeId(id));
     }
+    return () => {
+      dispatch(clearEditDisputeId());
+    };
   }, [id, dispatch]);
   
   const goBack = () => {
@@ -99,10 +104,13 @@ export const useEditDisputesPage = () => {
   
   return {
     // 🧩 Values
+    id,
     disputeDetails: editDisputeDetails,
     loadingDisputeDetails: loadingEditDisputeDetails,
     transactionDetails,
     loadingTransactionDetails,
+    disputeMessages,
+    loadingDisputeMessages,
     isEditingNotes,
     isUpdating,
     adminNotes,
@@ -112,6 +120,7 @@ export const useEditDisputesPage = () => {
     selectedResolution,
     
     // ⚙️ Functions
+    adminSendDisputeMutation,
     goBack,
     toggleEditDisputeNotes,
     toggleUpdating,

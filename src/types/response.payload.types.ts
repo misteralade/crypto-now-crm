@@ -57,7 +57,7 @@ export type SearchTransactionsResponse = {
   userId: string;
   sessionId: string;
   cryptocurrencyId: string;
-  exchangeRateId: string;
+  rateSnapshot: Record<string, any> | null;
   type: TransactionAction;
   amountCrypto: string;
   amountFiat: string;
@@ -79,6 +79,8 @@ export type SearchTransactionsResponse = {
   receiptImageUrl: string;
   adminCryptoWalletId: string;
   cryptoTxHash: string;
+  depositAddress?: string | null;
+  confirmationCount?: number;
   adminNotes: string;
   userNotes: string;
   internalNotes: string;
@@ -88,7 +90,9 @@ export type SearchTransactionsResponse = {
   usdAmount: number;
   createdAt: Date;
   updatedAt: Date;
-  
+  userType?: 'REGISTERED' | 'GUEST' | 'OTHER';
+  walletAddress?: string | null;
+  walletNetwork?: string | null;
 
   // Relations
   user?: UserResponsePayload;
@@ -101,7 +105,46 @@ export type SearchTransactionsResponse = {
   userCryptoWallet?: UserCryptoWalletResponsePayload;
   processor?: AdminResponsePayload;
   dispute?: DisputeDetailsResponse;
+  ledgerEntries?: LedgerEntryResponsePayload[];
 }
+
+export type AdminRetryPendingPayoutsResponse = {
+  retriedCount: number;
+  skippedCount: number;
+  warnings: string[];
+  requiresConfirmation: boolean;
+  forceProceed: boolean;
+};
+
+export type AdminRetryDepositConfirmationResponse = {
+  sessionId: string;
+  attemptNumber: number;
+};
+
+export type AdminForceTriggerPayoutResponse = {
+  warning?: string;
+  existingRailTransfer?: boolean;
+  railOutcome?: string;
+  reference?: string | null;
+} | null;
+
+export type PayoutAutoApprovalLimitResponsePayload = {
+  thresholdNgn: number;
+  isFallback: boolean;
+};
+
+export type PayoutAutoApprovalLimitAPIResponse =
+  BaseApiResponse<PayoutAutoApprovalLimitResponsePayload>;
+
+export type AdminTransactionStatsResponse = {
+  totalOrders: number;
+  payoutsSent: number;
+  completed: number;
+  payoutFailed: number;
+  inReview: number;
+  pendingPayout: number;
+  critical: number;
+};
 
 export type WeeklyTransactionVolume = {
   totalFiatVolume: string;
@@ -115,6 +158,21 @@ export type TransactionActivities = {
   adminId: string;
   action: string;
   message: string;
+  createdAt: Date;
+}
+
+export type LedgerEntryResponsePayload = {
+  id: string;
+  transactionId: string;
+  accountType: string;
+  entryType: string;
+  amount: string;
+  currency: string;
+  description: string;
+  userId: string | null;
+  referenceId: string | null;
+  referenceType: string | null;
+  runningBalance: string | null;
   createdAt: Date;
 }
 
@@ -210,6 +268,7 @@ export type UserResponsePayload = {
 export type DashboardUserStatsSummary = {
   newUsersCount: number;
   activeUsersCount: number;
+  pendingPayoutsCount?: number;
 };
 
 export type SummarisedUserProfileResponsePayload = {
@@ -276,9 +335,22 @@ export type SearchSupportedCryptoData = {
   buyRate: string;
   sellRate: string;
   isActive: boolean;
+  buyEnabled: boolean;
+  sellEnabled: boolean;
+  buyPrecision: number | null;
   websiteUrl: string;
   whitepaperUrl: string;
+  networks: string[];
+  blockchainEnvironment: "testnet" | "mainnet";
   adminCryptoWallets: Array<AdminCryptoWalletResponsePayload>;
+};
+
+export type SupportedExchangeRateResponse = {
+  fiatRate: number;
+  coinGeckoRate: number;
+  currency: string;
+  platformRate: number;
+  usdRate: number;
 };
 
 export type AdminCryptoWalletResponsePayload = {
@@ -287,6 +359,12 @@ export type AdminCryptoWalletResponsePayload = {
   walletAddress: string;
   isActive: string;
   network: string;
+  walletType?: string;
+  derivationPath?: string;
+  walletLabel?: string;
+  cachedBalance?: string | number;
+  cachedBalanceUpdatedAt?: string | null;
+  blockchainEnvironment: "testnet" | "mainnet";
   createdAt: Date;
 }
 
@@ -294,11 +372,88 @@ export type UserCryptoWalletResponsePayload = {
   id: string;
   userId: string;
   walletAddress: string;
+  walletLabel?: string | null;
   network: string;
   isPrimary: boolean;
   isVerified: boolean;
   createdAt: Date;
+  cryptocurrency?: {
+    id?: string;
+    symbol?: string;
+    name?: string;
+  };
 }
+
+export type CustodialWalletResponsePayload = {
+  id: string;
+  userId: string;
+  cryptocurrencyId: string;
+  network: string;
+  blockchainEnvironment: "testnet" | "mainnet";
+  walletAddress: string;
+  derivationIndex: number;
+  derivationPath: string | null;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type AdminGetUserCustodialWalletsAPIResponse = BaseApiResponse<Array<CustodialWalletResponsePayload>>
+
+export type AdminCustodialWalletDetailsResponsePayload = {
+  wallet: {
+    id: string;
+    userId: string;
+    cryptocurrencyId: string;
+    network: string;
+    blockchainEnvironment: "testnet" | "mainnet";
+    walletPurpose: string;
+    walletAddress: string;
+    derivationIndex: number;
+    derivationPath: string | null;
+    webhookProvider: string;
+    isActive: boolean;
+    leasedTransactionId: string | null;
+    leaseStartedAt: Date | null;
+    leaseExpiresAt: Date | null;
+    lastLeaseReleasedAt: Date | null;
+    lastDepositAt: Date | null;
+    totalDepositsCount: number;
+    cachedBalance: string;
+    cachedBalanceUpdatedAt: Date | null;
+    cachedBalanceSource: string;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+  user: UserResponsePayload | null;
+  cryptocurrency: {
+    id: string;
+    name: string;
+    symbol: string;
+    logoUrl: string | null;
+    networks: string[];
+    isActive: boolean;
+    buyRate: string;
+    sellRate: string;
+    createdAt: Date;
+  } | null;
+}
+
+export type AdminCustodialWalletDetailsAPIResponse = BaseApiResponse<AdminCustodialWalletDetailsResponsePayload>
+export type AdminTreasuryWalletsAPIResponse = BaseApiResponse<Array<AdminCustodialWalletDetailsResponsePayload>>
+
+export type RefreshCustodialWalletBalanceResponsePayload = {
+  walletAddress: string;
+  cachedBalance: string;
+  cachedBalanceUpdatedAt: Date;
+  cachedBalanceSource: string;
+}
+
+export type RefreshCustodialWalletBalanceAPIResponse = BaseApiResponse<RefreshCustodialWalletBalanceResponsePayload>
+
+export type AdminGetUserCryptoWalletsAPIResponse = BaseApiResponse<Array<UserCryptoWalletResponsePayload>>
+
+export type AdminGenerateUserCustodialWalletsAPIResponse = BaseApiResponse<Array<CustodialWalletResponsePayload>>
 // End Crypto
 
 // Start Upload
@@ -325,7 +480,6 @@ export type ExchangeRateResponsePayload = {
   platformRate: string;
   rate: string;
   action: string;
-  validUntil: Date;
   createdAt: Date;
 }
 // End Exchange Rate
@@ -347,12 +501,11 @@ export type SupportedPlatformBankAccountResponse = {
   id: string;
   name: string;
   logoUrl: string;
+  bankCode: string;
 }
 
 export type AdminBankAccountResponsePayload = {
   id: string;
-  bankName: string;
-  bankLogo: string;
   accountNumber: string;
   accountHolderName: string;
   isActive: boolean
@@ -362,16 +515,18 @@ export type AdminBankAccountResponsePayload = {
   type: string;
   label: string;
   createdAt: Date;
+  bank: SupportedPlatformBankAccountResponse;
 }
 
 export type UserBankAccountResponsePayload = {
   id: string;
   userId: string;
-  bankName: string;
-  bankLogo: string;
   accountName: string;
   accountNumber: string;
+  isDeleted: boolean;
+  isDefault: boolean;
   createdAt: Date;
+  bank: SupportedPlatformBankAccountResponse;
 }
 // End Bank Accounts
 
@@ -379,6 +534,14 @@ export type UserBankAccountResponsePayload = {
 export type AdminGetAllPermissionsAPIResponse = BaseApiResponse<Array<AdminPermissionResponsePayload>>;
 
 export type AdminGetAllRolesAPIResponse = BaseApiResponse<Array<RolesResponsePayload>>;
+
+export type RoleCatalogueItem = {
+  id: string;
+  name: string;
+  description: string | null;
+  isBuiltIn: boolean;
+  permissions: Array<{ id: string; code: string; description: string | null }>;
+};
 
 export type SearchAdminsAPIResponse = BaseApiResponse<AdminSearchAdminsResponse>;
 
@@ -596,3 +759,43 @@ export type GetTestimonialsAPIResponse = BaseApiResponse<{
 
 export type GetTestimonialDetailsAPIResponse = BaseApiResponse<TestimonialResponsePayload>;
 // End Testimonial
+
+// Start KYC Tier Limits
+export type KycTierLimitResponsePayload = {
+  id: string;
+  kycTier: 'GUEST' | 'VERIFIED';
+  currencyCode: string;
+  minTransactionAmount: string;
+  maxTransactionAmount: string;
+  dailyLimit: string;
+  monthlyLimit: string;
+  maxPayoutAttempts: number;
+  requiredConfirmationsBTC: number;
+  requiredConfirmationsSOL: number;
+  requiredConfirmationsTRC20: number;
+  isActive: boolean;
+  updatedBy: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type GetAllKycTierLimitsAPIResponse = BaseApiResponse<KycTierLimitResponsePayload[]>;
+export type CreateKycTierLimitAPIResponse = BaseApiResponse<null>;
+// End KYC Tier Limits
+
+// Start Supported Currency
+export type SupportedCurrencyResponsePayload = {
+  id: string;
+  name: string;
+  code: string;
+  description: string | null;
+  isActive: boolean;
+  logoUrl: string | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  additionalInfo: Record<string, any> | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type GetAllCurrenciesAPIResponse = BaseApiResponse<SupportedCurrencyResponsePayload[]>;
+// End Supported Currency

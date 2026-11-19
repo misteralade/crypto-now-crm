@@ -9,27 +9,45 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as Verify2faRouteImport } from './routes/verify-2fa'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardTestimonialsRouteImport } from './routes/dashboard/testimonials'
+import { Route as DashboardSupportedCurrenciesRouteImport } from './routes/dashboard/supported-currencies'
+import { Route as DashboardReviewsRouteImport } from './routes/dashboard/reviews'
 import { Route as DashboardNotificationsRouteImport } from './routes/dashboard/notifications'
 import { Route as DashboardManageFiatRouteImport } from './routes/dashboard/manage-fiat'
 import { Route as DashboardManageAdminsRouteImport } from './routes/dashboard/manage-admins'
+import { Route as DashboardKycTierLimitsRouteImport } from './routes/dashboard/kyc-tier-limits'
 import { Route as DashboardAuditTrailsRouteImport } from './routes/dashboard/audit-trails'
 import { Route as DashboardUsersIndexRouteImport } from './routes/dashboard/users/index'
+import { Route as DashboardTreasuryIndexRouteImport } from './routes/dashboard/treasury/index'
 import { Route as DashboardTransactionsIndexRouteImport } from './routes/dashboard/transactions/index'
+import { Route as DashboardKycSessionsIndexRouteImport } from './routes/dashboard/kyc-sessions/index'
 import { Route as DashboardDisputesIndexRouteImport } from './routes/dashboard/disputes/index'
 import { Route as DashboardCoinManagementIndexRouteImport } from './routes/dashboard/coin-management/index'
-import { Route as DashboardUsersUserIdRouteImport } from './routes/dashboard/users/$userId'
-import { Route as DashboardTransactionsIdRouteImport } from './routes/dashboard/transactions/$id'
-import { Route as DashboardDisputesIdRouteImport } from './routes/dashboard/disputes/$id'
+import { Route as DashboardAdminWalletsIndexRouteImport } from './routes/dashboard/admin-wallets/index'
+import { Route as DashboardUserUserIdRouteImport } from './routes/dashboard/user/$userId'
+import { Route as DashboardTreasuryWalletsRouteImport } from './routes/dashboard/treasury/wallets'
+import { Route as DashboardTreasurySweepIdRouteImport } from './routes/dashboard/treasury/$sweepId'
+import { Route as DashboardTransactionIdRouteImport } from './routes/dashboard/transaction/$id'
+import { Route as DashboardManageAdminsAdminIdRouteImport } from './routes/dashboard/manage-admins/$adminId'
+import { Route as DashboardKycSessionIdRouteImport } from './routes/dashboard/kyc-session/$id'
+import { Route as DashboardDisputeIdRouteImport } from './routes/dashboard/dispute/$id'
+import { Route as DashboardCustodialWalletWalletAddressRouteImport } from './routes/dashboard/custodial-wallet/$walletAddress'
 import { Route as DashboardCoinManagementAddCoinRouteImport } from './routes/dashboard/coin-management/add-coin'
 import { Route as DashboardCoinManagementCoinIdRouteImport } from './routes/dashboard/coin-management/$coinId'
-import { Route as DashboardUsersTransactionHistoryUserIdRouteImport } from './routes/dashboard/users/transaction-history/$userId'
 import { Route as DashboardDisputesEditIdRouteImport } from './routes/dashboard/disputes/edit/$id'
+import { Route as DashboardAdminWalletsEditWalletIdRouteImport } from './routes/dashboard/admin-wallets/edit.$walletId'
+import { Route as DashboardAdminWalletsAddWalletTypeRouteImport } from './routes/dashboard/admin-wallets/add.$walletType'
 
+const Verify2faRoute = Verify2faRouteImport.update({
+  id: '/verify-2fa',
+  path: '/verify-2fa',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
@@ -55,6 +73,17 @@ const DashboardTestimonialsRoute = DashboardTestimonialsRouteImport.update({
   path: '/dashboard/testimonials',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardSupportedCurrenciesRoute =
+  DashboardSupportedCurrenciesRouteImport.update({
+    id: '/dashboard/supported-currencies',
+    path: '/dashboard/supported-currencies',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DashboardReviewsRoute = DashboardReviewsRouteImport.update({
+  id: '/dashboard/reviews',
+  path: '/dashboard/reviews',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardNotificationsRoute = DashboardNotificationsRouteImport.update({
   id: '/dashboard/notifications',
   path: '/dashboard/notifications',
@@ -70,6 +99,11 @@ const DashboardManageAdminsRoute = DashboardManageAdminsRouteImport.update({
   path: '/dashboard/manage-admins',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardKycTierLimitsRoute = DashboardKycTierLimitsRouteImport.update({
+  id: '/dashboard/kyc-tier-limits',
+  path: '/dashboard/kyc-tier-limits',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardAuditTrailsRoute = DashboardAuditTrailsRouteImport.update({
   id: '/dashboard/audit-trails',
   path: '/dashboard/audit-trails',
@@ -80,10 +114,21 @@ const DashboardUsersIndexRoute = DashboardUsersIndexRouteImport.update({
   path: '/dashboard/users/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardTreasuryIndexRoute = DashboardTreasuryIndexRouteImport.update({
+  id: '/dashboard/treasury/',
+  path: '/dashboard/treasury/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardTransactionsIndexRoute =
   DashboardTransactionsIndexRouteImport.update({
     id: '/dashboard/transactions/',
     path: '/dashboard/transactions/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DashboardKycSessionsIndexRoute =
+  DashboardKycSessionsIndexRouteImport.update({
+    id: '/dashboard/kyc-sessions/',
+    path: '/dashboard/kyc-sessions/',
     getParentRoute: () => rootRouteImport,
   } as any)
 const DashboardDisputesIndexRoute = DashboardDisputesIndexRouteImport.update({
@@ -97,21 +142,56 @@ const DashboardCoinManagementIndexRoute =
     path: '/dashboard/coin-management/',
     getParentRoute: () => rootRouteImport,
   } as any)
-const DashboardUsersUserIdRoute = DashboardUsersUserIdRouteImport.update({
-  id: '/dashboard/users/$userId',
-  path: '/dashboard/users/$userId',
+const DashboardAdminWalletsIndexRoute =
+  DashboardAdminWalletsIndexRouteImport.update({
+    id: '/dashboard/admin-wallets/',
+    path: '/dashboard/admin-wallets/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DashboardUserUserIdRoute = DashboardUserUserIdRouteImport.update({
+  id: '/dashboard/user/$userId',
+  path: '/dashboard/user/$userId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardTransactionsIdRoute = DashboardTransactionsIdRouteImport.update({
-  id: '/dashboard/transactions/$id',
-  path: '/dashboard/transactions/$id',
+const DashboardTreasuryWalletsRoute =
+  DashboardTreasuryWalletsRouteImport.update({
+    id: '/dashboard/treasury/wallets',
+    path: '/dashboard/treasury/wallets',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DashboardTreasurySweepIdRoute =
+  DashboardTreasurySweepIdRouteImport.update({
+    id: '/dashboard/treasury/$sweepId',
+    path: '/dashboard/treasury/$sweepId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DashboardTransactionIdRoute = DashboardTransactionIdRouteImport.update({
+  id: '/dashboard/transaction/$id',
+  path: '/dashboard/transaction/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardDisputesIdRoute = DashboardDisputesIdRouteImport.update({
-  id: '/dashboard/disputes/$id',
-  path: '/dashboard/disputes/$id',
+const DashboardManageAdminsAdminIdRoute =
+  DashboardManageAdminsAdminIdRouteImport.update({
+    id: '/$adminId',
+    path: '/$adminId',
+    getParentRoute: () => DashboardManageAdminsRoute,
+  } as any)
+const DashboardKycSessionIdRoute = DashboardKycSessionIdRouteImport.update({
+  id: '/dashboard/kyc-session/$id',
+  path: '/dashboard/kyc-session/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardDisputeIdRoute = DashboardDisputeIdRouteImport.update({
+  id: '/dashboard/dispute/$id',
+  path: '/dashboard/dispute/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardCustodialWalletWalletAddressRoute =
+  DashboardCustodialWalletWalletAddressRouteImport.update({
+    id: '/dashboard/custodial-wallet/$walletAddress',
+    path: '/dashboard/custodial-wallet/$walletAddress',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DashboardCoinManagementAddCoinRoute =
   DashboardCoinManagementAddCoinRouteImport.update({
     id: '/dashboard/coin-management/add-coin',
@@ -124,84 +204,129 @@ const DashboardCoinManagementCoinIdRoute =
     path: '/dashboard/coin-management/$coinId',
     getParentRoute: () => rootRouteImport,
   } as any)
-const DashboardUsersTransactionHistoryUserIdRoute =
-  DashboardUsersTransactionHistoryUserIdRouteImport.update({
-    id: '/dashboard/users/transaction-history/$userId',
-    path: '/dashboard/users/transaction-history/$userId',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const DashboardDisputesEditIdRoute = DashboardDisputesEditIdRouteImport.update({
   id: '/dashboard/disputes/edit/$id',
   path: '/dashboard/disputes/edit/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardAdminWalletsEditWalletIdRoute =
+  DashboardAdminWalletsEditWalletIdRouteImport.update({
+    id: '/dashboard/admin-wallets/edit/$walletId',
+    path: '/dashboard/admin-wallets/edit/$walletId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DashboardAdminWalletsAddWalletTypeRoute =
+  DashboardAdminWalletsAddWalletTypeRouteImport.update({
+    id: '/dashboard/admin-wallets/add/$walletType',
+    path: '/dashboard/admin-wallets/add/$walletType',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/verify-2fa': typeof Verify2faRoute
   '/dashboard/audit-trails': typeof DashboardAuditTrailsRoute
-  '/dashboard/manage-admins': typeof DashboardManageAdminsRoute
+  '/dashboard/kyc-tier-limits': typeof DashboardKycTierLimitsRoute
+  '/dashboard/manage-admins': typeof DashboardManageAdminsRouteWithChildren
   '/dashboard/manage-fiat': typeof DashboardManageFiatRoute
   '/dashboard/notifications': typeof DashboardNotificationsRoute
+  '/dashboard/reviews': typeof DashboardReviewsRoute
+  '/dashboard/supported-currencies': typeof DashboardSupportedCurrenciesRoute
   '/dashboard/testimonials': typeof DashboardTestimonialsRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/coin-management/$coinId': typeof DashboardCoinManagementCoinIdRoute
   '/dashboard/coin-management/add-coin': typeof DashboardCoinManagementAddCoinRoute
-  '/dashboard/disputes/$id': typeof DashboardDisputesIdRoute
-  '/dashboard/transactions/$id': typeof DashboardTransactionsIdRoute
-  '/dashboard/users/$userId': typeof DashboardUsersUserIdRoute
+  '/dashboard/custodial-wallet/$walletAddress': typeof DashboardCustodialWalletWalletAddressRoute
+  '/dashboard/dispute/$id': typeof DashboardDisputeIdRoute
+  '/dashboard/kyc-session/$id': typeof DashboardKycSessionIdRoute
+  '/dashboard/manage-admins/$adminId': typeof DashboardManageAdminsAdminIdRoute
+  '/dashboard/transaction/$id': typeof DashboardTransactionIdRoute
+  '/dashboard/treasury/$sweepId': typeof DashboardTreasurySweepIdRoute
+  '/dashboard/treasury/wallets': typeof DashboardTreasuryWalletsRoute
+  '/dashboard/user/$userId': typeof DashboardUserUserIdRoute
+  '/dashboard/admin-wallets/': typeof DashboardAdminWalletsIndexRoute
   '/dashboard/coin-management/': typeof DashboardCoinManagementIndexRoute
   '/dashboard/disputes/': typeof DashboardDisputesIndexRoute
+  '/dashboard/kyc-sessions/': typeof DashboardKycSessionsIndexRoute
   '/dashboard/transactions/': typeof DashboardTransactionsIndexRoute
+  '/dashboard/treasury/': typeof DashboardTreasuryIndexRoute
   '/dashboard/users/': typeof DashboardUsersIndexRoute
+  '/dashboard/admin-wallets/add/$walletType': typeof DashboardAdminWalletsAddWalletTypeRoute
+  '/dashboard/admin-wallets/edit/$walletId': typeof DashboardAdminWalletsEditWalletIdRoute
   '/dashboard/disputes/edit/$id': typeof DashboardDisputesEditIdRoute
-  '/dashboard/users/transaction-history/$userId': typeof DashboardUsersTransactionHistoryUserIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/verify-2fa': typeof Verify2faRoute
   '/dashboard/audit-trails': typeof DashboardAuditTrailsRoute
-  '/dashboard/manage-admins': typeof DashboardManageAdminsRoute
+  '/dashboard/kyc-tier-limits': typeof DashboardKycTierLimitsRoute
+  '/dashboard/manage-admins': typeof DashboardManageAdminsRouteWithChildren
   '/dashboard/manage-fiat': typeof DashboardManageFiatRoute
   '/dashboard/notifications': typeof DashboardNotificationsRoute
+  '/dashboard/reviews': typeof DashboardReviewsRoute
+  '/dashboard/supported-currencies': typeof DashboardSupportedCurrenciesRoute
   '/dashboard/testimonials': typeof DashboardTestimonialsRoute
   '/dashboard': typeof DashboardIndexRoute
   '/dashboard/coin-management/$coinId': typeof DashboardCoinManagementCoinIdRoute
   '/dashboard/coin-management/add-coin': typeof DashboardCoinManagementAddCoinRoute
-  '/dashboard/disputes/$id': typeof DashboardDisputesIdRoute
-  '/dashboard/transactions/$id': typeof DashboardTransactionsIdRoute
-  '/dashboard/users/$userId': typeof DashboardUsersUserIdRoute
+  '/dashboard/custodial-wallet/$walletAddress': typeof DashboardCustodialWalletWalletAddressRoute
+  '/dashboard/dispute/$id': typeof DashboardDisputeIdRoute
+  '/dashboard/kyc-session/$id': typeof DashboardKycSessionIdRoute
+  '/dashboard/manage-admins/$adminId': typeof DashboardManageAdminsAdminIdRoute
+  '/dashboard/transaction/$id': typeof DashboardTransactionIdRoute
+  '/dashboard/treasury/$sweepId': typeof DashboardTreasurySweepIdRoute
+  '/dashboard/treasury/wallets': typeof DashboardTreasuryWalletsRoute
+  '/dashboard/user/$userId': typeof DashboardUserUserIdRoute
+  '/dashboard/admin-wallets': typeof DashboardAdminWalletsIndexRoute
   '/dashboard/coin-management': typeof DashboardCoinManagementIndexRoute
   '/dashboard/disputes': typeof DashboardDisputesIndexRoute
+  '/dashboard/kyc-sessions': typeof DashboardKycSessionsIndexRoute
   '/dashboard/transactions': typeof DashboardTransactionsIndexRoute
+  '/dashboard/treasury': typeof DashboardTreasuryIndexRoute
   '/dashboard/users': typeof DashboardUsersIndexRoute
+  '/dashboard/admin-wallets/add/$walletType': typeof DashboardAdminWalletsAddWalletTypeRoute
+  '/dashboard/admin-wallets/edit/$walletId': typeof DashboardAdminWalletsEditWalletIdRoute
   '/dashboard/disputes/edit/$id': typeof DashboardDisputesEditIdRoute
-  '/dashboard/users/transaction-history/$userId': typeof DashboardUsersTransactionHistoryUserIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/verify-2fa': typeof Verify2faRoute
   '/dashboard/audit-trails': typeof DashboardAuditTrailsRoute
-  '/dashboard/manage-admins': typeof DashboardManageAdminsRoute
+  '/dashboard/kyc-tier-limits': typeof DashboardKycTierLimitsRoute
+  '/dashboard/manage-admins': typeof DashboardManageAdminsRouteWithChildren
   '/dashboard/manage-fiat': typeof DashboardManageFiatRoute
   '/dashboard/notifications': typeof DashboardNotificationsRoute
+  '/dashboard/reviews': typeof DashboardReviewsRoute
+  '/dashboard/supported-currencies': typeof DashboardSupportedCurrenciesRoute
   '/dashboard/testimonials': typeof DashboardTestimonialsRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/coin-management/$coinId': typeof DashboardCoinManagementCoinIdRoute
   '/dashboard/coin-management/add-coin': typeof DashboardCoinManagementAddCoinRoute
-  '/dashboard/disputes/$id': typeof DashboardDisputesIdRoute
-  '/dashboard/transactions/$id': typeof DashboardTransactionsIdRoute
-  '/dashboard/users/$userId': typeof DashboardUsersUserIdRoute
+  '/dashboard/custodial-wallet/$walletAddress': typeof DashboardCustodialWalletWalletAddressRoute
+  '/dashboard/dispute/$id': typeof DashboardDisputeIdRoute
+  '/dashboard/kyc-session/$id': typeof DashboardKycSessionIdRoute
+  '/dashboard/manage-admins/$adminId': typeof DashboardManageAdminsAdminIdRoute
+  '/dashboard/transaction/$id': typeof DashboardTransactionIdRoute
+  '/dashboard/treasury/$sweepId': typeof DashboardTreasurySweepIdRoute
+  '/dashboard/treasury/wallets': typeof DashboardTreasuryWalletsRoute
+  '/dashboard/user/$userId': typeof DashboardUserUserIdRoute
+  '/dashboard/admin-wallets/': typeof DashboardAdminWalletsIndexRoute
   '/dashboard/coin-management/': typeof DashboardCoinManagementIndexRoute
   '/dashboard/disputes/': typeof DashboardDisputesIndexRoute
+  '/dashboard/kyc-sessions/': typeof DashboardKycSessionsIndexRoute
   '/dashboard/transactions/': typeof DashboardTransactionsIndexRoute
+  '/dashboard/treasury/': typeof DashboardTreasuryIndexRoute
   '/dashboard/users/': typeof DashboardUsersIndexRoute
+  '/dashboard/admin-wallets/add/$walletType': typeof DashboardAdminWalletsAddWalletTypeRoute
+  '/dashboard/admin-wallets/edit/$walletId': typeof DashboardAdminWalletsEditWalletIdRoute
   '/dashboard/disputes/edit/$id': typeof DashboardDisputesEditIdRoute
-  '/dashboard/users/transaction-history/$userId': typeof DashboardUsersTransactionHistoryUserIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -209,94 +334,152 @@ export interface FileRouteTypes {
     | '/'
     | '/forgot-password'
     | '/reset-password'
+    | '/verify-2fa'
     | '/dashboard/audit-trails'
+    | '/dashboard/kyc-tier-limits'
     | '/dashboard/manage-admins'
     | '/dashboard/manage-fiat'
     | '/dashboard/notifications'
+    | '/dashboard/reviews'
+    | '/dashboard/supported-currencies'
     | '/dashboard/testimonials'
     | '/dashboard/'
     | '/dashboard/coin-management/$coinId'
     | '/dashboard/coin-management/add-coin'
-    | '/dashboard/disputes/$id'
-    | '/dashboard/transactions/$id'
-    | '/dashboard/users/$userId'
+    | '/dashboard/custodial-wallet/$walletAddress'
+    | '/dashboard/dispute/$id'
+    | '/dashboard/kyc-session/$id'
+    | '/dashboard/manage-admins/$adminId'
+    | '/dashboard/transaction/$id'
+    | '/dashboard/treasury/$sweepId'
+    | '/dashboard/treasury/wallets'
+    | '/dashboard/user/$userId'
+    | '/dashboard/admin-wallets/'
     | '/dashboard/coin-management/'
     | '/dashboard/disputes/'
+    | '/dashboard/kyc-sessions/'
     | '/dashboard/transactions/'
+    | '/dashboard/treasury/'
     | '/dashboard/users/'
+    | '/dashboard/admin-wallets/add/$walletType'
+    | '/dashboard/admin-wallets/edit/$walletId'
     | '/dashboard/disputes/edit/$id'
-    | '/dashboard/users/transaction-history/$userId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/forgot-password'
     | '/reset-password'
+    | '/verify-2fa'
     | '/dashboard/audit-trails'
+    | '/dashboard/kyc-tier-limits'
     | '/dashboard/manage-admins'
     | '/dashboard/manage-fiat'
     | '/dashboard/notifications'
+    | '/dashboard/reviews'
+    | '/dashboard/supported-currencies'
     | '/dashboard/testimonials'
     | '/dashboard'
     | '/dashboard/coin-management/$coinId'
     | '/dashboard/coin-management/add-coin'
-    | '/dashboard/disputes/$id'
-    | '/dashboard/transactions/$id'
-    | '/dashboard/users/$userId'
+    | '/dashboard/custodial-wallet/$walletAddress'
+    | '/dashboard/dispute/$id'
+    | '/dashboard/kyc-session/$id'
+    | '/dashboard/manage-admins/$adminId'
+    | '/dashboard/transaction/$id'
+    | '/dashboard/treasury/$sweepId'
+    | '/dashboard/treasury/wallets'
+    | '/dashboard/user/$userId'
+    | '/dashboard/admin-wallets'
     | '/dashboard/coin-management'
     | '/dashboard/disputes'
+    | '/dashboard/kyc-sessions'
     | '/dashboard/transactions'
+    | '/dashboard/treasury'
     | '/dashboard/users'
+    | '/dashboard/admin-wallets/add/$walletType'
+    | '/dashboard/admin-wallets/edit/$walletId'
     | '/dashboard/disputes/edit/$id'
-    | '/dashboard/users/transaction-history/$userId'
   id:
     | '__root__'
     | '/'
     | '/forgot-password'
     | '/reset-password'
+    | '/verify-2fa'
     | '/dashboard/audit-trails'
+    | '/dashboard/kyc-tier-limits'
     | '/dashboard/manage-admins'
     | '/dashboard/manage-fiat'
     | '/dashboard/notifications'
+    | '/dashboard/reviews'
+    | '/dashboard/supported-currencies'
     | '/dashboard/testimonials'
     | '/dashboard/'
     | '/dashboard/coin-management/$coinId'
     | '/dashboard/coin-management/add-coin'
-    | '/dashboard/disputes/$id'
-    | '/dashboard/transactions/$id'
-    | '/dashboard/users/$userId'
+    | '/dashboard/custodial-wallet/$walletAddress'
+    | '/dashboard/dispute/$id'
+    | '/dashboard/kyc-session/$id'
+    | '/dashboard/manage-admins/$adminId'
+    | '/dashboard/transaction/$id'
+    | '/dashboard/treasury/$sweepId'
+    | '/dashboard/treasury/wallets'
+    | '/dashboard/user/$userId'
+    | '/dashboard/admin-wallets/'
     | '/dashboard/coin-management/'
     | '/dashboard/disputes/'
+    | '/dashboard/kyc-sessions/'
     | '/dashboard/transactions/'
+    | '/dashboard/treasury/'
     | '/dashboard/users/'
+    | '/dashboard/admin-wallets/add/$walletType'
+    | '/dashboard/admin-wallets/edit/$walletId'
     | '/dashboard/disputes/edit/$id'
-    | '/dashboard/users/transaction-history/$userId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  Verify2faRoute: typeof Verify2faRoute
   DashboardAuditTrailsRoute: typeof DashboardAuditTrailsRoute
-  DashboardManageAdminsRoute: typeof DashboardManageAdminsRoute
+  DashboardKycTierLimitsRoute: typeof DashboardKycTierLimitsRoute
+  DashboardManageAdminsRoute: typeof DashboardManageAdminsRouteWithChildren
   DashboardManageFiatRoute: typeof DashboardManageFiatRoute
   DashboardNotificationsRoute: typeof DashboardNotificationsRoute
+  DashboardReviewsRoute: typeof DashboardReviewsRoute
+  DashboardSupportedCurrenciesRoute: typeof DashboardSupportedCurrenciesRoute
   DashboardTestimonialsRoute: typeof DashboardTestimonialsRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardCoinManagementCoinIdRoute: typeof DashboardCoinManagementCoinIdRoute
   DashboardCoinManagementAddCoinRoute: typeof DashboardCoinManagementAddCoinRoute
-  DashboardDisputesIdRoute: typeof DashboardDisputesIdRoute
-  DashboardTransactionsIdRoute: typeof DashboardTransactionsIdRoute
-  DashboardUsersUserIdRoute: typeof DashboardUsersUserIdRoute
+  DashboardCustodialWalletWalletAddressRoute: typeof DashboardCustodialWalletWalletAddressRoute
+  DashboardDisputeIdRoute: typeof DashboardDisputeIdRoute
+  DashboardKycSessionIdRoute: typeof DashboardKycSessionIdRoute
+  DashboardTransactionIdRoute: typeof DashboardTransactionIdRoute
+  DashboardTreasurySweepIdRoute: typeof DashboardTreasurySweepIdRoute
+  DashboardTreasuryWalletsRoute: typeof DashboardTreasuryWalletsRoute
+  DashboardUserUserIdRoute: typeof DashboardUserUserIdRoute
+  DashboardAdminWalletsIndexRoute: typeof DashboardAdminWalletsIndexRoute
   DashboardCoinManagementIndexRoute: typeof DashboardCoinManagementIndexRoute
   DashboardDisputesIndexRoute: typeof DashboardDisputesIndexRoute
+  DashboardKycSessionsIndexRoute: typeof DashboardKycSessionsIndexRoute
   DashboardTransactionsIndexRoute: typeof DashboardTransactionsIndexRoute
+  DashboardTreasuryIndexRoute: typeof DashboardTreasuryIndexRoute
   DashboardUsersIndexRoute: typeof DashboardUsersIndexRoute
+  DashboardAdminWalletsAddWalletTypeRoute: typeof DashboardAdminWalletsAddWalletTypeRoute
+  DashboardAdminWalletsEditWalletIdRoute: typeof DashboardAdminWalletsEditWalletIdRoute
   DashboardDisputesEditIdRoute: typeof DashboardDisputesEditIdRoute
-  DashboardUsersTransactionHistoryUserIdRoute: typeof DashboardUsersTransactionHistoryUserIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/verify-2fa': {
+      id: '/verify-2fa'
+      path: '/verify-2fa'
+      fullPath: '/verify-2fa'
+      preLoaderRoute: typeof Verify2faRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset-password': {
       id: '/reset-password'
       path: '/reset-password'
@@ -332,6 +515,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardTestimonialsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/supported-currencies': {
+      id: '/dashboard/supported-currencies'
+      path: '/dashboard/supported-currencies'
+      fullPath: '/dashboard/supported-currencies'
+      preLoaderRoute: typeof DashboardSupportedCurrenciesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/reviews': {
+      id: '/dashboard/reviews'
+      path: '/dashboard/reviews'
+      fullPath: '/dashboard/reviews'
+      preLoaderRoute: typeof DashboardReviewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard/notifications': {
       id: '/dashboard/notifications'
       path: '/dashboard/notifications'
@@ -353,6 +550,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardManageAdminsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/kyc-tier-limits': {
+      id: '/dashboard/kyc-tier-limits'
+      path: '/dashboard/kyc-tier-limits'
+      fullPath: '/dashboard/kyc-tier-limits'
+      preLoaderRoute: typeof DashboardKycTierLimitsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard/audit-trails': {
       id: '/dashboard/audit-trails'
       path: '/dashboard/audit-trails'
@@ -367,11 +571,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardUsersIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/treasury/': {
+      id: '/dashboard/treasury/'
+      path: '/dashboard/treasury'
+      fullPath: '/dashboard/treasury/'
+      preLoaderRoute: typeof DashboardTreasuryIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard/transactions/': {
       id: '/dashboard/transactions/'
       path: '/dashboard/transactions'
       fullPath: '/dashboard/transactions/'
       preLoaderRoute: typeof DashboardTransactionsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/kyc-sessions/': {
+      id: '/dashboard/kyc-sessions/'
+      path: '/dashboard/kyc-sessions'
+      fullPath: '/dashboard/kyc-sessions/'
+      preLoaderRoute: typeof DashboardKycSessionsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/disputes/': {
@@ -388,25 +606,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardCoinManagementIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/users/$userId': {
-      id: '/dashboard/users/$userId'
-      path: '/dashboard/users/$userId'
-      fullPath: '/dashboard/users/$userId'
-      preLoaderRoute: typeof DashboardUsersUserIdRouteImport
+    '/dashboard/admin-wallets/': {
+      id: '/dashboard/admin-wallets/'
+      path: '/dashboard/admin-wallets'
+      fullPath: '/dashboard/admin-wallets/'
+      preLoaderRoute: typeof DashboardAdminWalletsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/transactions/$id': {
-      id: '/dashboard/transactions/$id'
-      path: '/dashboard/transactions/$id'
-      fullPath: '/dashboard/transactions/$id'
-      preLoaderRoute: typeof DashboardTransactionsIdRouteImport
+    '/dashboard/user/$userId': {
+      id: '/dashboard/user/$userId'
+      path: '/dashboard/user/$userId'
+      fullPath: '/dashboard/user/$userId'
+      preLoaderRoute: typeof DashboardUserUserIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/disputes/$id': {
-      id: '/dashboard/disputes/$id'
-      path: '/dashboard/disputes/$id'
-      fullPath: '/dashboard/disputes/$id'
-      preLoaderRoute: typeof DashboardDisputesIdRouteImport
+    '/dashboard/treasury/wallets': {
+      id: '/dashboard/treasury/wallets'
+      path: '/dashboard/treasury/wallets'
+      fullPath: '/dashboard/treasury/wallets'
+      preLoaderRoute: typeof DashboardTreasuryWalletsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/treasury/$sweepId': {
+      id: '/dashboard/treasury/$sweepId'
+      path: '/dashboard/treasury/$sweepId'
+      fullPath: '/dashboard/treasury/$sweepId'
+      preLoaderRoute: typeof DashboardTreasurySweepIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/transaction/$id': {
+      id: '/dashboard/transaction/$id'
+      path: '/dashboard/transaction/$id'
+      fullPath: '/dashboard/transaction/$id'
+      preLoaderRoute: typeof DashboardTransactionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/manage-admins/$adminId': {
+      id: '/dashboard/manage-admins/$adminId'
+      path: '/$adminId'
+      fullPath: '/dashboard/manage-admins/$adminId'
+      preLoaderRoute: typeof DashboardManageAdminsAdminIdRouteImport
+      parentRoute: typeof DashboardManageAdminsRoute
+    }
+    '/dashboard/kyc-session/$id': {
+      id: '/dashboard/kyc-session/$id'
+      path: '/dashboard/kyc-session/$id'
+      fullPath: '/dashboard/kyc-session/$id'
+      preLoaderRoute: typeof DashboardKycSessionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/dispute/$id': {
+      id: '/dashboard/dispute/$id'
+      path: '/dashboard/dispute/$id'
+      fullPath: '/dashboard/dispute/$id'
+      preLoaderRoute: typeof DashboardDisputeIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/custodial-wallet/$walletAddress': {
+      id: '/dashboard/custodial-wallet/$walletAddress'
+      path: '/dashboard/custodial-wallet/$walletAddress'
+      fullPath: '/dashboard/custodial-wallet/$walletAddress'
+      preLoaderRoute: typeof DashboardCustodialWalletWalletAddressRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/coin-management/add-coin': {
@@ -423,13 +683,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardCoinManagementCoinIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/users/transaction-history/$userId': {
-      id: '/dashboard/users/transaction-history/$userId'
-      path: '/dashboard/users/transaction-history/$userId'
-      fullPath: '/dashboard/users/transaction-history/$userId'
-      preLoaderRoute: typeof DashboardUsersTransactionHistoryUserIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/dashboard/disputes/edit/$id': {
       id: '/dashboard/disputes/edit/$id'
       path: '/dashboard/disputes/edit/$id'
@@ -437,31 +690,72 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDisputesEditIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/admin-wallets/edit/$walletId': {
+      id: '/dashboard/admin-wallets/edit/$walletId'
+      path: '/dashboard/admin-wallets/edit/$walletId'
+      fullPath: '/dashboard/admin-wallets/edit/$walletId'
+      preLoaderRoute: typeof DashboardAdminWalletsEditWalletIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/admin-wallets/add/$walletType': {
+      id: '/dashboard/admin-wallets/add/$walletType'
+      path: '/dashboard/admin-wallets/add/$walletType'
+      fullPath: '/dashboard/admin-wallets/add/$walletType'
+      preLoaderRoute: typeof DashboardAdminWalletsAddWalletTypeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
+
+interface DashboardManageAdminsRouteChildren {
+  DashboardManageAdminsAdminIdRoute: typeof DashboardManageAdminsAdminIdRoute
+}
+
+const DashboardManageAdminsRouteChildren: DashboardManageAdminsRouteChildren = {
+  DashboardManageAdminsAdminIdRoute: DashboardManageAdminsAdminIdRoute,
+}
+
+const DashboardManageAdminsRouteWithChildren =
+  DashboardManageAdminsRoute._addFileChildren(
+    DashboardManageAdminsRouteChildren,
+  )
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  Verify2faRoute: Verify2faRoute,
   DashboardAuditTrailsRoute: DashboardAuditTrailsRoute,
-  DashboardManageAdminsRoute: DashboardManageAdminsRoute,
+  DashboardKycTierLimitsRoute: DashboardKycTierLimitsRoute,
+  DashboardManageAdminsRoute: DashboardManageAdminsRouteWithChildren,
   DashboardManageFiatRoute: DashboardManageFiatRoute,
   DashboardNotificationsRoute: DashboardNotificationsRoute,
+  DashboardReviewsRoute: DashboardReviewsRoute,
+  DashboardSupportedCurrenciesRoute: DashboardSupportedCurrenciesRoute,
   DashboardTestimonialsRoute: DashboardTestimonialsRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardCoinManagementCoinIdRoute: DashboardCoinManagementCoinIdRoute,
   DashboardCoinManagementAddCoinRoute: DashboardCoinManagementAddCoinRoute,
-  DashboardDisputesIdRoute: DashboardDisputesIdRoute,
-  DashboardTransactionsIdRoute: DashboardTransactionsIdRoute,
-  DashboardUsersUserIdRoute: DashboardUsersUserIdRoute,
+  DashboardCustodialWalletWalletAddressRoute:
+    DashboardCustodialWalletWalletAddressRoute,
+  DashboardDisputeIdRoute: DashboardDisputeIdRoute,
+  DashboardKycSessionIdRoute: DashboardKycSessionIdRoute,
+  DashboardTransactionIdRoute: DashboardTransactionIdRoute,
+  DashboardTreasurySweepIdRoute: DashboardTreasurySweepIdRoute,
+  DashboardTreasuryWalletsRoute: DashboardTreasuryWalletsRoute,
+  DashboardUserUserIdRoute: DashboardUserUserIdRoute,
+  DashboardAdminWalletsIndexRoute: DashboardAdminWalletsIndexRoute,
   DashboardCoinManagementIndexRoute: DashboardCoinManagementIndexRoute,
   DashboardDisputesIndexRoute: DashboardDisputesIndexRoute,
+  DashboardKycSessionsIndexRoute: DashboardKycSessionsIndexRoute,
   DashboardTransactionsIndexRoute: DashboardTransactionsIndexRoute,
+  DashboardTreasuryIndexRoute: DashboardTreasuryIndexRoute,
   DashboardUsersIndexRoute: DashboardUsersIndexRoute,
+  DashboardAdminWalletsAddWalletTypeRoute:
+    DashboardAdminWalletsAddWalletTypeRoute,
+  DashboardAdminWalletsEditWalletIdRoute:
+    DashboardAdminWalletsEditWalletIdRoute,
   DashboardDisputesEditIdRoute: DashboardDisputesEditIdRoute,
-  DashboardUsersTransactionHistoryUserIdRoute:
-    DashboardUsersTransactionHistoryUserIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

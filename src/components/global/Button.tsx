@@ -1,17 +1,21 @@
 import { Link } from "@tanstack/react-router";
 import { type ReactNode } from "react";
+import { motion } from "framer-motion";
+import { cn } from "../../lib/utils";
 
-type ButtonVariant = "button" | "link";
+type ButtonVariant = "button" | "link" | "secondary" | "outline" | "danger";
+type ButtonSize = "sm" | "md" | "lg";
 
 interface BaseProps {
   children?: ReactNode;
   className?: string;
   variant?: ButtonVariant;
+  size?: ButtonSize;
   buttonText?: string;
 }
 
 interface ButtonProps extends BaseProps {
-  variant?: "button";
+  variant?: "button" | "secondary" | "outline" | "danger";
   onClick?: () => void;
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
@@ -26,47 +30,62 @@ interface LinkProps extends BaseProps {
 
 type CustomButtonProps = ButtonProps | LinkProps;
 
+const MotionLink = motion(Link);
+
 const CustomButton = (props: CustomButtonProps) => {
-  const { children, className = "", variant = "button", buttonText } = props;
+  const { children, className = "", variant = "button", size = "md", buttonText } = props;
 
-  // Base styles for both button and link variants
-  const baseStyles =
-    `bg-[#03034D] cursor-pointer text-white px-6 py-3 rounded-full font-medium hover:bg-[#03034D]/90 transition-colors inline-block text-center no-underline disabled:opacity-50 disabled:cursor-not-allowed`;
+  const sizeClasses: Record<ButtonSize, string> = {
+    sm: "h-8 px-3 text-xs gap-1.5",
+    md: "h-10 px-4 text-sm gap-2",
+    lg: "h-11 px-5 text-base gap-2.5",
+  };
 
-  // Link variant styles (more subtle, underlined)
-  const linkStyles =
-    "bg-transparent text-lg font-semibold flex justify-center items-center  text-[#03034D] px-0 py-0 rounded-none hover:bg-transparent hover:underline";
+  const variantClasses: Record<ButtonVariant, string> = {
+    button: "bg-blue-600 text-white hover:bg-blue-700 shadow-xs border border-transparent",
+    secondary: "bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/80 shadow-xs",
+    outline: "bg-white text-slate-700 hover:bg-slate-50 border border-slate-300 shadow-xs",
+    danger: "bg-rose-600 text-white hover:bg-rose-700 shadow-xs border border-transparent",
+    link: "bg-transparent text-sm font-semibold text-blue-600 hover:text-blue-700 p-0 shadow-none border-transparent",
+  };
 
-  const finalClassName =
-    variant === "link"
-      ? `${linkStyles} ${className}`
-      : `${baseStyles} ${className}`;
+  const baseStyles = cn(
+    "inline-flex items-center justify-center rounded-lg font-semibold tracking-tight transition-all duration-150 cursor-pointer select-none no-underline whitespace-nowrap touch-manipulation",
+    "disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none active:scale-[0.98]",
+    sizeClasses[size],
+    variantClasses[variant],
+    className
+  );
 
   if (variant === "link") {
     const linkProps = props as LinkProps;
     return (
-      <Link
+      <MotionLink
         to={linkProps.to}
-        className={finalClassName}
+        className={baseStyles}
         onClick={linkProps.onClick}
+        whileHover={{ scale: 1.01 }}
+        whileTap={{ scale: 0.98 }}
       >
         {children ? children : buttonText}
-      </Link>
+      </MotionLink>
     );
   }
 
-  // Button variant
   const buttonProps = props as ButtonProps;
 
   return (
-    <button
-      className={finalClassName}
+    <motion.button
+      className={baseStyles}
       onClick={buttonProps.onClick}
       type={buttonProps.type || "button"}
       disabled={buttonProps.disabled}
+      whileHover={{ scale: 1.005 }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ type: "spring", stiffness: 400, damping: 20 }}
     >
       {children ? children : buttonText}
-    </button>
+    </motion.button>
   );
 };
 

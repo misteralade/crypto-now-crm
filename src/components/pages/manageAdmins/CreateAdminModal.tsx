@@ -1,125 +1,133 @@
 import { X } from 'lucide-react'
-import MFLabeledPillInput from '../../global/LabeledPillInput'
-import MFLabeledPillSelect from '../../global/LabeledPillSelect'
-import type {RolesResponsePayload} from "../../../types/response.payload.types";
-import type {CreateNewAdminRequestType} from "../../../schemas/admin.schema";
+import { PillInput } from '../../ui/input'
+import { LabeledSelect } from '../../ui/select'
+import { Switch } from '../../ui/switch'
+import type { RolesResponsePayload } from "../../../types/response.payload.types";
+import type { CreateNewAdminRequestType } from "../../../schemas/admin.schema";
+import { motion, AnimatePresence } from 'framer-motion'
+import CustomButton from '../../global/Button'
 
 interface CreateAdminModalProps {
   open: boolean;
   roles: Array<RolesResponsePayload>;
+  createAdmin: CreateNewAdminRequestType;
   onClose: () => void;
   onCreate: () => void;
   handleCreateAdminFieldChange: (field: (keyof CreateNewAdminRequestType), value: any) => void;
 }
 
-const CreateAdminModal = ({ open, roles, onClose, onCreate, handleCreateAdminFieldChange }: CreateAdminModalProps) => {
-  if (!open) return null
+const CreateAdminModal = ({ open, roles, createAdmin, onClose, onCreate, handleCreateAdminFieldChange }: CreateAdminModalProps) => {
+  const rolesOptions = [
+    { value: '', label: 'Select role' },
+    ...roles.map((role: RolesResponsePayload) => ({ value: role.id, label: role.name })),
+  ]
 
-  // Set the first item to be select roles
-  const rolesOptions = [{
-    value: '',
-    label: 'Select role',
-  }, ...roles.map((role: RolesResponsePayload) => ({
-    value: role.id,
-    label: role.name,
-  }))]
+  const selectedRole = roles.find((role) => role.id === createAdmin.roleId);
 
   return (
-    <section
-      className="fixed inset-0 z-50 overflow-y-auto"
-      role="dialog"
-      aria-modal="true"
-    >
-      <div
-        className="absolute py-[53px] inset-0 bg-black/20"
-        onClick={onClose}
-      />
+    <AnimatePresence>
+      {open && (
+        <section className="fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" 
+            onClick={onClose} 
+          />
 
-      <div className="absolute inset-0 grid place-items-center">
-        <div className="w-4xl bg-white rounded-2xl shadow-sm border px-4 py-4 border-[#ECECEC] max-h-[90vh] overflow-y-auto">
-          <div className="px-6 pt-6 pb-2 flex items-start justify-between">
-            <div className="flex-1 text-center text-[24px] leading-7 font-medium">
-              Create admin
-            </div>
-            <button
-              onClick={onClose}
-              className="-mt-6 -mr-1 px-2 py-1 text-[#0E0F0C] cursor-pointer"
+          <div className="absolute inset-0 grid place-items-center p-4 pointer-events-none">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="w-full max-w-2xl bg-white rounded-[32px] shadow-2xl border border-[#ECECEC] max-h-[90vh] overflow-y-auto pointer-events-auto"
             >
-              <X size={20} />
-            </button>
-          </div>
+              <div className="px-8 pt-8 pb-6 flex items-center justify-between border-b border-[#F2F4F7]">
+                <h2 className="text-2xl font-bold text-[#0E0F0C]">Create Admin</h2>
+                <button 
+                  onClick={onClose} 
+                  className="p-2 rounded-full hover:bg-gray-100 transition-colors text-[#9A9A9A] hover:text-[#03034D]"
+                >
+                  <X size={24} />
+                </button>
+              </div>
 
-          <div className="px-6 space-y-[32px] mt-4 grid grid-cols-2 gap-x-8">
-            <MFLabeledPillInput
-              label="First Name"
-              placeholder="e.g John"
-              onChange={(e) => handleCreateAdminFieldChange("firstName", e.target.value)}
-              valueClass="text-[18px] placeholder:text-[#9A9A9A] text-black"
-            />
-
-            <MFLabeledPillInput
-              label="Last Name"
-              placeholder="e.g Doe"
-              onChange={(e) => handleCreateAdminFieldChange("lastName", e.target.value)}
-              valueClass="text-[18px] placeholder:text-[#9A9A9A] text-black"
-            />
-
-            <MFLabeledPillInput
-              label="Email"
-              type="email"
-              placeholder="example@email.com"
-              onChange={(e) => handleCreateAdminFieldChange("email", e.target.value)}
-              valueClass="text-[18px] placeholder:text-[#9A9A9A] text-black"
-            />
-
-            <MFLabeledPillInput
-              label="Username"
-              type="text"
-              placeholder="john_doe"
-              onChange={(e) => handleCreateAdminFieldChange("username", e.target.value)}
-              valueClass="text-[18px] placeholder:text-[#9A9A9A] text-black"
-            />
-
-            <MFLabeledPillSelect
-              label="Role"
-              onChange={(e) => handleCreateAdminFieldChange("roleId", e.target.value)}
-              options={rolesOptions}
-            />
-
-            <div className="flex items-center gap-3">
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  id="isActive"
-                  type="checkbox"
-                  className="sr-only peer"
-                  onChange={(e) => handleCreateAdminFieldChange("active", e.target.checked)}
-                  defaultChecked
+              <div className="px-8 py-8 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8">
+                <PillInput
+                  label="First Name"
+                  placeholder="e.g John"
+                  onChange={(e) => handleCreateAdminFieldChange("firstName", e.target.value)}
                 />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-3 peer-focus:ring-gray-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#7c7c97] peer-checked:after:bg-[#03034D]"></div>
-              </label>
-              <span className="text-[16px] font-semibold text-[#454745]">Enable Admin</span>
-            </div>
-          </div>
+                <PillInput
+                  label="Last Name"
+                  placeholder="e.g Doe"
+                  onChange={(e) => handleCreateAdminFieldChange("lastName", e.target.value)}
+                />
+                <PillInput
+                  label="Email"
+                  type="email"
+                  placeholder="example@email.com"
+                  onChange={(e) => handleCreateAdminFieldChange("email", e.target.value)}
+                />
+                <PillInput
+                  label="Username"
+                  type="text"
+                  placeholder="john_doe"
+                  onChange={(e) => handleCreateAdminFieldChange("username", e.target.value)}
+                />
+                <div>
+                  <LabeledSelect
+                    label="Role"
+                    value={createAdmin.roleId || ''}
+                    options={rolesOptions}
+                    onValueChange={(v) => handleCreateAdminFieldChange("roleId", v === '__empty__' ? '' : v)}
+                  />
+                  {selectedRole?.description && (
+                    <p className="-mt-3 ml-1 text-sm italic text-[#9A9A9A]">
+                      {selectedRole.description}
+                    </p>
+                  )}
+                </div>
+                <div className="flex items-center h-full pt-2">
+                  <Switch
+                    id="isActive"
+                    label="Enable Admin"
+                    defaultChecked
+                    onCheckedChange={(checked) => handleCreateAdminFieldChange("active", checked)}
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <Switch
+                    id="admin-two-factor"
+                    label="Require two-factor authentication"
+                    description="Send a verification code when this admin signs in."
+                    checked={createAdmin.twoFactorEnabled !== false}
+                    onCheckedChange={(checked) => handleCreateAdminFieldChange("twoFactorEnabled", checked)}
+                  />
+                </div>
+              </div>
 
-          <div className="px-6 pb-6 flex mt-6 md:mt-[50px] flex-col md:flex-row items-center justify-center gap-6">
-            <button
-              className="text-[#03034D] hover:bg-[#FF8B5A] rounded-full hover:text-white px-10 py-3 text-base font-semibold w-full hover:cursor-pointer md:w-fit"
-              onClick={onClose}
-            >
-              Go back
-            </button>
-            <button
-              className="rounded-full bg-[#03034D] hover:bg-[#FF8B5A] text-white px-10 py-3 text-base font-semibold w-full hover:cursor-pointer md:w-fit"
-              onClick={onCreate}
-            >
-              Create admin
-            </button>
+              <div className="px-8 pb-8 flex flex-col sm:flex-row items-center justify-end gap-4 border-t border-[#F2F4F7] pt-6">
+                <CustomButton
+                  variant="button"
+                  className="bg-white !text-[#03034D] border border-[#ECECEC] hover:bg-gray-50 w-full sm:w-auto px-8"
+                  onClick={onClose}
+                  buttonText="Cancel"
+                />
+                <CustomButton
+                  className="w-full sm:w-auto px-10"
+                  onClick={onCreate}
+                  buttonText="Create Admin"
+                />
+              </div>
+            </motion.div>
           </div>
-        </div>
-      </div>
-    </section>
+        </section>
+      )}
+    </AnimatePresence>
   )
 }
-
 
 export default CreateAdminModal;

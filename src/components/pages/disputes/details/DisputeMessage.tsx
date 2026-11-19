@@ -1,18 +1,21 @@
 import {Fragment, useEffect, useRef, useState, type ChangeEvent} from "react";
-import {AlertCircle, CheckCircle, Download, FileText, Paperclip, Send, Shield, User, X} from "lucide-react";
+import {AlertCircle, CheckCircle, Clock, Download, FileText, Paperclip, Send, Shield, User, X} from "lucide-react";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import type { AttachmentType, DisputeMessageResponse, MessageAttachment } from "../../../../types/response.payload.types.ts";
 import { useUploadQuery } from "../../../../queries/upload.query.ts";
 import {formatFileSize, getFileType} from "../../../../util/index.util.ts";
 import { ATTACHMENT_TYPE, TIME_IN_MILLISECONDS } from "../../../../util/constants.util.ts";
+import { MESSAGE_SENDER_TYPE, isDisputeClosed } from "../../../../util/dispute.constants.util.ts";
 import { LoadingSpinner } from "../../../global/LoadingSpinner.tsx";
 import {setDisputeAttachments, setDisputeMessageText} from "../../../../redux/dispute.slice.ts";
 
 interface DisputeMessageProps {
   loading: boolean;
-  messages: Array<DisputeMessageResponse>
+  messages: Array<DisputeMessageResponse> | null | undefined;
   sendMessageMutation: any;
+  disputeId?: string;
+  disputeStatus?: string | null;
 }
 
 interface UploadingFile {
@@ -27,7 +30,13 @@ interface UploadingFile {
   error?: string;
 }
 
-const DisputeMessage = ({ loading, messages, sendMessageMutation }: DisputeMessageProps) => {
+const DisputeMessage = ({
+  loading,
+  messages,
+  sendMessageMutation,
+  disputeId,
+  disputeStatus,
+}: DisputeMessageProps) => {
   const dispatch = useDispatch();
   const { uploadFileMutation } = useUploadQuery();
   
@@ -38,6 +47,10 @@ const DisputeMessage = ({ loading, messages, sendMessageMutation }: DisputeMessa
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const lastActivityTimeRef = useRef<number>(Date.now());
+  const initialScrollDoneRef = useRef<boolean>(false);
+
+  const safeMessages = Array.isArray(messages) ? messages : [];
+  const closed = isDisputeClosed(disputeStatus);
 
   // Track user activity (mouse movement, scroll, and touch events)
   useEffect(() => {
@@ -48,13 +61,9 @@ const DisputeMessage = ({ loading, messages, sendMessageMutation }: DisputeMessa
       lastActivityTimeRef.current = Date.now();
     };
 
-    // Listen for mouse movement
     messagesContainer.addEventListener('mousemove', handleActivity, { passive: true });
-    // Listen for mouse wheel scroll
     messagesContainer.addEventListener('wheel', handleActivity, { passive: true });
-    // Listen for touch scroll (mobile)
     messagesContainer.addEventListener('touchmove', handleActivity, { passive: true });
-    // Listen for scroll events (covers all scroll types)
     messagesContainer.addEventListener('scroll', handleActivity, { passive: true });
 
     return () => {
@@ -65,18 +74,23 @@ const DisputeMessage = ({ loading, messages, sendMessageMutation }: DisputeMessa
     };
   }, []);
 
+  // Initial scroll on message load
+  useEffect(() => {
+    if (safeMessages.length > 0 && !initialScrollDoneRef.current) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      initialScrollDoneRef.current = true;
+    }
+  }, [safeMessages.length]);
+
   // Auto-scroll to bottom only if user has been idle for 120 seconds
   useEffect(() => {
-    // Only check when messages change (new message arrives)
-    if (messages.length === 0) return;
+    if (safeMessages.length === 0) return;
 
     const timeSinceLastActivity = Date.now() - lastActivityTimeRef.current;
-
-    // Only auto-scroll if user has been inactive for 120 seconds
     if (timeSinceLastActivity >= TIME_IN_MILLISECONDS.TWO_MINUTES) {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages]);
+  }, [safeMessages]);
   
   // Get image dimensions
   const getImageDimensions = (file: File): Promise<{ width: number; height: number } | null> => {
@@ -146,13 +160,8 @@ const DisputeMessage = ({ loading, messages, sendMessageMutation }: DisputeMessa
         const formData = new FormData();
         formData.append("file", uploadingFile.file);
         
-        const toastId = toast.loading(`Uploading ${uploadingFile.name}...`);
-        
         try {
-          // Upload file
           const url = await uploadFileMutation.mutateAsync(formData);
-          toast.dismiss(toastId);
-          toast.success(`${uploadingFile.name} uploaded successfully`);
           
           // Get metadata
           const metadata: MessageAttachment["metadata"] = {};
@@ -192,8 +201,6 @@ const DisputeMessage = ({ loading, messages, sendMessageMutation }: DisputeMessa
             URL.revokeObjectURL(uploadingFile.localPreview);
           }
         } catch (error) {
-          toast.dismiss(toastId);
-          toast.error(`Failed to upload ${uploadingFile.name}`);
           throw error;
         }
       } catch (error) {
@@ -230,7 +237,8 @@ const DisputeMessage = ({ loading, messages, sendMessageMutation }: DisputeMessa
   
   // Send message
   const handleSendMessage = async () => {
-    if (!message.trim() && uploadedAttachments.length === 0) {
+    const trimmedMessage = message.trim();
+    if (!trimmedMessage && uploadedAttachments.length === 0) {
       toast.error("Please enter a message or attach a file");
       return;
     }
@@ -243,11 +251,15 @@ const DisputeMessage = ({ loading, messages, sendMessageMutation }: DisputeMessa
     
     try {
       // Set message and attachments in Redux
-      dispatch(setDisputeMessageText(message.trim()));
+      dispatch(setDisputeMessageText(trimmedMessage));
       dispatch(setDisputeAttachments(uploadedAttachments));
       
-      // Send message (disputeId will be passed from parent)
-      await sendMessageMutation.mutateAsync();
+      // Send message directly with payload
+      await sendMessageMutation.mutateAsync({
+        disputeId,
+        message: trimmedMessage,
+        attachments: uploadedAttachments,
+      });
       
       // Clear form after successful send
       setMessage("");
@@ -261,166 +273,158 @@ const DisputeMessage = ({ loading, messages, sendMessageMutation }: DisputeMessa
   return (
     <Fragment>
       {loading ? (
-        <LoadingSpinner size="lg" message="Loading messages..." />
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+          <LoadingSpinner size="lg" message="Loading messages..." />
+        </div>
       ) : (
-        <div className="bg-white rounded-lg shadow-sm flex flex-col h-[calc(148vh-200px)]">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col h-[650px] max-h-[calc(100vh-220px)] min-h-[500px]">
           {/* Chat Header */}
-          <div className="border-b border-gray-200 p-4">
-            <h2 className="text-lg font-semibold text-gray-900">
-              Conversation
-            </h2>
-            <p className="text-sm text-gray-500">
-              Chat with support team about this dispute
-            </p>
+          <div className="border-b border-gray-200 px-5 py-4 flex items-center justify-between bg-gray-50/60 rounded-t-xl">
+            <div>
+              <h2 className="text-base font-semibold text-gray-900">
+                Dispute Conversation
+              </h2>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Live thread with the customer regarding this dispute
+              </p>
+            </div>
+            {closed && (
+              <span className="px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-600 border border-gray-200">
+                Dispute Closed
+              </span>
+            )}
           </div>
           
           {/* Messages */}
           <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <AlertCircle className="w-8 h-8 text-gray-400" />
+            {safeMessages.length === 0 ? (
+              <div className="text-center py-16">
+                <div className="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 text-gray-400">
+                  <AlertCircle className="w-7 h-7" />
                 </div>
-                <p className="text-gray-500">No messages yet</p>
-                <p className="text-sm text-gray-400 mt-1">
-                  Start a conversation with the support team
+                <p className="text-sm font-medium text-gray-700">No messages yet</p>
+                <p className="text-xs text-gray-400 mt-1">
+                  Send a reply below to communicate with the user
                 </p>
               </div>
             ) : (
-              messages.map((msg: DisputeMessageResponse) => (
-                <div
-                  key={msg.id}
-                  className={`flex gap-3 ${
-                    msg.senderType === "ADMIN" ? "flex-row-reverse" : ""
-                  }`}
-                >
-                  {/* Avatar */}
+              safeMessages.map((msg: DisputeMessageResponse) => {
+                const isAdmin = msg.senderType === MESSAGE_SENDER_TYPE.ADMIN;
+
+                return (
                   <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                      msg.senderType === "ADMIN"
-                        ? "bg-blue-100"
-                        : "bg-purple-100"
-                    }`}
+                    key={msg.id}
+                    className={`flex gap-3 ${isAdmin ? "flex-row-reverse" : "flex-row"}`}
                   >
-                    {msg.senderType === "ADMIN" ? (
-                      <Shield className="w-4 h-4 text-blue-600" />
-                    ) : (
-                      <User className="w-4 h-4 text-purple-600" />
-                    )}
-                  </div>
-                  
-                  {/* Message Content */}
-                  <div
-                    className={`flex-1 max-w-lg ${
-                      msg.senderType === "ADMIN" ? "items-end" : "items-start"
-                    } flex flex-col`}
-                  >
-                    <div className="flex items-center gap-2 mb-1">
-                      <p
-                        className={`text-xs font-medium ${
-                          msg.senderType === "ADMIN"
-                            ? "text-blue-600"
-                            : "text-purple-600"
-                        }`}
-                      >
-                        {msg.senderType === "ADMIN" ? "You" : "User"}
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        {new Date(msg.createdAt).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </p>
+                    {/* Avatar */}
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-xs font-bold ${
+                        isAdmin
+                          ? "bg-[#E6E6FE] text-[#03034D]"
+                          : "bg-gray-100 text-gray-600 border border-gray-200"
+                      }`}
+                    >
+                      {isAdmin ? (
+                        <Shield className="w-4 h-4" />
+                      ) : (
+                        <User className="w-4 h-4" />
+                      )}
                     </div>
                     
-                    {msg.messageText && (
-                      <div
-                        className={`rounded-lg px-4 py-2 ${
-                          msg.senderType === "ADMIN"
-                            ? "bg-gray-100 text-gray-900"
-                            : "bg-purple-600 text-white"
-                        }`}
-                      >
-                        <p className="text-sm whitespace-pre-wrap">
-                          {msg.messageText}
+                    {/* Message Content */}
+                    <div
+                      className={`flex-1 max-w-[80%] ${
+                        isAdmin ? "items-end" : "items-start"
+                      } flex flex-col`}
+                    >
+                      <div className="flex items-center gap-2 mb-1 px-1">
+                        <p
+                          className={`text-xs font-semibold ${
+                            isAdmin ? "text-[#03034D]" : "text-gray-700"
+                          }`}
+                        >
+                          {isAdmin ? "Support (You)" : msg.email ? `User (${msg.email})` : "Customer"}
                         </p>
+                        <span className="text-2xs text-gray-400 flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {new Date(msg.createdAt).toLocaleString([], {
+                            month: "short",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
                       </div>
-                    )}
-                    
-                    {/* Message Attachments */}
-                    {msg.attachments && msg.attachments.length > 0 && (
-                      <div className="mt-2 space-y-2">
-                        {msg.attachments.map((attachment, index) => (
-                          <a
-                            key={index}
-                            href={attachment.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={`flex items-center gap-2 p-2 rounded-lg hover:opacity-80 transition-opacity ${
-                              msg.senderType === "ADMIN"
-                                ? "bg-gray-100"
-                                : "bg-purple-500"
-                            }`}
-                          >
-                            {attachment.type === ATTACHMENT_TYPE.IMAGE ? (
-                              <img
-                                src={attachment.url}
-                                alt={attachment.filename}
-                                className="w-10 h-10 object-cover rounded"
-                              />
-                            ) : (
-                              <div className="w-10 h-10 bg-white rounded flex items-center justify-center">
-                                <FileText className="w-5 h-5 text-gray-400" />
-                              </div>
-                            )}
-                            <div className="flex-1 min-w-0">
-                              <p
-                                className={`text-xs font-medium truncate ${
-                                  msg.senderType === "ADMIN"
-                                    ? "text-gray-900"
-                                    : "text-white"
-                                }`}
-                              >
-                                {attachment.filename}
-                              </p>
-                              <p
-                                className={`text-xs ${
-                                  msg.senderType === "ADMIN"
-                                    ? "text-gray-500"
-                                    : "text-purple-200"
-                                }`}
-                              >
-                                {formatFileSize(attachment.size)}
-                              </p>
-                            </div>
-                            <Download
-                              className={`w-4 h-4 ${
-                                msg.senderType === "ADMIN"
-                                  ? "text-gray-400"
-                                  : "text-white"
+                      
+                      {msg.messageText && (
+                        <div
+                          className={`rounded-2xl px-4 py-2.5 shadow-sm text-sm whitespace-pre-wrap leading-relaxed ${
+                            isAdmin
+                              ? "bg-[#03034D] text-white rounded-tr-none"
+                              : "bg-gray-100 text-gray-900 border border-gray-200 rounded-tl-none"
+                          }`}
+                        >
+                          {msg.messageText}
+                        </div>
+                      )}
+                      
+                      {/* Message Attachments */}
+                      {msg.attachments && msg.attachments.length > 0 && (
+                        <div className="mt-2 space-y-2 w-full max-w-sm">
+                          {msg.attachments.map((attachment, index) => (
+                            <a
+                              key={index}
+                              href={attachment.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={`flex items-center gap-3 p-2.5 rounded-xl transition-all border ${
+                                isAdmin
+                                  ? "bg-gray-50 hover:bg-gray-100 text-gray-900 border-gray-200"
+                                  : "bg-white hover:bg-gray-50 text-gray-900 border-gray-200 shadow-sm"
                               }`}
-                            />
-                          </a>
-                        ))}
-                      </div>
-                    )}
+                            >
+                              {attachment.type === ATTACHMENT_TYPE.IMAGE ? (
+                                <img
+                                  src={attachment.url}
+                                  alt={attachment.filename}
+                                  className="w-10 h-10 object-cover rounded-lg shrink-0 border border-gray-200"
+                                />
+                              ) : (
+                                <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center shrink-0">
+                                  <FileText className="w-5 h-5 text-gray-500" />
+                                </div>
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-medium text-gray-900 truncate">
+                                  {attachment.filename}
+                                </p>
+                                <p className="text-2xs text-gray-500">
+                                  {formatFileSize(attachment.size)}
+                                </p>
+                              </div>
+                              <Download className="w-4 h-4 text-gray-400 shrink-0" />
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
             <div ref={messagesEndRef} />
           </div>
           
           {/* Message Input */}
-          <div className="border-t border-gray-200 p-4">
+          <div className="border-t border-gray-200 p-4 bg-gray-50/50 rounded-b-xl">
             {/* Files Preview - Both Uploading and Uploaded */}
             {(uploadingFiles.length > 0 || uploadedAttachments.length > 0) && (
               <div className="mb-3 space-y-2">
-                <p className="text-sm font-medium text-gray-900">
-                  Files ({uploadingFiles.length + uploadedAttachments.length})
+                <p className="text-xs font-semibold text-gray-700">
+                  Attachments ({uploadingFiles.length + uploadedAttachments.length})
                   {uploadingFiles.length > 0 && (
-                    <span className="text-gray-500 ml-2">
-                      ({uploadingFiles.length} uploading)
+                    <span className="text-blue-600 font-normal ml-2">
+                      ({uploadingFiles.length} uploading...)
                     </span>
                   )}
                 </p>
@@ -430,24 +434,25 @@ const DisputeMessage = ({ loading, messages, sendMessageMutation }: DisputeMessa
                   {uploadingFiles.map((file) => (
                     <div
                       key={file.id}
-                      className="flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-2 border border-gray-200"
+                      className="flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-1.5 border border-gray-200 text-xs"
                     >
-                      <FileText className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm text-gray-700 max-w-[150px] truncate">
+                      <FileText className="w-3.5 h-3.5 text-gray-500" />
+                      <span className="text-gray-700 max-w-[140px] truncate">
                         {file.name}
                       </span>
                       {file.isUploading && (
-                        <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                        <div className="w-3.5 h-3.5 border-2 border-[#03034D] border-t-transparent rounded-full animate-spin" />
                       )}
                       {file.error && (
-                        <span className="text-xs text-red-600">{file.error}</span>
+                        <span className="text-red-600 font-medium">{file.error}</span>
                       )}
                       <button
+                        type="button"
                         onClick={() => removeUploadingFile(file.id)}
                         disabled={file.isUploading}
                         className="text-gray-400 hover:text-red-600 disabled:opacity-50"
                       >
-                        <X className="w-4 h-4" />
+                        <X className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   ))}
@@ -456,18 +461,19 @@ const DisputeMessage = ({ loading, messages, sendMessageMutation }: DisputeMessa
                   {uploadedAttachments.map((attachment, index) => (
                     <div
                       key={index}
-                      className="flex items-center gap-2 bg-green-50 rounded-lg px-3 py-2 border border-green-200"
+                      className="flex items-center gap-2 bg-green-50 rounded-lg px-3 py-1.5 border border-green-200 text-xs"
                     >
-                      <FileText className="w-4 h-4 text-green-600" />
-                      <span className="text-sm text-gray-700 max-w-[150px] truncate">
+                      <FileText className="w-3.5 h-3.5 text-green-700" />
+                      <span className="text-green-900 max-w-[140px] truncate font-medium">
                         {attachment.filename}
                       </span>
-                      <CheckCircle className="w-4 h-4 text-green-600" />
+                      <CheckCircle className="w-3.5 h-3.5 text-green-600 shrink-0" />
                       <button
+                        type="button"
                         onClick={() => removeAttachment(attachment.url)}
                         className="text-gray-400 hover:text-red-600"
                       >
-                        <X className="w-4 h-4" />
+                        <X className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   ))}
@@ -487,9 +493,11 @@ const DisputeMessage = ({ loading, messages, sendMessageMutation }: DisputeMessa
               />
               
               <button
+                type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors hover:cursor-pointer"
+                className="p-2.5 text-gray-500 hover:text-gray-700 hover:bg-gray-200/70 rounded-xl transition-colors cursor-pointer shrink-0"
                 disabled={sendMessageMutation.isPending}
+                title="Attach files"
               >
                 <Paperclip className="w-5 h-5" />
               </button>
@@ -503,40 +511,44 @@ const DisputeMessage = ({ loading, messages, sendMessageMutation }: DisputeMessa
                     handleSendMessage();
                   }
                 }}
-                placeholder="Type your message..."
-                rows={1}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                placeholder="Type reply to customer..."
+                rows={2}
+                className="flex-1 px-3.5 py-2 text-sm bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#03034D] focus:border-transparent resize-none leading-relaxed"
                 disabled={sendMessageMutation.isPending}
               />
               
               <button
+                type="button"
                 onClick={handleSendMessage}
                 disabled={
                   sendMessageMutation.isPending ||
                   (!message.trim() && uploadedAttachments.length === 0) ||
                   uploadingFiles.length > 0
                 }
-                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="px-4 py-2.5 bg-[#03034D] text-white rounded-xl hover:bg-[#050568] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer shrink-0 text-sm font-medium shadow-sm"
               >
                 {sendMessageMutation.isPending ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 ) : (
-                  <Send className="w-5 h-5" />
+                  <Fragment>
+                    <span>Reply</span>
+                    <Send className="w-4 h-4" />
+                  </Fragment>
                 )}
               </button>
             </div>
             
-            <p className="text-xs text-gray-500 mt-2">
-              Press Enter to send, Shift+Enter for new line
+            <p className="text-2xs text-gray-500 mt-2 px-1">
+              Press Enter to send, Shift+Enter for a new line.
               {uploadingFiles.length > 0 && (
-                <span className="text-blue-600 ml-2">• Files uploading...</span>
+                <span className="text-blue-600 ml-2 font-medium">Files uploading...</span>
               )}
             </p>
           </div>
         </div>
       )}
     </Fragment>
-  )
-}
+  );
+};
 
 export default DisputeMessage;

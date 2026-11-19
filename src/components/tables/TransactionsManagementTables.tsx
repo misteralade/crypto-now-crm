@@ -1,11 +1,6 @@
-import {ArrowUpRight, ChevronDown, ChevronRight, Download} from 'lucide-react'
-import { Fragment } from 'react'
-import { convertToMillify } from '../../util/index.util.ts'
-import { CustomCheckbox } from '../global/CheckBoxes'
-import CopyDetails, {ClickableDetails} from '../global/CopyDetails'
+import { ArrowUpRight, ChevronDown, ChevronUp } from 'lucide-react'
 import momentClient from '../../util/moment'
 import {
-  TableAmount,
   TableDate,
   TableStatus,
   mapTransactionStatus,
@@ -15,50 +10,116 @@ import type {
   SearchTransactionsResponse,
   UsersWithTopTransactionVolume,
 } from '../../types/response.payload.types'
+import type { SearchTransactionsRequestType } from '../../schemas/transaction.schema'
+
+const formatCryptoAmountUpTo4Decimals = (amount: number | string | undefined, symbol?: string) => {
+  if (amount === undefined || amount === null || amount === "") return "0"
+  const num = Number(amount)
+  const factor = 10000
+  const rounded = Math.ceil(num * factor) / factor
+  return `${rounded} ${symbol ? symbol.toUpperCase() : ""}`.trim()
+}
+
+type TransactionSummaryRow = {
+  sessionId: string
+  user: string
+  userEmail: string
+  type: string
+  cryptoSymbol: string
+  amount: string
+  amountCrypto: string
+  date: Date | string
+  status: string
+}
+
+type TransactionManagementRow = {
+  id: string
+  type: string
+  amount: string
+  date: string
+  status: string
+  action?: string
+}
 
 // Dashboard Tables Start
 export const UsersWithTopTransactionColumn = (
   handleViewTransaction: (sessionId: string) => void,
-): Array<TableColumn> => [
+): Array<TableColumn<TransactionSummaryRow>> => [
   {
-    key: 'user',
-    header: 'User',
-    className: 'font-medium text-gray-900',
-  },
-  {
-    key: 'transactionId',
+    key: 'sessionId',
     header: 'Transaction ID',
-    render: (value) => (
-      <button className="flex items-center max-w-[300px] space-x-1 underline text-gray-900 hover:text-purple-600 transition-colors font-medium">
-        <span className="overflow-hidden whitespace-nowrap text-ellipsis">
-          {value}
+    render: (value, row) => (
+      <button
+        onClick={() => handleViewTransaction(row.sessionId)}
+        className="font-mono text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1 group cursor-pointer"
+        title={String(value)}
+      >
+        <span className="truncate max-w-[120px] sm:max-w-[150px]">
+          {String(value).slice(0, 10)}...{String(value).slice(-4)}
         </span>
-        <ArrowUpRight size={14} className="text-gray-400" />
+        <ArrowUpRight size={13} className="text-blue-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
       </button>
     ),
   },
   {
+    key: 'user',
+    header: 'Customer',
+    render: (value, row) => (
+      <div className="flex items-center gap-2.5">
+        <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold shrink-0">
+          {String(value || 'U').charAt(0).toUpperCase()}
+        </div>
+        <div className="min-w-0">
+          <p className="font-semibold text-slate-900 text-xs truncate max-w-[130px]">{value}</p>
+          <p className="text-2xs text-slate-400 truncate max-w-[130px]">{row.userEmail}</p>
+        </div>
+      </div>
+    ),
+  },
+  {
+    key: 'type',
+    header: 'Type & Asset',
+    render: (value, row) => (
+      <div className="flex items-center gap-1.5">
+        <span className={`px-2 py-0.5 rounded text-2xs font-bold uppercase tracking-wider ${value === 'BUY' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60' : 'bg-blue-50 text-blue-700 border border-blue-200/60'}`}>
+          {value}
+        </span>
+        <span className="text-xs font-bold text-slate-700">{row.cryptoSymbol}</span>
+      </div>
+    ),
+  },
+  {
     key: 'amount',
-    header: 'Amount',
-    render: (value) => <TableAmount amount={value} />,
+    header: 'Fiat Amount',
+    render: (value) => (
+      <span className="text-xs font-bold text-slate-900 tabular-nums">
+        {value}
+      </span>
+    ),
+  },
+  {
+    key: 'status',
+    header: 'Status',
+    render: (value) => {
+      const { displayText, variant } = mapTransactionStatus(String(value));
+      return <TableStatus status={displayText} variant={variant} />;
+    },
   },
   {
     key: 'date',
     header: 'Date',
-    render: (value) => <TableDate date={value} />,
+    render: (value) => <TableDate date={value as Date} />,
   },
   {
     key: 'action',
     header: 'Action',
     render: (_, row) => (
-      <div className="flex items-center justify-start gap-2 lg:gap-x-[16px] whitespace-nowrap">
-        <button
-          className="px-2.5 md:px-3 py-1 rounded-full bg-[#E6E6FE] cursor-pointer hover:opacity-80 text-[#03034D] text-xs md:text-xs font-medium"
-          onClick={() => handleViewTransaction(row.transactionId)}
-        >
-          View
-        </button>
-      </div>
+      <button
+        className="h-7 px-2.5 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 font-semibold text-xs transition-colors cursor-pointer"
+        onClick={() => handleViewTransaction(row.sessionId)}
+      >
+        View
+      </button>
     ),
   },
 ]
@@ -66,22 +127,24 @@ export const UsersWithTopTransactionColumn = (
 export const UsersWithTopTransactionDataRow = (
   data: Array<UsersWithTopTransactionVolume> | undefined,
 ) => {
-  const rowItems: Array<any> = []
+  const rowItems: Array<TransactionSummaryRow> = []
 
   if (!data) {
     return rowItems
   }
 
-  data.map((item: UsersWithTopTransactionVolume) => {
+  data.forEach((item: UsersWithTopTransactionVolume) => {
     rowItems.push({
-      user: `${item.userFirstName} ${item.userLastName}`,
-      transactionId: item.sessionId,
-      amount: convertToMillify(Number(item.amountFiat)),
+      sessionId: item.sessionId,
+      user: `${item.userFirstName || ''} ${item.userLastName || ''}`.trim() || 'Anonymous User',
+      userEmail: item.userEmail || '',
+      type: item.type,
+      cryptoSymbol: item.cryptoSymbol || 'USDT',
+      amount: `₦${Number(item.amountFiat || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      amountCrypto: item.amountCrypto,
       date: item.createdAt,
       status: item.status,
     })
-
-    return
   })
 
   return rowItems
@@ -90,183 +153,130 @@ export const UsersWithTopTransactionDataRow = (
 
 // Start Transactions Management Tables
 export const TransactionsManagementColumn = (
-  handleSelectTransactionId: (transactionId: string) => void,
-  handleSelectAllTransactionIds: () => void,
   handleSortBy: (columnKey: string) => void,
-  handleShowTransactionDetails: (sessionId: string) => void,
   handleViewTransactionDetails: (sessionId: string) => void,
-  selectedTransactionIds: Array<string>, // Add this to track selected state
-  selectedIdCount: number,
-): Array<TableColumn> => [
-  {
-    key: 'index',
-    header: (
-      <Fragment>
-        <div className="py-3">
-          <CustomCheckbox
-            checked={selectedTransactionIds.length === selectedIdCount}
-            onChange={handleSelectAllTransactionIds}
-          />
-        </div>
-      </Fragment>
-    ),
-    render: (_, row) => (
-      <Fragment>
-        <div className="py-3">
-          <CustomCheckbox
-            checked={selectedTransactionIds.includes(row.id)}
-            onChange={() => handleSelectTransactionId(row.id)}
-          />
-        </div>
-      </Fragment>
-    ),
-  },
+  sortModel: SearchTransactionsRequestType['sortModel'],
+): Array<TableColumn<TransactionManagementRow>> => [
   {
     key: 'id',
     header: (
-      <Fragment>
-        <div className="py-3 text-left text-sm font-medium text-gray-500">
-          <span className="flex items-center gap-2">
-            <span>Session ID</span>
-          </span>
-        </div>
-      </Fragment>
+      <div className="py-2.5 text-left text-xs font-semibold text-slate-600">
+        Session ID
+      </div>
     ),
     render: (value) => (
-      <div className="px-4 py-5 text-sm text-[14px] text-[#101828]">
-        <ClickableDetails text={value} className="!max-w-[200px]" onClick={handleViewTransactionDetails}/>
+      <div
+        className="py-2 pr-2 font-mono text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1 group cursor-pointer"
+        onClick={() => handleViewTransactionDetails(value)}
+        title={String(value)}
+      >
+        <span className="truncate max-w-[130px] sm:max-w-[160px]">
+          {String(value).slice(0, 10)}...{String(value).slice(-4)}
+        </span>
+        <ArrowUpRight size={13} className="text-blue-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform shrink-0" />
       </div>
     ),
   },
   {
     key: 'type',
     header: (
-      <div
+      <button
+        type="button"
         onClick={() => handleSortBy('type')}
-        className="py-3 text-left text-sm font-medium text-gray-500 hover:cursor-pointer"
+        aria-pressed={sortModel?.colId === 'type'}
+        className="py-2.5 text-left text-xs font-semibold text-slate-600 hover:cursor-pointer inline-flex items-center gap-1"
       >
-        <span className="flex items-center gap-2">
-          <span>Type</span>
-          <ChevronDown className="text-gray-400" />
-        </span>
-      </div>
+        <span>Type</span>
+        {sortModel?.colId === 'type' && sortModel.orderBy === 'ASC' ? <ChevronUp className="w-3.5 h-3.5 text-blue-600" /> : <ChevronDown className={`w-3.5 h-3.5 ${sortModel?.colId === 'type' ? 'text-blue-600' : 'text-slate-400'}`} />}
+      </button>
     ),
-    render: (value) => <span className="py-3 text-sm text-[#667085]">{value}</span>,
+    render: (value) => {
+      const isBuy = String(value).toUpperCase().startsWith('BUY')
+      const asset = String(value).replace(/^(BUY|SELL)\s*[-–]?\s*/i, '').trim()
+      return (
+        <div className="py-2 flex items-center gap-1.5 whitespace-nowrap">
+          <span className={`px-2 py-0.5 rounded text-2xs font-bold uppercase tracking-wider ${isBuy ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60' : 'bg-blue-50 text-blue-700 border border-blue-200/60'}`}>
+            {isBuy ? 'BUY' : 'SELL'}
+          </span>
+          {asset && <span className="text-xs font-semibold text-slate-700">{asset}</span>}
+        </div>
+      )
+    },
   },
   {
     key: 'amount',
     header: (
-      <div className="py-3 text-left text-sm font-medium text-gray-500">
-        <span className="flex items-center gap-2">
-          <span>Amount</span>
-        </span>
+      <div className="py-2.5 text-left text-xs font-semibold text-slate-600">
+        Crypto Amount
       </div>
     ),
     render: (value) => (
-      <span className="py-3 text-sm text-[14px] text-[#667085]">{value}</span>
+      <span className="py-2 text-xs sm:text-sm font-semibold text-slate-900 tabular-nums whitespace-nowrap">
+        {value}
+      </span>
     ),
   },
   {
     key: 'date',
     header: (
-      <Fragment>
-        <div 
-        className="py-3 text-left text-sm font-medium text-gray-500 hover:cursor-pointer"
+      <button
+        type="button"
+        aria-pressed={sortModel?.colId === 'createdAt'}
+        className="py-2.5 text-left text-xs font-semibold text-slate-600 hover:cursor-pointer inline-flex items-center gap-1"
         onClick={() => handleSortBy('createdAt')}
-        >
-          <span className="flex items-center gap-2">
-            <span>Date</span>
-            <ChevronDown className="text-gray-400 ml-4" onClick={() => handleSortBy('createdAt')} />
-          </span>
-        </div>
-      </Fragment>
+      >
+        <span>Date</span>
+        {sortModel?.colId === 'createdAt' && sortModel.orderBy === 'ASC' ? <ChevronUp className="w-3.5 h-3.5 text-blue-600" /> : <ChevronDown className={`w-3.5 h-3.5 ${sortModel?.colId === 'createdAt' ? 'text-blue-600' : 'text-slate-400'}`} />}
+      </button>
     ),
     render: (value) => (
-      <Fragment>
-        <span className="py-3 text-sm text-[14px] text-[#667085]">{value}</span>
-      </Fragment>
+      <span className="py-2 text-xs text-slate-500 whitespace-nowrap tabular-nums">
+        {value}
+      </span>
     ),
   },
   {
     key: 'status',
     header: (
-      <Fragment>
-        <div className="py-3 text-left text-sm font-medium text-gray-500 hover:cursor-pointer" onClick={() => handleSortBy('status')}>
-          <span className="flex items-center gap-2">
-            <span>Status</span>
-            <ChevronDown
-              className="text-gray-400"
-              onClick={() => handleSortBy('status')}
-            />
-          </span>
-        </div>
-      </Fragment>
+      <button
+        type="button"
+        aria-pressed={sortModel?.colId === 'status'}
+        className="py-2.5 text-left text-xs font-semibold text-slate-600 hover:cursor-pointer inline-flex items-center gap-1"
+        onClick={() => handleSortBy('status')}
+      >
+        <span>Status</span>
+        {sortModel?.colId === 'status' && sortModel.orderBy === 'ASC' ? <ChevronUp className="w-3.5 h-3.5 text-blue-600" /> : <ChevronDown className={`w-3.5 h-3.5 ${sortModel?.colId === 'status' ? 'text-blue-600' : 'text-slate-400'}`} />}
+      </button>
     ),
     render: (value) => {
       const { displayText, variant } = mapTransactionStatus(value)
-      return <TableStatus status={displayText} variant={variant} />
-    },
-  },
-  {
-    key: 'isAnonymous',
-    header: (
-      <Fragment>
-        <div className="py-3 text-left text-sm font-medium text-gray-500">
-          <span className="flex items-center gap-2">
-            <span>User Type</span>
-          </span>
-        </div>
-      </Fragment>
-    ),
-    render: (value) => {
       return (
-        <span className={`text-sm text-[14px] px-3 py-1 rounded-full inline-flex items-center ${
-          value === 'Anonymous' 
-            ? 'bg-orange-100 text-orange-800' 
-            : 'bg-green-100 text-green-800'
-        }`}>
-          {value == "Anonymous" ? "Guest" : "Registered"}
-        </span>
+        <div className="py-2">
+          <TableStatus status={displayText} variant={variant} />
+        </div>
       )
     },
   },
   {
-    key: "updatedAt",
-    header: (
-      <Fragment>
-        <div className="py-3 text-left text-sm font-medium text-gray-500 hover:cursor-pointer" onClick={() => handleSortBy('updatedAt')}>
-          <span className="flex items-center gap-2">
-            <span>Last Updated</span>
-            <ChevronDown className="text-gray-400 ml-4" onClick={() => handleSortBy('updatedAt')} />
-          </span>
-        </div>
-      </Fragment>
-    ),
-    render: (value) => (
-      <Fragment>
-        <span className="py-3 text-sm text-[14px] text-[#667085]">{value}</span>
-      </Fragment>
-    ),
-  },
-  {
     key: 'action',
     header: (
-      <Fragment>
-        <div className="py-3 text-left text-sm font-medium text-gray-500">
-          <span className="flex items-center gap-2"></span>
-        </div>
-      </Fragment>
+      <div className="py-2.5 text-right text-xs font-semibold text-slate-600">
+        Action
+      </div>
     ),
     render: (_, row) => (
-      <Fragment>
+      <div className="py-2 text-right">
         <button
-          className="text-[#03034D] hover:opacity-80 text-[12px] cursor-pointer font-medium inline-flex items-center gap-1"
-          onClick={() => handleShowTransactionDetails(row.id)}
+          onClick={(e) => {
+            e.stopPropagation()
+            handleViewTransactionDetails(row.id)
+          }}
+          className="h-7 px-2.5 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 font-semibold text-xs transition-colors cursor-pointer touch-manipulation inline-flex items-center gap-1"
         >
-          <span>View Order</span>
-          <span aria-hidden><ChevronRight size={16} /></span>
+          <span>Details</span>
+          <ArrowUpRight className="w-3 h-3 text-slate-400" />
         </button>
-      </Fragment>
+      </div>
     ),
   },
 ]
@@ -274,202 +284,22 @@ export const TransactionsManagementColumn = (
 export const TransactionsManagementDataRow = (
   data: Array<SearchTransactionsResponse> | undefined,
 ) => {
-  const rowItems: Array<any> = []
+  const rowItems: Array<TransactionManagementRow> = []
 
   if (!data) {
     return rowItems
   }
 
-  data.map((item: SearchTransactionsResponse) => {
+  data.forEach((item: SearchTransactionsResponse) => {
     rowItems.push({
       id: item.sessionId,
       type: `${item.type} ${item.cryptocurrency ? `- ${item.cryptocurrency.symbol}` : ''}`,
-      amount: `$${convertToMillify(Number(item.usdAmount))}`,
+      amount: formatCryptoAmountUpTo4Decimals(item.amountCrypto, item.cryptocurrency?.symbol),
       date: momentClient.formatToNormalisedDateAndTime(item.createdAt),
       status: item.status,
-      isAnonymous: item?.email ? 'Anonymous' : 'Registered',
-      updatedAt: momentClient.formatToNormalisedDateAndTime(item.updatedAt),
     })
-
-    return
   })
 
   return rowItems
 }
 // End Transactions Management Tables
-
-// Start User Details Transactions History Table
-export const UserTransactionsManagementColumn = (
-  handleViewTransaction: (sessionId: string) => void,
-  onDownload: (id: string) => void,
-): Array<TableColumn> => [
-  {
-    key: 'id',
-    header: (
-      <Fragment>
-        <div className="py-3 text-left text-sm font-medium text-gray-500">
-          <span className="flex items-center gap-2">
-            <span>Transaction ID</span>
-          </span>
-        </div>
-      </Fragment>
-    ),
-    render: (value) => (
-      <div className="px-4 py-5 text-sm text-[14px] text-[#101828]">
-        <CopyDetails text={value} className="!max-w-[200px]" iconClassName='!h-8 !w-8'/>
-      </div>
-    ),
-  },
-  {
-    key: 'date',
-    header: (
-      <Fragment>
-        <div className="py-3 text-left text-sm font-medium text-gray-500">
-          <span className="flex items-center gap-2">
-            <span>Date</span>
-          </span>
-        </div>
-      </Fragment>
-    ),
-    render: (value) => (
-      <Fragment>
-        <span className="py-3 text-sm text-[14px] text-[#667085]">{value}</span>
-      </Fragment>
-    ),
-  },
-  {
-    key: 'type',
-    header: (
-      <div
-        className="py-3 text-left text-sm font-medium text-gray-500 hover:cursor-pointer"
-      >
-        <span className="flex items-center gap-2">
-          <span>Type</span>
-        </span>
-      </div>
-    ),
-    render: (value) => <span className="py-3 text-sm text-[#667085]">{value}</span>,
-  },
-  {
-    key: 'amount',
-    header: (
-      <div className="py-3 text-left text-sm font-medium text-gray-500">
-        <span className="flex items-center gap-2">
-          <span>Amount</span>
-        </span>
-      </div>
-    ),
-    render: (value) => (
-      <span className="py-3 text-sm text-[14px] text-[#667085]">{value}</span>
-    ),
-  },
-  {
-    key: 'rate',
-    header: (
-      <div className="py-3 text-left text-sm font-medium text-gray-500">
-        <span className="flex items-center gap-2">
-          <span>Rate</span>
-        </span>
-      </div>
-    ),
-    render: (value) => (
-      <span className="py-3 text-sm text-[14px] text-[#667085]">{value}</span>
-    ),
-  },
-  {
-    key: 'status',
-    header: (
-      <Fragment>
-        <div className="py-3 text-left text-sm font-medium text-gray-500">
-          <span className="flex items-center gap-2">
-            <span>Status</span>
-          </span>
-        </div>
-      </Fragment>
-    ),
-    render: (value) => {
-      const { displayText, variant } = mapTransactionStatus(value)
-      return <TableStatus status={displayText} variant={variant} />
-    },
-  },
-  {
-    key: 'action',
-    header: (
-      <Fragment>
-        <div className="py-3 text-left text-sm font-medium text-gray-500">
-          <span className="flex items-center gap-2">Actions</span>
-        </div>
-      </Fragment>
-    ),
-    render: (_, row) => (
-      <Fragment>
-        <div className="px-4 justify-between min-w-[100px] items-center align-middle">
-          <button
-            aria-label="Download"
-            className={`p-1 rounded cursor-pointer ${
-              row.status === 'EXPIRED'
-                ? 'opacity-40 cursor-not-allowed'
-                : 'hover:bg-black/5'
-            }`}
-            disabled={row.status === 'EXPIRED'}
-            onClick={() => onDownload?.(row.id)}
-          >
-            <Download size={20} fill={row.status === 'EXPIRED' ? '#98A2B3' : '#575AE5'}/>
-          </button>
-          
-          <button
-            className="ml-4 px-2.5 md:px-3 py-1 rounded-full bg-[#E6E6FE] cursor-pointer hover:opacity-80 text-[#03034D] text-xs md:text-xs font-medium"
-            onClick={() => handleViewTransaction(row.id)}
-          >
-            View
-          </button>
-        </div>
-      </Fragment>
-    ),
-  },
-]
-
-export const UserTransactionsManagementDataRow = (
-  data: Array<SearchTransactionsResponse> | undefined,
-) => {
-  const rowItems: Array<any> = []
-
-  if (!data) {
-    return rowItems
-  }
-
-  data.map((item: SearchTransactionsResponse) => {
-    const symbol = item.cryptocurrency?.symbol ?? 'CRYPTO'
-    const amountCrypto = Number(item.amountCrypto)
-    const currency = item.currency
-    let rateDisplay = '—'
-    if (amountCrypto > 0) {
-      if (item.exchangeRate) {
-        const rate = Number(item.exchangeRate.rate)
-        const platformRate = Number(item.exchangeRate.platformRate)
-        rateDisplay = currency === 'USD'
-          ? `1 ${symbol} = $ ${convertToMillify(rate, 2)}`
-          : `1 ${symbol} = ₦ ${convertToMillify(rate * platformRate, 2)}`
-      } else {
-        const effective = currency === 'USD'
-          ? Number(item.amountFiat) / amountCrypto
-          : Number(item.amountFiatNGN || 0) / amountCrypto
-        const fiatSym = currency === 'USD' ? '$' : '₦'
-        rateDisplay = `1 ${symbol} = ${fiatSym} ${convertToMillify(effective, 2)}`
-      }
-    }
-    rowItems.push({
-      id: item.sessionId,
-      date: momentClient.formatToNormalisedDateAndTime(item.createdAt),
-      type: `${item.type} ${item.cryptocurrency ? `- ${item.cryptocurrency.symbol}` : ''}`,
-      amount: `$${convertToMillify(Number(item.usdAmount))}`,
-      rate: rateDisplay,
-      status: item.status,
-    })
-
-    return
-  })
-
-  return rowItems
-}
-// End User Details Transactions History Table

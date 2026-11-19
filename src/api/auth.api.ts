@@ -8,15 +8,15 @@ class AuthServiceApi {
   }
 
   public static getInstance(): AuthServiceApi {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+     
     if (!AuthServiceApi.instance) {
       AuthServiceApi.instance = new AuthServiceApi();
     }
     return AuthServiceApi.instance;
   }
 
-  async login(payload: Record<string, any>): Promise<BaseApiResponse<null>> {
-    return await axiosPostRequestHandler("/admin/auth/sign-in", payload) as BaseApiResponse<null>;
+  async login(payload: Record<string, any>): Promise<BaseApiResponse<{ twoFactorRequired?: boolean; mustChangePassword?: boolean; challengeToken?: string } | null>> {
+    return await axiosPostRequestHandler("/admin/auth/sign-in", payload);
   }
   
   async pingAdmin() {
@@ -29,6 +29,32 @@ class AuthServiceApi {
 
   async confirmPasswordReset(payload: { token: string; password: string; confirmPassword: string }): Promise<BaseApiResponse<null>> {
     return await axiosPatchRequestHandler("/admin/auth/password-reset/confirm", payload) as BaseApiResponse<null>;
+  }
+
+  async getOwnProfile(): Promise<BaseApiResponse<{
+    id: string;
+    email: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+    profileImg: string | null;
+    twoFactorEnabled: boolean;
+    role: string;
+    permissions: string[];
+  }>> {
+    return await axiosGetRequestHandler("/admin/auth/profile") as any;
+  }
+
+  async toggleTwoFactorAuthentication(): Promise<BaseApiResponse<null>> {
+    return await axiosPatchRequestHandler("/admin/auth/two-factor-authentication", {}) as BaseApiResponse<null>;
+  }
+
+  async verifyTwoFactorAuthenticationCode(code: string, challengeToken: string): Promise<BaseApiResponse<null>> {
+    return await axiosPostRequestHandler("/admin/auth/two-factor-authentication/verify", { code, challengeToken }) as BaseApiResponse<null>;
+  }
+
+  async resendTwoFactorAuthenticationCode(challengeToken: string): Promise<BaseApiResponse<{ challengeToken: string }>> {
+    return await axiosPostRequestHandler("/admin/auth/two-factor-authentication/resend-code", { challengeToken }) as BaseApiResponse<{ challengeToken: string }>;
   }
 }
 

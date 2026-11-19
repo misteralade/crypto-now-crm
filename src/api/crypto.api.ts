@@ -2,15 +2,22 @@ import {
   axiosDeleteRequestHandler,
   axiosGetRequestHandler,
   axiosPatchRequestHandler,
-  axiosPostRequestHandler
+  axiosPostRequestHandler,
+  API_KIT,
 } from './index.js'
 import type {
   CreateSupportedCryptoAndAdminWalletRequestType, EditSupportedCryptoAndAdminWalletRequestType,
   SearchSupportedCryptoWalletRequestSchema,
+  CreateAdminWalletRequestType,
 } from '../schemas/crypto.schema.js'
 import type {
   BaseApiResponse, GetAllSupportedCryptoAPIResponse, GetSupportedCryptoAPIResponse,
-  SearchSupportedCryptoAPIResponse, UploadAPIResponse
+  SearchSupportedCryptoAPIResponse, UploadAPIResponse,
+  AdminGetUserCustodialWalletsAPIResponse,
+  AdminCustodialWalletDetailsAPIResponse,
+  AdminTreasuryWalletsAPIResponse,
+  RefreshCustodialWalletBalanceAPIResponse,
+  AdminGenerateUserCustodialWalletsAPIResponse,
 } from "../types/response.payload.types";
 
 class CryptoServiceApi {
@@ -20,7 +27,7 @@ class CryptoServiceApi {
   }
 
   public static getInstance(): CryptoServiceApi {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+     
     if (!CryptoServiceApi.instance) {
       CryptoServiceApi.instance = new CryptoServiceApi();
     }
@@ -29,6 +36,21 @@ class CryptoServiceApi {
 
   async searchSupportedCryptoCurrencies(body: SearchSupportedCryptoWalletRequestSchema) {
     return await axiosPostRequestHandler("/crypto/admin/search", body) as SearchSupportedCryptoAPIResponse;
+  }
+
+  async searchCoins(query: string, signal?: AbortSignal) {
+    const response = await API_KIT.get<BaseApiResponse<Array<{ id: string; name: string; symbol: string }>>>(
+      "/crypto/admin/coin-search", { params: { query }, signal },
+    );
+    return response.data;
+  }
+
+  async getNetworks() {
+    return await axiosGetRequestHandler("/crypto/admin/networks") as BaseApiResponse<Array<{ code: string; label: string }>>;
+  }
+
+  async createNetwork(code: string, label: string) {
+    return await axiosPostRequestHandler("/crypto/admin/networks", { code, label }) as BaseApiResponse<{ code: string; label: string }>;
   }
 
   async uploadCoinLogo(formData: FormData) {
@@ -61,6 +83,70 @@ class CryptoServiceApi {
   
   async adminDeleteSupportedCrypto(cryptoId: string) {
     return await axiosDeleteRequestHandler(`/crypto/admin/supported-crypto/${cryptoId}`) as BaseApiResponse<null>;
+  }
+
+  // Fetch a user's custodial (deposit) wallets (Admin only).
+  async adminGetUserCustodialWallets(userId: string) {
+    return await axiosGetRequestHandler(`/custodial-wallet/admin/${userId}`) as AdminGetUserCustodialWalletsAPIResponse;
+  }
+
+  async adminGetCustodialWalletByAddress(walletAddress: string) {
+    return await axiosGetRequestHandler(`/custodial-wallet/admin/address/${encodeURIComponent(walletAddress)}`) as AdminCustodialWalletDetailsAPIResponse;
+  }
+
+  async adminGetTreasuryWallets(cryptocurrencyId: string, network: string) {
+    return await axiosGetRequestHandler(`/custodial-wallet/admin/crypto/${encodeURIComponent(cryptocurrencyId)}/network/${encodeURIComponent(network)}`) as AdminTreasuryWalletsAPIResponse;
+  }
+
+  async adminRefreshCustodialWalletBalance(walletAddress: string) {
+    return await axiosPostRequestHandler(`/custodial-wallet/admin/address/${encodeURIComponent(walletAddress)}/refresh`, {}) as RefreshCustodialWalletBalanceAPIResponse;
+  }
+
+  // Generate all missing custodial (deposit) wallets for a user (Admin only).
+  async adminGenerateUserCustodialWallets(userId: string) {
+    return await axiosPostRequestHandler(`/custodial-wallet/admin/${userId}/generate/all`, {}) as AdminGenerateUserCustodialWalletsAPIResponse;
+  }
+
+  async adminToggleCustodialWalletActive(walletAddress: string, isActive: boolean) {
+    return await axiosPostRequestHandler(`/custodial-wallet/admin/address/${encodeURIComponent(walletAddress)}/toggle-active`, { isActive }) as BaseApiResponse<null>;
+  }
+
+  async adminGeneratePlatformFuelingWallet(cryptoId: string, network: string) {
+    return await axiosPostRequestHandler(`/crypto/admin/wallet/fueling/generate`, { cryptoId, network }) as BaseApiResponse<any>;
+  }
+
+  async adminCreatePlatformWallet(payload: CreateAdminWalletRequestType) {
+    return await axiosPostRequestHandler(`/crypto/admin/wallet/create`, payload) as BaseApiResponse<null>;
+  }
+
+  async adminDeletePlatformWallet(walletId: string) {
+    return await axiosDeleteRequestHandler(`/crypto/admin/wallet/${encodeURIComponent(walletId)}`) as BaseApiResponse<null>;
+  }
+
+  async adminUpdatePlatformWallet(payload: {
+    walletId: string;
+    cryptoId: string;
+    network: string;
+    walletType: "SENDING" | "RECEIVING";
+    walletAddress: string;
+    walletLabel?: string;
+    isActive: boolean;
+  }) {
+    return await axiosPatchRequestHandler(`/crypto/admin/wallet/${encodeURIComponent(payload.walletId)}`, {
+      cryptoId: payload.cryptoId,
+      network: payload.network,
+      walletType: payload.walletType,
+      walletAddress: payload.walletAddress,
+      walletLabel: payload.walletLabel,
+      isActive: payload.isActive,
+    }) as BaseApiResponse<null>;
+  }
+
+  async adminGetPlatformWalletBalance(walletId: string) {
+    return await axiosGetRequestHandler(`/crypto/admin/wallet/${encodeURIComponent(walletId)}/balance`) as BaseApiResponse<{
+      balance: number;
+      symbol: string;
+    }>;
   }
 }
 

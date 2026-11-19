@@ -174,6 +174,21 @@ export const disputeStatusStyles: Record<
 };
 
 
+export const MESSAGE_SENDER_TYPE = {
+  USER: 'USER',
+  ADMIN: 'ADMIN',
+} as const;
+
+export type MessageSenderType = typeof MESSAGE_SENDER_TYPE[keyof typeof MESSAGE_SENDER_TYPE];
+
+export const isDisputeClosed = (status?: string | null): boolean => {
+  return (
+    status === 'RESOLVED' ||
+    status === 'REJECTED' ||
+    status === 'CLOSED'
+  );
+};
+
 export const getStatusMessage = (status: DisputeStatus): string => {
   const messages: Record<DisputeStatus, string> = {
     OPEN: "Mark this dispute as open and ready for review.",

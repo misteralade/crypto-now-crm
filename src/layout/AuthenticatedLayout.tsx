@@ -1,13 +1,24 @@
-import {type ReactNode, useEffect, useState} from 'react'
-import { Menu } from 'lucide-react'
+import { type ReactNode, useEffect, useMemo, useState } from 'react'
 import Sidebar from "../components/sidebar.tsx";
-import {authServiceApi} from "../api/auth.api.ts";
-import {useNavigate} from "@tanstack/react-router";
+import GlobalTopBar from "../components/global/GlobalTopBar.tsx";
+import {useNavigate, useRouterState} from "@tanstack/react-router";
 import {LOCAL_STORAGE_KEYS, ROUTES} from "../util/constants.util.ts";
+import { motion, AnimatePresence } from 'framer-motion'
+import { SidebarToggleProvider } from "./sidebar-toggle-context.tsx";
+import { useAdminAuth } from "../hooks/useAdminAuth.ts";
+import { getRequiredPermissionsForPath } from "../util/permissions.util.ts";
 
 const AuthenticatedLayout = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate()
+  const routerState = useRouterState()
+  const { hasAnyPermission, loading: loadingAdminAuth } = useAdminAuth()
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const sidebarToggleValue = useMemo(() => ({
+    openSidebar: () => setSidebarOpen(true),
+    closeSidebar: () => setSidebarOpen(false),
+    toggleSidebar: () => setSidebarOpen((current) => !current),
+    isSidebarOpen: sidebarOpen,
+  }), [sidebarOpen])
   
   useEffect(() => {
     const isDesktop = window.innerWidth >= 1024
@@ -32,38 +43,52 @@ const AuthenticatedLayout = ({ children }: { children: ReactNode }) => {
     pingAdminUser();
   }, []);
   
-  const pingAdminUser = async () => {
-    const { success } = await authServiceApi.pingAdmin();
-    
-    if (!success) {
-      localStorage.removeItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-      navigate({ to: ROUTES.LOGIN })
+  const pingAdminUser = () => {
+    const token = localStorage.getItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+    if (!token) {
+      navigate({ to: ROUTES.LOGIN });
     }
   }
+
+  // Guard against direct URL access to a page the admin's permissions don't
+  // cover - hiding the nav link is UX, this is the actual enforcement layer
+  // on the frontend (the backend still rejects the underlying API calls either way).
+  useEffect(() => {
+    if (loadingAdminAuth) return;
+    const requiredPermissions = getRequiredPermissionsForPath(routerState.location.pathname);
+    if (requiredPermissions && !hasAnyPermission(requiredPermissions)) {
+      navigate({ to: ROUTES.DASHBOARD });
+    }
+  }, [loadingAdminAuth, routerState.location.pathname]);
   
   return (
-    <div className="min-h-screen font-[DM Sans]]">
-      <div className="flex">
+    <div className="min-h-screen bg-[#F8FAFC]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+      <div className="flex min-h-screen">
         <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
-        {sidebarOpen && (
-          <div
-            className="fixed inset-0 bg-black/30 z-40 lg:hidden"
-            onClick={() => setSidebarOpen(false)}
-          />
-        )}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {!sidebarOpen && (
-            <button
-              aria-label="Open sidebar"
-              className="lg:hidden fixed top-4 left-4 z-30 p-2 rounded-md border border-[#ECECEC] bg-white shadow"
-              onClick={() => setSidebarOpen(true)}
-            >
-              <Menu className="w-5 h-5" />
-            </button>
+        <AnimatePresence>
+          {sidebarOpen && window.innerWidth < 1024 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-40 lg:hidden pointer-events-auto"
+              onClick={() => setSidebarOpen(false)}
+            />
           )}
-          <main className="">
-            {children}
-          </main>
+        </AnimatePresence>
+        <div className="flex-1 flex flex-col min-w-0">
+          <SidebarToggleProvider value={sidebarToggleValue}>
+            <GlobalTopBar />
+            <motion.main
+              key={window.location.pathname}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="min-w-0 flex-1 pb-10"
+            >
+              {children}
+            </motion.main>
+          </SidebarToggleProvider>
         </div>
       </div>
     </div>

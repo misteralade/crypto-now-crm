@@ -1,4 +1,5 @@
-import type { ChangeEvent } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 
 interface TableFooterProps {
   currentPage: number;
@@ -6,11 +7,12 @@ interface TableFooterProps {
   pageSize: number;
   totalItems: number;
   onPageChange: (page: number) => void;
-  onPageSizeChange: (size: number) => void;
+  onPageSizeChange?: (size: number) => void;
+  showPageSize?: boolean;
   maxVisible?: number;
 }
 
-const TableFooter = ({ currentPage, totalPages, pageSize, totalItems, onPageChange, onPageSizeChange, maxVisible = 10 }: TableFooterProps) => {
+const TableFooter = ({ currentPage, totalPages, pageSize, totalItems, onPageChange, onPageSizeChange, showPageSize = true, maxVisible = 5 }: TableFooterProps) => {
   const getVisiblePages = () => {
     const pages = []
 
@@ -43,62 +45,45 @@ const TableFooter = ({ currentPage, totalPages, pageSize, totalItems, onPageChan
     return pages
   }
 
-  const handlePageSizeChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    const newSize = e.target.value === 'all' ? totalItems : Number(e.target.value)
-    onPageSizeChange(newSize)
-    onPageChange(1) // Reset to first page when page size changes
+  const handlePageSizeChange = (value: string) => {
+    const newSize = value === 'all' ? totalItems : Number(value)
+    onPageSizeChange?.(newSize)
+    onPageChange(1)
   }
 
-  const startItem = (currentPage - 1) * pageSize + 1
+  const startItem = totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1
   const endItem = Math.min(currentPage * pageSize, totalItems)
 
   return (
-    <div className="flex items-center justify-between w-full mt-4">
-      {/* Left side - Items per page selector */}
-      <div className="flex items-center gap-3">
-        <span className="text-sm text-[#667085]">Show</span>
-        <select
-          value={pageSize === totalItems ? 'all' : pageSize}
-          onChange={handlePageSizeChange}
-          className="px-3 py-2 border border-[#ECECEC] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#03034D] cursor-pointer"
-        >
-          <option value={10}>10</option>
-          <option value={20}>20</option>
-          <option value={50}>50</option>
-          <option value={100}>100</option>
-          <option value="all">All</option>
-        </select>
-        <span className="text-sm text-[#667085]">
-          {startItem}-{endItem} of {totalItems}
-        </span>
+    <div className="flex w-full min-w-0 flex-wrap items-center justify-center gap-3 border-t border-slate-100 bg-white px-1 py-3 sm:justify-between sm:px-4">
+      {/* Left side - Showing count (SilverLogix style) */}
+      <div className="text-xs text-slate-500 font-medium">
+        Showing <span className="text-slate-800 font-semibold">{startItem}</span> to <span className="text-slate-800 font-semibold">{endItem}</span> of <span className="text-slate-800 font-semibold">{totalItems}</span> entries
       </div>
 
-      {/* Right side - Pagination controls */}
-      <div className="flex items-center gap-2">
+      {/* Center - Numbered Pagination */}
+      <div className="flex items-center gap-1.5">
         <button
           onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className={`flex items-center gap-1 px-3 py-2 text-sm transition-colors ${
-            currentPage === 1
-              ? 'text-[#CCCCCC] cursor-not-allowed'
-              : 'text-black hover:text-[#03034D]'
-          } hover:cursor-pointer`}
+          disabled={currentPage <= 1}
+          className="w-7 h-7 flex items-center justify-center rounded-md border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer touch-manipulation shadow-2xs"
+          aria-label="Previous page"
         >
-          Prev
+          <ChevronLeft className="w-3.5 h-3.5" />
         </button>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           {getVisiblePages().map((page, index) => (
             page === '...' ? (
-              <span key={`${index}-${page}`} className="px-2 text-[#CCCCCC]">...</span>
+              <span key={`${index}-ellipsis`} className="px-1 text-slate-400 text-xs">···</span>
             ) : (
               <button
                 key={page}
                 onClick={() => onPageChange(page as number)}
-                className={`w-8 h-8 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
+                className={`w-7 h-7 rounded-md text-xs font-semibold transition-all cursor-pointer touch-manipulation ${
                   currentPage === page
-                    ? 'bg-[#03034D] text-white'
-                    : 'border border-[#ECECEC] text-[#667085] hover:border-[#03034D]'
+                    ? 'bg-blue-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                 }`}
               >
                 {page}
@@ -109,16 +94,30 @@ const TableFooter = ({ currentPage, totalPages, pageSize, totalItems, onPageChan
 
         <button
           onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className={`flex items-center gap-1 px-3 py-2 text-sm transition-colors ${
-            currentPage === totalPages
-              ? 'text-[#CCCCCC] cursor-not-allowed'
-              : 'text-black hover:text-[#03034D]'
-          } hover:cursor-pointer`}
+          disabled={currentPage >= totalPages}
+          className="w-7 h-7 flex items-center justify-center rounded-md border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer touch-manipulation shadow-2xs"
+          aria-label="Next page"
         >
-          Next
+          <ChevronRight className="w-3.5 h-3.5" />
         </button>
       </div>
+
+      {/* Right side - Rows per page */}
+      {showPageSize && <div className="flex items-center gap-2">
+        <span className="text-xs text-slate-500 font-medium">Rows per page</span>
+        <Select value={pageSize === totalItems ? 'all' : String(pageSize)} onValueChange={handlePageSizeChange}>
+          <SelectTrigger className="h-7.5 w-[70px] rounded-md border-slate-200 text-xs text-slate-800 font-semibold shadow-2xs px-2">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="10">10</SelectItem>
+            <SelectItem value="20">20</SelectItem>
+            <SelectItem value="50">50</SelectItem>
+            <SelectItem value="100">100</SelectItem>
+            <SelectItem value="all">All</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>}
     </div>
   )
 }

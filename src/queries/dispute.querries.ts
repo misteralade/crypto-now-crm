@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMatchRoute } from "@tanstack/react-router";
 import { toast } from "react-toastify";
@@ -10,11 +10,19 @@ import type { AxiosServerError, MessageAttachment } from '../types/response.payl
 import { transactionServiceApi } from "../api/transaction.api.ts";
 import type { SearchTransactionsRequestType } from "../schemas/transaction.schema.ts";
 import { searchTransactionsInitialState } from "../redux/states/initial-transaction-management.states.ts";
+import { clearDisputeMessageAttachments, clearDisputeMessageText } from "../redux/dispute.slice.ts";
 
 export const useDisputeQuery = () => {
+  const dispatch = useDispatch();
   const matchRoute = useMatchRoute();
   const queryClient = useQueryClient();
   const search = useSelector((state: RootState) => state.dispute.manage.search);
+  const detailsId = useSelector((state: RootState) => state.dispute.details.id);
+  const editId = useSelector((state: RootState) => state.dispute.edit.id);
+
+  const isDisputeDetails = !!matchRoute({ to: ROUTES.DISPUTE_DETAILS });
+  const isEditDispute = !!matchRoute({ to: ROUTES.EDIT_DISPUTE });
+  const activeDisputeId = isDisputeDetails ? detailsId : isEditDispute ? editId : (detailsId || editId);
   
   const { data: searchDispute, isLoading: loadingSearchDispute } = useQuery({
     queryKey: [QUERY_KEYS.DISPUTE.ADMIN_SEARCH_DISPUTES, search],
@@ -31,30 +39,28 @@ export const useDisputeQuery = () => {
   });
   
   const { data: disputeMessages, isLoading: loadingDisputeMessages } = useQuery({
-    queryKey: [QUERY_KEYS.DISPUTE.DISPUTE_MESSAGES],
+    queryKey: [QUERY_KEYS.DISPUTE.DISPUTE_MESSAGES, activeDisputeId],
     queryFn: async () => {
-      const disputeId = (store.getState() as RootState).dispute.details.id;
-      if (!disputeId) return null;
+      if (!activeDisputeId) return [];
       
-      const { data, success } = await disputeServiceApi.getDisputeMessages(disputeId);
+      const { data, success } = await disputeServiceApi.getDisputeMessages(activeDisputeId);
       
-      if (success) {
+      if (success && Array.isArray(data)) {
         return data;
       }
       
-      return null;
+      return [];
     },
-    enabled: !!matchRoute({ to: ROUTES.DISPUTE_DETAILS }) && !!(store.getState() as RootState).dispute.details.id,
+    enabled: (isDisputeDetails || isEditDispute) && !!activeDisputeId,
     refetchInterval: TIME_IN_MILLISECONDS.TEN_SECONDS,
   });
   
   const { data: disputeDetails, isLoading: loadingDisputeDetails } = useQuery({
-    queryKey: [QUERY_KEYS.DISPUTE.DISPUTE_DETAILS, store.getState().dispute.details.id],
+    queryKey: [QUERY_KEYS.DISPUTE.DISPUTE_DETAILS, detailsId],
     queryFn: async () => {
-      const disputeId = (store.getState() as RootState).dispute.details.id ;
-      if (!disputeId) return null;
+      if (!detailsId) return null;
       
-      const { data, success } = await disputeServiceApi.getDisputeDetails(disputeId);
+      const { data, success } = await disputeServiceApi.getDisputeDetails(detailsId);
       
       if (success) {
         return data;
@@ -62,16 +68,15 @@ export const useDisputeQuery = () => {
       
       return null;
     },
-    enabled: !!(matchRoute({ to: ROUTES.DISPUTE_DETAILS })) && !!((store.getState() as RootState).dispute.details.id),
+    enabled: isDisputeDetails && !!detailsId,
   });
   
   const { data: editDisputeDetails, isLoading: loadingEditDisputeDetails } = useQuery({
-    queryKey: [QUERY_KEYS.DISPUTE.DISPUTE_DETAILS, (store.getState() as RootState).dispute.edit.id],
+    queryKey: [QUERY_KEYS.DISPUTE.DISPUTE_DETAILS, editId],
     queryFn: async () => {
-      const disputeId = (store.getState() as RootState).dispute.edit.id;
-      if (!disputeId) return null;
+      if (!editId) return null;
       
-      const { data, success } = await disputeServiceApi.getDisputeDetails(disputeId);
+      const { data, success } = await disputeServiceApi.getDisputeDetails(editId);
       
       if (success) {
         return data;
@@ -79,7 +84,7 @@ export const useDisputeQuery = () => {
       
       return null;
     },
-    enabled: !!matchRoute({ to: ROUTES.EDIT_DISPUTE }) && !!(store.getState() as RootState).dispute.edit.id,
+    enabled: isEditDispute && !!editId,
   });
   
   const { data: transactionDetails, isLoading: loadingTransactionDetails } = useQuery({
@@ -108,24 +113,33 @@ export const useDisputeQuery = () => {
   
   const adminSendDisputeMutation = useMutation({
     mutationKey: [QUERY_KEYS.DISPUTE.ADMIN_SEND_DISPUTE_MESSAGE],
-    mutationFn: async () => {
-      const message = (store.getState() as RootState).dispute.details.message.text;
-      const attachments = (store.getState() as RootState).dispute.details.message.attachments;
-      const disputeId = (store.getState() as RootState).dispute.details.id;
+    mutationFn: async (payload?: { disputeId?: string; message?: string; attachments?: Array<MessageAttachment> }) => {
+      const disputeId = payload?.disputeId || activeDisputeId || (store.getState() as RootState).dispute.details.id;
+      const message = payload?.message !== undefined ? payload.message : ((store.getState() as RootState).dispute.details.message.text || '');
+      const attachments = payload?.attachments !== undefined ? payload.attachments : (((store.getState() as RootState).dispute.details.message.attachments as Array<MessageAttachment>) || []);
       
-      if (!disputeId || !message) {
-        throw new Error("Dispute ID and message are required to send a dispute message.");
+      if (!disputeId) {
+        throw new Error("Dispute ID is required to send a dispute message.");
+      }
+      
+      if (!message.trim() && (!attachments || attachments.length === 0)) {
+        throw new Error("Dispute message or attachment is required to send a message.");
       }
       
       toast.loading(`Sending message...`, { toastId: QUERY_KEYS.DISPUTE.ADMIN_SEND_DISPUTE_MESSAGE });
-      return await disputeServiceApi.sendDisputeMessage(disputeId, message, attachments as Array<MessageAttachment>);
+      return await disputeServiceApi.sendDisputeMessage(disputeId, message.trim(), attachments || []);
     },
     onSuccess: ({ message }) => {
       toast.dismiss(QUERY_KEYS.DISPUTE.ADMIN_SEND_DISPUTE_MESSAGE);
+      dispatch(clearDisputeMessageText());
+      dispatch(clearDisputeMessageAttachments());
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.DISPUTE.DISPUTE_MESSAGES]
       });
-      toast.success(message);
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.DISPUTE.DISPUTE_DETAILS]
+      });
+      toast.success(message || "Message sent successfully");
     },
     onError: ( error: AxiosServerError ) => {
       toast.dismiss(QUERY_KEYS.DISPUTE.ADMIN_SEND_DISPUTE_MESSAGE);

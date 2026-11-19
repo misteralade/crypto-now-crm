@@ -18,7 +18,7 @@ class BankServiceApi {
   }
 
   public static getInstance(): BankServiceApi {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+     
     if (!BankServiceApi.instance) {
       BankServiceApi.instance = new BankServiceApi();
     }
@@ -44,9 +44,21 @@ class BankServiceApi {
   async adminCreateBankAccount(payload: CreateBankAccountRequestType) {
     return await axiosPostRequestHandler(`/bank/platform/create`, payload) as BaseApiResponse<null>;
   }
+
+  async adminUpdatePlatformBankAccount(id: string, payload: { bankId: string; accountNumber: string }) {
+    return await axiosPatchRequestHandler(`/bank/admin/${id}/update`, payload) as BaseApiResponse<null>;
+  }
   
   async adminSearchSupportedBanks(payload: AdminSearchSupportedBankRequestType) {
     return await axiosPostRequestHandler(`/bank/admin/supported-bank/search`, payload) as SearchSupportedBanksAPIResponse;
+  }
+
+  async lookupAccountName(accountNumber: string, bankId: string) {
+    return await axiosPostRequestHandler("/bank/bank/lookup", { accountNumber, bankId }) as BaseApiResponse<{ accountName: string }>;
+  }
+
+  async adminUpdateUserBankAccount(userId: string, accountId: string, payload: { bankId: string; accountNumber: string }) {
+    return await axiosPatchRequestHandler(`/user/admin/${userId}/bank-accounts/${accountId}/update`, payload) as BaseApiResponse<null>;
   }
 }
 

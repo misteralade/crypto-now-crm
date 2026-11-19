@@ -11,8 +11,8 @@ import {
 export const SearchTransactionsRequestSchema = BasicSearchQuerySchema.extend({
   sessionId: z.coerce.string().optional(),
   userId: z.coerce.string().uuid().optional(),
+  userEmail: z.string().trim().email().max(255).optional(),
   cryptoCurrencyId: z.coerce.string().uuid().optional(),
-  exchangeRateId: z.coerce.string().uuid().optional(),
   type: TransactionAction.optional(),
   amountCrypto: z.coerce.number().optional(),
   amountFiat: z.coerce.number().optional(),

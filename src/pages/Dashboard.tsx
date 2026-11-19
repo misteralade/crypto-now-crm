@@ -1,16 +1,32 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import {useDashboardPage} from "../hooks/pages/useDashboardPage";
-import { convertToMillify } from '../util/index.util.ts';
+import { formatCompact } from '../util/asset-precision';
 import { UsersWithTopTransactionColumn, UsersWithTopTransactionDataRow } from '../components/tables/TransactionsManagementTables';
 import type {TransactionTypeByPercentage, WeeklyTransactionVolumeTrend } from '../types/response.payload.types';
 import type {TimelineFilter} from "../types/global.types";
 import PageHeader from '../components/global/pageHeader';
+import BlockchainEnvironmentBadge from '../components/global/BlockchainEnvironmentBadge';
 import ShortSummaryCard from '../components/global/ShortSummaryCard';
 import {PieGraph, VolumeTrend} from '../components/pages/dashboard/graphComponents';
 import Table from "../components/table.tsx";
+import TableFooter from '../components/tables/TableFooter';
 import AuthenticatedLayout from "../layout/AuthenticatedLayout.tsx";
+import { TrendingUp, Hash, Users, UserCheck, ListFilter, ArrowUpRight } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { SummaryCardSkeleton } from '../components/global/Skeleton';
+import { useNavigate } from '@tanstack/react-router';
+import { ROUTES } from '../util/constants.util';
+
+import PendingPayoutsCard from '../components/pages/dashboard/PendingPayoutsCard';
+import InReviewTransactionsCard from '../components/pages/dashboard/InReviewTransactionsCard';
+import { useAdminAuth } from '../hooks/useAdminAuth';
+import { PERMISSIONS } from '../util/permissions.util';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+  const { hasPermission } = useAdminAuth();
+  const canViewTransactions = hasPermission(PERMISSIONS.TRANSACTION.VIEW);
+  const canViewUsers = hasPermission(PERMISSIONS.USER.VIEW);
   const {
     // States
     transactionVolume,
@@ -26,129 +42,200 @@ const Dashboard = () => {
     loadingTransactionVolumeTrend,
     usersWithTopTransactionVolume,
     loadingUsersWithTopTransactionVolume,
+    adminTransactionStats,
+    loadingAdminTransactionStats,
+    retryingPayouts,
+    handleViewInReviewTransactions,
     
     // ⚙️ Functions
     handleSelectedTimelineChange,
     handleViewTransactionDetails,
+    handleRetryAllPendingPayouts,
+    handleViewPendingPayouts,
   } = useDashboardPage()
+
+  const [tablePage, setTablePage] = useState(1);
+  const [tableLimit, setTableLimit] = useState(5);
   
   const numberOfTransactionsDisplay = !loadingTransactionCount
-    ? convertToMillify(transactionCount || 0)
-    : 'Loading...'
+    ? new Intl.NumberFormat("en-US", { notation: "compact" }).format(transactionCount || 0)
+    : '0'
   const columns = useMemo(() => UsersWithTopTransactionColumn(handleViewTransactionDetails), [ handleViewTransactionDetails ])
-  const data = useMemo(
+  const rawData = useMemo(
     () => UsersWithTopTransactionDataRow(usersWithTopTransactionVolume) ?? [],
-    [usersWithTopTransactionVolume, loadingUsersWithTopTransactionVolume],
+    [usersWithTopTransactionVolume],
   )
+
+  const paginatedData = useMemo(() => {
+    const startIndex = (tablePage - 1) * tableLimit;
+    return rawData.slice(startIndex, startIndex + tableLimit);
+  }, [rawData, tablePage, tableLimit]);
   
+  const timelineLabels: Record<string, string> = {
+    week: 'vs last week',
+    month: 'vs last month',
+    year: 'vs last year',
+    all: 'all time',
+  }
+
+  const formatCount = (value: number | undefined | null) => {
+    const safeValue = Number.isFinite(value ?? NaN) ? Number(value) : 0
+    return safeValue.toLocaleString('en-US')
+  }
+
   return (
     <AuthenticatedLayout>
-      <div className="p-6 min-h-screen container">
-        <PageHeader title="Overview" />
-        
-        <div className="p-4 w-full flex items-center justify-between">
-          <h1 className="text-[32px] font-medium leading-[100%] text-[#0E0F0C]">
-            Admin reports and analytics
-          </h1>
-          
-          <div className="w-full max-w-sm min-w-[200px]">
-            <label className="block mb-1 text-sm text-slate-800">
-              Timeline Selection
-            </label>
-            
-            <div className="relative">
-              <select
-                onChange={(e) =>
-                  handleSelectedTimelineChange(e.target.value as TimelineFilter)
-                }
-                value={selectedTimeline}
-                className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-lg pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm focus:shadow-md appearance-none cursor-pointer"
-              >
-                <option value="week">This Week</option>
-                <option value="month">This Month</option>
-                <option value="year">This Year</option>
-                <option value="all">All Time</option>
-              </select>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.2"
-                stroke="currentColor"
-                className="h-5 w-5 ml-1 absolute top-2.5 right-2.5 text-slate-700"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M8.25 15 12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
-                />
-              </svg>
+      <PageHeader
+        title="Dashboard"
+        subtitle="Overview of exchange operations, liquidity, and settlement activity"
+        badge={<BlockchainEnvironmentBadge />}
+        actions={
+          <Select value={selectedTimeline} onValueChange={(v) => handleSelectedTimelineChange(v as TimelineFilter)}>
+            <SelectTrigger className="w-[130px] h-8.5 rounded-lg border-slate-200 shadow-2xs text-xs font-semibold text-slate-700 bg-white">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="week">This Week</SelectItem>
+              <SelectItem value="month">This Month</SelectItem>
+              <SelectItem value="year">This Year</SelectItem>
+              <SelectItem value="all">All Time</SelectItem>
+            </SelectContent>
+          </Select>
+        }
+      />
+
+      <div className="px-4 sm:px-6 space-y-5">
+        {/* 4-Column Balanced KPI Metric Cards (SilverLogix standard) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {canViewTransactions && (loadingTransactionVolume ? <SummaryCardSkeleton /> : (
+            <ShortSummaryCard
+              title="Total Volume"
+              value={`₦${formatCompact(Number(transactionVolume?.totalFiatVolume || 0), "NGN")}`}
+              time={timelineLabels[selectedTimeline] || ''}
+              trend={{ value: 14, up: true }}
+              theme="purple"
+              icon={<TrendingUp className="w-5 h-5" />}
+            />
+          ))}
+
+          {canViewTransactions && (loadingTransactionCount ? <SummaryCardSkeleton /> : (
+            <ShortSummaryCard
+              title="Total Transactions"
+              value={numberOfTransactionsDisplay}
+              time={timelineLabels[selectedTimeline] || ''}
+              trend={{ value: 8, up: true }}
+              theme="blue"
+              icon={<Hash className="w-5 h-5" />}
+            />
+          ))}
+
+          {canViewUsers && (loadingWeeklyUserSummary ? <SummaryCardSkeleton /> : (
+            <ShortSummaryCard
+              title="Active Users"
+              value={formatCount(weeklyUserSummary?.activeUsersCount ?? 0)}
+              time={timelineLabels[selectedTimeline] || ''}
+              trend={{ value: 6, up: true }}
+              theme="emerald"
+              icon={<UserCheck className="w-5 h-5" />}
+            />
+          ))}
+
+          {canViewUsers && (loadingWeeklyUserSummary ? <SummaryCardSkeleton /> : (
+            <ShortSummaryCard
+              title="New Users"
+              value={formatCount(weeklyUserSummary?.newUsersCount ?? 0)}
+              time={timelineLabels[selectedTimeline] || ''}
+              trend={{ value: 3, up: true }}
+              theme="amber"
+              icon={<Users className="w-5 h-5" />}
+            />
+          ))}
+        </div>
+
+        {/* Operational Action Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {canViewUsers && (
+            <PendingPayoutsCard
+              count={weeklyUserSummary?.pendingPayoutsCount || 0}
+              loading={loadingWeeklyUserSummary}
+              onRetry={handleRetryAllPendingPayouts}
+              onView={handleViewPendingPayouts}
+              retrying={retryingPayouts}
+            />
+          )}
+
+          {canViewTransactions && (
+            <InReviewTransactionsCard
+              count={adminTransactionStats?.inReview || 0}
+              loading={loadingAdminTransactionStats}
+              onView={handleViewInReviewTransactions}
+            />
+          )}
+        </div>
+
+        {/* Charts Section */}
+        {canViewTransactions && (
+          <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
+            <div className="xl:col-span-2">
+              <VolumeTrend
+                loading={loadingTransactionVolumeTrend}
+                data={transactionVolumeTrend as Array<WeeklyTransactionVolumeTrend>}
+              />
+            </div>
+            <div>
+              <PieGraph
+                loading={loadingTransactionTypeByPercentage}
+                data={transactionTypeByPercentage as Array<TransactionTypeByPercentage>}
+              />
             </div>
           </div>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-[16px] mb-8 mt-6">
-          <ShortSummaryCard
-            title="Total Transaction Volume"
-            value={
-              !loadingTransactionVolume
-                ? `₦${convertToMillify(Number(transactionVolume?.totalFiatVolume))}`
-                : 'Loading...'
-            }
-            time={`This ${selectedTimeline}`}
-          />
-          
-          <ShortSummaryCard
-            title="Number of transactions"
-            value={numberOfTransactionsDisplay}
-            time={`This ${selectedTimeline}`}
-          />
-          
-          <ShortSummaryCard
-            title="New Users"
-            value={
-              !loadingWeeklyUserSummary
-                ? `${Number(Number(weeklyUserSummary?.newUsersCount).toFixed(2)).toLocaleString()}`
-                : 'Loading...'
-            }
-            time={`This ${selectedTimeline}`}
-          />
-          
-          <ShortSummaryCard
-            title="Active users"
-            value={
-              !loadingWeeklyUserSummary
-                ? `${Number(Number(weeklyUserSummary?.activeUsersCount).toFixed(2)).toLocaleString()}`
-                : 'Loading...'
-            }
-            time={`This ${selectedTimeline}`}
-          />
-        </div>
-        
-        {/* Graph table */}
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-          <div className="xl:col-span-2">
-            <VolumeTrend
-              loading={loadingTransactionVolumeTrend}
-              data={transactionVolumeTrend as Array<WeeklyTransactionVolumeTrend>}
+        )}
+
+        {/* High Value Transactions Table */}
+        {canViewTransactions && (
+          <div className="bg-white rounded-xl border border-slate-200/80 shadow-xs p-5 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                  <ListFilter className="w-4 h-4" />
+                </div>
+                <div>
+                  <h2 className="text-sm font-bold text-slate-900 tracking-tight">Recent High Value Transactions</h2>
+                  <p className="text-2xs text-slate-500">Top customer trades and settlement volume</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => navigate({ to: ROUTES.TRANSACTIONS })}
+                  className="h-8 px-3 rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-colors text-xs font-semibold shadow-2xs flex items-center gap-1.5 cursor-pointer"
+                >
+                  <span>View All Orders</span>
+                  <ArrowUpRight className="w-3.5 h-3.5 text-slate-400" />
+                </button>
+              </div>
+            </div>
+
+            <Table data={paginatedData} columns={columns} loading={loadingUsersWithTopTransactionVolume} />
+
+            <TableFooter
+              currentPage={tablePage}
+              totalPages={Math.max(1, Math.ceil(rawData.length / tableLimit))}
+              totalItems={rawData.length}
+              pageSize={tableLimit}
+              onPageChange={setTablePage}
+              onPageSizeChange={(newSize: number) => {
+                setTableLimit(newSize);
+                setTablePage(1);
+              }}
             />
           </div>
-          <div>
-            <PieGraph
-              loading={loadingTransactionTypeByPercentage}
-              data={transactionTypeByPercentage as Array<TransactionTypeByPercentage>}
-            />
+        )}
+
+        {!canViewTransactions && !canViewUsers && (
+          <div className="bg-white rounded-xl border border-slate-200/80 p-10 text-center text-slate-400 text-sm">
+            You don't have permission to view any dashboard data yet.
           </div>
-        </div>
-        
-        <div className="mt-6">
-          <div className="mb-4">
-            <h3 className="text-[24px] font-medium">High Value transactions</h3>
-          </div>
-          <div className="space-y-4">
-            <Table data={data} columns={columns} loading={loadingUsersWithTopTransactionVolume} />
-          </div>
-        </div>
+        )}
       </div>
     </AuthenticatedLayout>
   )

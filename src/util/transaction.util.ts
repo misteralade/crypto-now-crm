@@ -1,5 +1,29 @@
 import type {TransactionStatus} from "../schemas/enum.schema.ts";
 
+/**
+ * amountFiat is stored in the transaction's own settlement/display currency
+ * (USD for stablecoin trades), not always NGN — anywhere the amount is shown
+ * with a ₦ symbol must convert through stableToFiatRate first. Prefer
+ * amountFiatNGN directly when the response type already has it.
+ */
+export function getTransactionAmountFiatNGN(tx: {
+  amountFiat: string | number;
+  currency: string;
+  stableToFiatRate: string | number;
+}): number {
+  const amountFiat = Number(tx.amountFiat ?? 0);
+  const stableToFiatRate = Number(tx.stableToFiatRate ?? 0);
+  if (tx.currency === "NGN") return amountFiat;
+  if (tx.currency === "USD" && stableToFiatRate > 0)
+    return amountFiat * stableToFiatRate;
+  return amountFiat;
+}
+
+const MANUAL_PAYOUT_RETRY_STATUSES = new Set<TransactionStatus>([
+  "PENDING_PAYOUT",
+  "PAYOUT_FAILED",
+]);
+
 export enum StatusCategory {
   INITIAL = 'initial',
   IN_PROGRESS = 'in_progress',
@@ -31,15 +55,6 @@ const statusConfig: Record<TransactionStatus, {
   },
 
   // In progress statuses
-  PENDING: {
-    category: StatusCategory.IN_PROGRESS,
-    bgColor: 'bg-amber-50',
-    textColor: 'text-amber-700',
-    dotColor: 'bg-amber-500',
-    displayName: 'Pending',
-    description: 'Transaction is being processed',
-    isActionable: false,
-  },
   PROCESSING: {
     category: StatusCategory.IN_PROGRESS,
     bgColor: 'bg-indigo-50',
@@ -49,43 +64,6 @@ const statusConfig: Record<TransactionStatus, {
     description: 'Transaction is currently being processed',
     isActionable: false,
   },
-  PAYMENT_CONFIRMED: {
-    category: StatusCategory.IN_PROGRESS,
-    bgColor: 'bg-cyan-50',
-    textColor: 'text-cyan-700',
-    dotColor: 'bg-cyan-500',
-    displayName: 'Payment Confirmed',
-    description: 'Payment has been confirmed',
-    isActionable: false,
-  },
-  PAYMENT_ACCOUNT_CONFIRMED: {
-    category: StatusCategory.IN_PROGRESS,
-    bgColor: 'bg-teal-50',
-    textColor: 'text-teal-700',
-    dotColor: 'bg-teal-500',
-    displayName: 'Account Confirmed',
-    description: 'Payment account has been confirmed',
-    isActionable: false,
-  },
-  CRYPTO_SENT: {
-    category: StatusCategory.IN_PROGRESS,
-    bgColor: 'bg-purple-50',
-    textColor: 'text-purple-700',
-    dotColor: 'bg-purple-500',
-    displayName: 'Crypto Sent',
-    description: 'Cryptocurrency has been sent',
-    isActionable: false,
-  },
-  CRYPTO_CONFIRMED: {
-    category: StatusCategory.IN_PROGRESS,
-    bgColor: 'bg-violet-50',
-    textColor: 'text-violet-700',
-    dotColor: 'bg-violet-500',
-    displayName: 'Crypto Confirmed',
-    description: 'Cryptocurrency transaction confirmed',
-    isActionable: false,
-  },
-
   // Awaiting statuses
   AWAITING_PAYMENT: {
     category: StatusCategory.AWAITING,
@@ -96,13 +74,13 @@ const statusConfig: Record<TransactionStatus, {
     description: 'Waiting for payment to be received',
     isActionable: true,
   },
-  PAYMENT_RECEIVED: {
+  IN_REVIEW: {
     category: StatusCategory.AWAITING,
-    bgColor: 'bg-lime-50',
-    textColor: 'text-lime-700',
-    dotColor: 'bg-lime-500',
-    displayName: 'Payment Received',
-    description: 'Payment has been received, awaiting confirmation',
+    bgColor: 'bg-amber-50',
+    textColor: 'text-amber-700',
+    dotColor: 'bg-amber-500',
+    displayName: 'In Review',
+    description: 'Receipt has been uploaded and is awaiting review',
     isActionable: false,
   },
   AWAITING_CRYPTO: {
@@ -114,13 +92,13 @@ const statusConfig: Record<TransactionStatus, {
     description: 'Waiting for cryptocurrency transaction',
     isActionable: false,
   },
-  CRYPTO_RECEIVED: {
+  DEPOSIT_PENDING_MINIMUM: {
     category: StatusCategory.AWAITING,
-    bgColor: 'bg-emerald-50',
-    textColor: 'text-emerald-700',
-    dotColor: 'bg-emerald-500',
-    displayName: 'Crypto Received',
-    description: 'Cryptocurrency received, awaiting confirmation',
+    bgColor: 'bg-sky-50',
+    textColor: 'text-sky-700',
+    dotColor: 'bg-sky-500',
+    displayName: 'Deposit Pending Minimum',
+    description: 'Deposit is confirmed but still below the minimum threshold',
     isActionable: false,
   },
 
@@ -134,16 +112,6 @@ const statusConfig: Record<TransactionStatus, {
     description: 'Transaction completed successfully',
     isActionable: true,
   },
-  REFUNDED: {
-    category: StatusCategory.SUCCESS,
-    bgColor: 'bg-green-50',
-    textColor: 'text-green-700',
-    dotColor: 'bg-green-500',
-    displayName: 'Refunded',
-    description: 'Transaction has been refunded',
-    isActionable: true,
-  },
-
   // Failed statuses
   FAILED: {
     category: StatusCategory.FAILED,
@@ -172,6 +140,15 @@ const statusConfig: Record<TransactionStatus, {
     description: 'Transaction is under dispute',
     isActionable: true,
   },
+  REFUNDED: {
+    category: StatusCategory.SUCCESS,
+    bgColor: 'bg-green-50',
+    textColor: 'text-green-700',
+    dotColor: 'bg-green-600',
+    displayName: 'Refunded',
+    description: 'Transaction refund completed successfully',
+    isActionable: true,
+  },
 
   // Cancelled statuses
   CANCELLED: {
@@ -183,14 +160,59 @@ const statusConfig: Record<TransactionStatus, {
     description: 'Transaction was cancelled',
     isActionable: true,
   },
-  REFUNDING: {
-    category: StatusCategory.CANCELLED,
-    bgColor: 'bg-slate-50',
-    textColor: 'text-slate-700',
-    dotColor: 'bg-slate-500',
-    displayName: 'Refunding',
-    description: 'Refund is being processed',
+  DEPOSIT_DETECTED: {
+    category: StatusCategory.AWAITING,
+    bgColor: 'bg-sky-50',
+    textColor: 'text-sky-700',
+    dotColor: 'bg-sky-500',
+    displayName: 'Deposit Detected',
+    description: 'Blockchain deposit seen, awaiting confirmations',
     isActionable: false,
+  },
+  PENDING_CONFIRMATION: {
+    category: StatusCategory.AWAITING,
+    bgColor: 'bg-sky-50',
+    textColor: 'text-sky-700',
+    dotColor: 'bg-sky-500',
+    displayName: 'Pending Confirmation',
+    description: 'Deposit detected and waiting for blockchain confirmation',
+    isActionable: false,
+  },
+  DEPOSIT_CONFIRMED: {
+    category: StatusCategory.IN_PROGRESS,
+    bgColor: 'bg-blue-50',
+    textColor: 'text-blue-700',
+    dotColor: 'bg-blue-500',
+    displayName: 'Deposit Confirmed',
+    description: 'Required confirmations reached, triggering payout',
+    isActionable: false,
+  },
+  PAYOUT_INITIATED: {
+    category: StatusCategory.IN_PROGRESS,
+    bgColor: 'bg-indigo-50',
+    textColor: 'text-indigo-700',
+    dotColor: 'bg-indigo-500',
+    displayName: 'Payout Initiated',
+    description: 'NGN payout instruction sent to fiat rail',
+    isActionable: false,
+  },
+  PAYOUT_FAILED: {
+    category: StatusCategory.FAILED,
+    bgColor: 'bg-red-50',
+    textColor: 'text-red-700',
+    dotColor: 'bg-red-500',
+    displayName: 'Payout Failed',
+    description: 'Payout attempt failed, will retry',
+    isActionable: true,
+  },
+  PENDING_PAYOUT: {
+    category: StatusCategory.AWAITING,
+    bgColor: 'bg-yellow-50',
+    textColor: 'text-yellow-800',
+    dotColor: 'bg-yellow-600',
+    displayName: 'Pending Payout',
+    description: 'Transaction is awaiting payout due to low platform balance or other non-critical issues',
+    isActionable: true,
   },
 };
 
@@ -277,4 +299,8 @@ export const getStatusColor = (status: string): string => {
 export const getStatusDot = (status: string): string => {
   const config = getStatusConfig(status);
   return config.dotColor;
+};
+
+export const canManuallyRetryPayout = (status: string): boolean => {
+  return MANUAL_PAYOUT_RETRY_STATUSES.has(status.toUpperCase() as TransactionStatus);
 };

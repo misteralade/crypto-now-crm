@@ -67,6 +67,10 @@ export const useAdminQuery = () => {
     onSuccess: ({ message, success }) => {
       toast.dismiss();
       toast.success(message || "Successfully Created new Role");
+      if (success) {
+        void queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN.ROLE_CATALOGUE] });
+        void queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN.GET_ALL_ADMIN_ROLES] });
+      }
       return success;
     },
     onError: (error: AxiosServerError) => {

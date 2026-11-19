@@ -58,7 +58,7 @@ console.log({
             First Name
           </label>
           <div className="px-4 py-3 bg-[#F9FAFB] rounded-lg border border-[#D9D9D9] text-[#0E0F0C]">
-            {user?.profile?.firstName || '—'}
+            {user?.profile?.firstName || '-'}
           </div>
         </div>
 
@@ -68,7 +68,7 @@ console.log({
             Last Name
           </label>
           <div className="px-4 py-3 bg-[#F9FAFB] rounded-lg border border-[#D9D9D9] text-[#0E0F0C]">
-            {user?.profile?.lastName || '—'}
+            {user?.profile?.lastName || '-'}
           </div>
         </div>
         
@@ -81,7 +81,7 @@ console.log({
             {user?.status ? (
               <UserStatusBadge status={user.status as UserStatusVariant} />
             ) : (
-              <span className="text-sm text-[#667085]">—</span>
+              <span className="text-sm text-[#667085]">-</span>
             )}
           </div>
         </div>
@@ -92,7 +92,7 @@ console.log({
             Email
           </label>
           <div className="px-4 py-3 bg-[#F9FAFB] rounded-lg border border-[#D9D9D9] text-[#0E0F0C]">
-            {user?.email || '—'}
+            {user?.email || '-'}
           </div>
         </div>
 
@@ -102,7 +102,7 @@ console.log({
             Phone Number
           </label>
           <div className="px-4 py-3 bg-[#F9FAFB] rounded-lg border border-[#D9D9D9] text-[#0E0F0C]">
-            {user?.profile?.phoneNumber || '—'}
+            {user?.profile?.phoneNumber || '-'}
           </div>
         </div>
 
@@ -142,7 +142,7 @@ console.log({
           <div className="px-4 py-3 bg-[#F9FAFB] rounded-lg border border-[#D9D9D9] text-[#0E0F0C]">
             {user?.createdAt 
               ? momentClient.formatToNormalisedDateAndTime(user.createdAt)
-              : '—'}
+              : '-'}
           </div>
         </div>
       </div>

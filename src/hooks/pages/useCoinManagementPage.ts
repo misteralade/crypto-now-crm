@@ -7,12 +7,12 @@ import {
   clearEditCoinPayload, setDeleteCoinId,
   setEditCoinId,
   setEditCoinPayloadField,
-  setSearchSupportedCrypto,
   setSearchSupportedCryptoField,
 } from '../../redux/coin-management.slice'
 import { useCryptoQuery } from '../../queries/crypto.querries'
 import { ROUTES } from "../../util/constants.util.ts";
-import {searchSupportedCryptoInitialState} from "../../redux/states/initial-coin-management.states";
+import type { SearchSupportedCryptoData } from "../../types/response.payload.types";
+import { cryptoServiceApi } from '../../api/crypto.api';
 
 export const useCoinManagementPage = () => {
   const dispatch = useDispatch();
@@ -20,10 +20,11 @@ export const useCoinManagementPage = () => {
   const { supportedCrypto, loadingSupportedCrypto, updateCryptoCurrencyMutation, adminDeleteCryptoCurrencyMutation } = useCryptoQuery()
 
   const [query, setQuery] = useState('')
-  const [pageSize, setPageSize] = useState<number>(10);
-  
-  // Modal
+
+  // Modals
   const [deleteCoinModal, setDeleteCoinModal] = useState(false);
+  const [selectedCoin, setSelectedCoin] = useState<SearchSupportedCryptoData | null>(null);
+  const [loadingCoinDetails, setLoadingCoinDetails] = useState(false);
 
   const openAddCoin = () => navigate({ to: ROUTES.ADD_COIN })
 
@@ -39,24 +40,22 @@ export const useCoinManagementPage = () => {
     }));
   }
 
-  const handlePageSizeChange = (size: number) => {
-    setPageSize(size);
-    dispatch(setSearchSupportedCrypto({
-      ...searchSupportedCryptoInitialState,
-      size: size,
-    }))
-  }
-
-  const handlePageChange = (page: number) => {
-    dispatch(setSearchSupportedCryptoField({
-      field: 'page',
-      value: page,
-    }));
-  }
-
   const handleViewCoinDetails = (id: string) => {
     navigate({ to: ROUTES.EDIT_COIN.replace('$coinId', id) })
   }
+
+  const handleOpenCoinDetails = async (id: string) => {
+    setSelectedCoin(null)
+    setLoadingCoinDetails(true)
+    try {
+      const { data, success } = await cryptoServiceApi.adminGetSupportedCrypto(id)
+      if (success && data) setSelectedCoin(data)
+    } finally {
+      setLoadingCoinDetails(false)
+    }
+  }
+
+  const handleCloseCoinDetails = () => setSelectedCoin(null)
 
   const handleDisableCoin = async (id: string, status: boolean) => {
     dispatch(setEditCoinId(id));
@@ -65,7 +64,7 @@ export const useCoinManagementPage = () => {
       value: !status,
     }))
     const { success } = await updateCryptoCurrencyMutation.mutateAsync()
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+     
     if (success) {
       dispatch(clearEditCoinPayload())
       dispatch(clearEditCoinId())
@@ -94,16 +93,16 @@ export const useCoinManagementPage = () => {
     query,
     supportedCrypto,
     loadingSupportedCrypto,
-    pageSize,
     deleteCoinModal,
-
+    selectedCoin,
+    loadingCoinDetails,
 
     // ⚙️ Functions
     openAddCoin,
     handleCoinSearchChange,
-    handlePageSizeChange,
-    handlePageChange,
     handleViewCoinDetails,
+    handleOpenCoinDetails,
+    handleCloseCoinDetails,
     handleDisableCoin,
     handleDeleteCryptoCurrency,
     toggleDeleteCoinModal,

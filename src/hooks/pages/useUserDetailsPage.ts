@@ -17,12 +17,13 @@ export const useUserDetailsPage = () => {
     loadingUserProfileSummary,
     patchUserStatusMutation, 
     adminResetPasswordMutation, 
-    adminUpdateUserProfileMutation 
+    adminUpdateUserProfileMutation,
+    adminUpdateUserBankAccountMutation,
   } = useUserQuery();
   
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   
-  const { userId } = useParams({ from: '/dashboard/users/$userId' })
+  const { userId } = useParams({ from: '/dashboard/user/$userId' })
   
   useEffect(() => {
     if (userId) {
@@ -32,7 +33,7 @@ export const useUserDetailsPage = () => {
 
   const handleNavigateToTransactionHistory = () => {
     if (userId) {
-      navigate({ to: `${ROUTES.USER_TRANSACTIONS.replace('$userId', userId)}` })
+      navigate({ to: ROUTES.TRANSACTIONS, search: { userId } as any })
     }
   }
 
@@ -81,6 +82,16 @@ export const useUserDetailsPage = () => {
     }
   }
 
+  const handleUpdateUserBankAccount = async (accountId: string, payload: { bankId: string; accountNumber: string }) => {
+    if (!userId) return false;
+    try {
+      const result = await adminUpdateUserBankAccountMutation.mutateAsync({ userId, accountId, payload });
+      return !!result?.success;
+    } catch {
+      return false;
+    }
+  }
+
   const getEditModalInitialValues = () => {
     const profile = userProfileSummary?.user?.profile || userProfile?.profile;
     return {
@@ -109,5 +120,6 @@ export const useUserDetailsPage = () => {
     openEditModal,
     closeEditModal,
     handleUpdateUserProfile,
+    handleUpdateUserBankAccount,
   };
 };

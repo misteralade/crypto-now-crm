@@ -1,7 +1,11 @@
 import {useState, useEffect} from "react";
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { useQuery } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import {useTransactionQuery} from "../../queries/transaction.query";
+import {userServiceApi} from "../../api/user.api";
+import {QUERY_KEYS} from "../../queries/querries.keys";
 import {
   clearTransactionDetailSessionId,
   clearTransactionDetailUpdateField,
@@ -11,43 +15,85 @@ import {
   setTransactionDetailUpdateField
 } from '../../redux/transaction-management.slice'
 import {useCryptoQuery} from "../../queries/crypto.querries";
-import { store} from "../../store";
 import {searchTransactionsInitialState} from "../../redux/states/initial-transaction-management.states";
 import type {
   SearchTransactionsRequestType,
   UpdateTransactionStatusRequestType
 } from "../../schemas/transaction.schema";
 import type {RootState} from "../../store";
+import type { TimelineFilter } from "../../types/global.types";
 import type {AxiosServerError} from "../../types/response.payload.types";
 
 export const useManageTransactionsPage = () => {
   const dispatch = useDispatch()
-  
-  // Ensure userId is always undefined for manage transactions page
+  const sortModel = useSelector((state: RootState) => state.transactionManagement.search.transactions.sortModel)
+  const activeFilters = useSelector((state: RootState) => state.transactionManagement.search.transactions)
+  const navigate = useNavigate()
+  const [selectedStatsTimeline, setSelectedStatsTimeline] =
+    useState<TimelineFilter>('all')
+
+  // Arriving with ?userId=<id> (e.g. from a user's profile "Transactions" link,
+  // or a transaction's "Transactions" link) scopes this same page to that user
+  // instead of duplicating the table in a separate route.
+  const { userId: filteredUserId } = useSearch({ from: '/dashboard/transactions/' })
+
   useEffect(() => {
     dispatch(setSearchTransactionsField({
       field: 'userId',
-      value: undefined,
+      value: filteredUserId,
     }))
-  }, [dispatch])
+  }, [dispatch, filteredUserId])
+
+  const clearUserFilter = () => {
+    navigate({ to: '/dashboard/transactions', search: { userId: undefined } })
+  }
+
+  // Fetch just enough about the filtered user to name them in the
+  // "Showing transactions for this user only" banner.
+  const { data: filteredUserSummary } = useQuery({
+    queryKey: [QUERY_KEYS.USER.GET_USER_PROFILE_SUMMARY, filteredUserId],
+    queryFn: async () => {
+      if (!filteredUserId) return null
+      const { data, success } = await userServiceApi.getUserProfileSummary(filteredUserId)
+      return success ? data : null
+    },
+    enabled: !!filteredUserId,
+  })
+
+  const filteredUserName = filteredUserSummary
+    ? [filteredUserSummary.user.profile?.firstName, filteredUserSummary.user.profile?.lastName]
+        .filter(Boolean)
+        .join(' ') || filteredUserSummary.user.email
+    : undefined
   const {
     // Queries
     searchTransactions,
     loadingSearchTransactions,
+    fetchingSearchTransactions,
+    refetchSearchTransactions,
     transactionDetail,
     loadingTransactionDetails,
+    refetchTransactionDetail,
+    adminTransactionStats,
+    loadingAdminTransactionStats,
 
     // Mutations
     adminUpdateTransactionMutation,
     adminUploadTransactionReceiptMutation,
     adminLockTransactionMutation,
-  } = useTransactionQuery();
+    adminRetryDepositConfirmationMutation,
+    adminForceTriggerPayoutMutation,
+  } = useTransactionQuery({
+    adminStatsTimeline: selectedStatsTimeline,
+  });
   
   const { allSupportedCrypto, loadingAllSupportedCrypto } = useCryptoQuery();
-  const [selectedTransactionIds, setSelectedTransactionIds] = useState<Array<string>>([])
   const [showTransactionDetails, setShowTransactionDetails] = useState(false);
 
-  const handleSearchTransactionFieldUpdate = (field: keyof SearchTransactionsRequestType, value: any ) => {
+  const handleSearchTransactionFieldUpdate = (
+    field: keyof SearchTransactionsRequestType,
+    value: SearchTransactionsRequestType[keyof SearchTransactionsRequestType],
+  ) => {
     dispatch(setSearchTransactionsField({
       field,
       value,
@@ -58,32 +104,11 @@ export const useManageTransactionsPage = () => {
     dispatch(setSearchTransactions({
       ...searchTransactionsInitialState,
       size: size,
-      userId: undefined, // Explicitly ensure userId is not set
+      userId: filteredUserId,
     }))
   }
   
-  const handleSelectTransactionId = (transactionId: string) => {
-    let updatedSelectedIds = [...selectedTransactionIds];
-    if (updatedSelectedIds.includes(transactionId)) {
-      updatedSelectedIds = updatedSelectedIds.filter(id => id !== transactionId);
-    } else {
-      updatedSelectedIds.push(transactionId);
-    }
-    setSelectedTransactionIds(updatedSelectedIds);
-  }
-
-  const handleSelectAllTransactionIds = () => {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    const transactionIds = searchTransactions && searchTransactions?.transactions?.map(tx => tx.id) || [];
-    if (selectedTransactionIds.length === transactionIds.length) {
-      setSelectedTransactionIds([]);
-    } else {
-      setSelectedTransactionIds(transactionIds);
-    }
-  }
-
   const handleSortBy = (columnKey: string) => {
-    const sortModel = (store.getState() as RootState).transactionManagement.search.transactions.sortModel;
     handleSearchTransactionFieldUpdate("sortModel", {
       colId: columnKey,
       orderBy: sortModel && sortModel.colId === columnKey && sortModel.orderBy === 'ASC' ? 'DESC' : 'ASC',
@@ -91,47 +116,76 @@ export const useManageTransactionsPage = () => {
   }
 
   const handleShowTransactionDetails = async (sessionId?: string) => {
-    // If sessionId is not present, then just toggle the state and clear the redux
     if (!sessionId) {
       dispatch(clearTransactionDetailSessionId())
-      toggleShowTransactionDetails()
+      setShowTransactionDetails(false)
       return
     }
 
-    // If sessionId is present, try to lock the transaction first
+    // Open drawer immediately — lock in the background, close only on failure
+    dispatch(setTransactionDetailSessionId(sessionId))
+    setShowTransactionDetails(true)
+
     try {
       await adminLockTransactionMutation.mutateAsync(sessionId)
-      // Lock successful, open the sidebar
-      dispatch(setTransactionDetailSessionId(sessionId))
-      toggleShowTransactionDetails()
     } catch (error) {
-      console.log({
-        error
-      })
-      // Handle lock error
       const axiosError = error as AxiosServerError
       const errorMessage = axiosError.response?.data?.error?.message || 'Failed to lock transaction'
-      
-      // Show error message
       toast.error(errorMessage)
-      
-      // Ensure sidebar is closed and clear sessionId
-      if (showTransactionDetails) {
-        toggleShowTransactionDetails()
-      }
+      setShowTransactionDetails(false)
       dispatch(clearTransactionDetailSessionId())
     }
   }
 
-  const handleTransactionUpdateField = (field: (keyof UpdateTransactionStatusRequestType), value: any) => {
+  const handleTransactionUpdateField = (
+    field: keyof UpdateTransactionStatusRequestType,
+    value: UpdateTransactionStatusRequestType[keyof UpdateTransactionStatusRequestType],
+  ) => {
     dispatch(setTransactionDetailUpdateField({ field, value }))
   }
 
   const handleTransactionUpdate = async () => {
-    await adminUpdateTransactionMutation.mutateAsync();
-    toggleShowTransactionDetails();
-    dispatch(clearTransactionDetailSessionId())
-    dispatch(clearTransactionDetailUpdateField());
+    const response = await adminUpdateTransactionMutation.mutateAsync(undefined);
+    if (response?.success) {
+      await Promise.all([refetchTransactionDetail(), refetchSearchTransactions()]);
+      dispatch(clearTransactionDetailUpdateField());
+    }
+    return response;
+  }
+
+  const handleRetryDepositConfirmation = async (sessionId?: string) => {
+    if (!sessionId) {
+      toast.error("Transaction session ID is required to retry confirmation");
+      return;
+    }
+
+    const res = await adminRetryDepositConfirmationMutation.mutateAsync(sessionId);
+
+    if (res?.success) {
+      await Promise.all([
+        refetchTransactionDetail(),
+        refetchSearchTransactions(),
+      ]);
+    }
+  }
+
+  const handleForceTriggerPayout = async (sessionId?: string) => {
+    if (!sessionId) {
+      toast.error("Transaction session ID is required to trigger payout");
+      return;
+    }
+
+    const res = await adminForceTriggerPayoutMutation.mutateAsync({
+      sessionId,
+      forceProceed: true,
+    });
+
+    if (res?.success) {
+      await Promise.all([
+        refetchTransactionDetail(),
+        refetchSearchTransactions(),
+      ]);
+    }
   }
 
   const handleTransactionReceiptUpload = async (file: File): Promise<string> => {
@@ -149,27 +203,42 @@ export const useManageTransactionsPage = () => {
     return result?.signedUrl || '';
   }
 
-  const toggleShowTransactionDetails = () => setShowTransactionDetails(!showTransactionDetails)
+  const handleSelectedStatsTimelineChange = (timeline: TimelineFilter) => {
+    setSelectedStatsTimeline(timeline)
+  }
 
   return {
     // 🧩 Values
     searchTransactions,
     loadingSearchTransactions,
+    sortModel,
+    activeFilters,
     allSupportedCrypto,
     loadingAllSupportedCrypto,
-    selectedTransactionIds,
     transactionDetail,
     loadingTransactionDetails,
     showTransactionDetails,
+    adminTransactionStats,
+    loadingAdminTransactionStats,
+    selectedStatsTimeline,
+    filteredUserId,
+    filteredUserName,
 
     // ⚙️ Functions
-    handleSelectTransactionId,
-    handleSelectAllTransactionIds,
     handleSortBy,
     handleShowTransactionDetails,
     handleTransactionUpdateField,
     handleTransactionUpdate,
     handleTransactionReceiptUpload,
+    handleRetryDepositConfirmation,
+    handleForceTriggerPayout,
+    retryingConfirmation: adminRetryDepositConfirmationMutation.isPending,
+    forcingPayout: adminForceTriggerPayoutMutation.isPending,
+    updatingTransactionStatus: adminUpdateTransactionMutation.isPending,
     handlePageSizeChange,
+    handleSelectedStatsTimelineChange,
+    handleRefreshTransactions: refetchSearchTransactions,
+    isFetchingTransactions: fetchingSearchTransactions,
+    clearUserFilter,
   }
 }

@@ -1,42 +1,51 @@
-import {Fragment, type SelectHTMLAttributes, useEffect, useRef, useState} from 'react'
-import {ChevronDown, Search, X} from 'lucide-react'
+// Re-exports from ui/select for backwards compatibility.
+// MFLabeledPillSelect maps to PillSelect (Radix-based).
+// MFLabeledPillSearchSelect is kept as a full custom component
+// since it has search/filter functionality not in the base select.
 
-interface MFLabeledPillSelectProps
-  extends SelectHTMLAttributes<HTMLSelectElement> {
+import { useEffect, useRef, useState } from 'react'
+import { ChevronDown, Search, X } from 'lucide-react'
+import { PillSelect } from '../ui/select'
+import { cn } from '../../lib/utils'
+
+// Default export: simple pill select (wraps Radix)
+interface MFLabeledPillSelectProps {
   label: string
-  valueClass?: string
-  labelClass?: string
   options: Array<{ value: string; label: string }>
+  value?: string
+  placeholder?: string
+  onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void
+  onValueChange?: (value: string) => void
+  disabled?: boolean
+  className?: string
 }
 
-export default function MFLabeledPillSelect({
-  label,
-  className = '',
-  valueClass = 'text-[18px] placeholder:text-[#9A9A9A]',
-  labelClass = 'text-[14px] font-me  leading-[24px] text-[#454745]',
-  options,
-  ...props
-}: MFLabeledPillSelectProps) {
+export default function MFLabeledPillSelect({ label, options, value, placeholder = "Select...", onChange, onValueChange, disabled, className }: MFLabeledPillSelectProps) {
+  const handleValueChange = (val: string) => {
+    onValueChange?.(val)
+    if (onChange) {
+      // Synthesize a native-like event for backwards compat
+      const syntheticEvent = { target: { value: val === '__empty__' ? '' : val } } as React.ChangeEvent<HTMLSelectElement>
+      onChange(syntheticEvent)
+    }
+  }
+
   return (
-    <fieldset className="relative rounded-full border-[1.5px] border-[#E4E7EC] px-[16px] py-[12px]">
-      <legend className={`px-3 font-medium ${labelClass}`}>{label}</legend>
-      <select
-        {...props}
-        className={`w-full cursor-pointer bg-transparent outline-none pr-8 text-[#101828] ${valueClass} ${className} appearance-none`}
-      >
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
-      <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-[20px] h-[20px] text-[#9A9A9A]" />
-    </fieldset>
+    <PillSelect
+      label={label}
+      value={value ?? ""}
+      placeholder={placeholder}
+      onValueChange={handleValueChange}
+      options={options}
+      disabled={disabled}
+      className={className}
+    />
   )
 }
 
+// Named export: search-capable select (kept custom but updated styling)
 interface MFLabeledPillSearchSelectProps {
-  options: Array<{ value: string; label: string }>;
+  options: Array<{ value: string; label: string; logoUrl?: string }>;
   label: string;
   placeholder?: string;
   valueClass?: string;
@@ -51,176 +60,158 @@ export const MFLabeledPillSearchSelect = ({ label, options, onChange, labelClass
   const [searchTerm, setSearchTerm] = useState('');
   const [highlightedIndex, setHighlightedIndex] = useState(0);
   const [selectedItem, setSelectedItem] = useState(controlledValue || '')
-  const dropdownRef = useRef<any>(null);
-  const searchInputRef = useRef<any>(null);
-  
-  // Sync internal state with controlled value
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
-    if (controlledValue !== undefined) {
-      setSelectedItem(controlledValue);
-    }
+    if (controlledValue !== undefined) setSelectedItem(controlledValue);
   }, [controlledValue]);
-  
-  // Filter options based on search term
+
   const filteredOptions = options.filter(opt =>
     opt.label.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  
-  // Get selected option label
+
   const selectedOption = options.find(opt => opt.value === selectedItem);
   const displayValue = selectedOption ? selectedOption.label : '';
-  
-  // Close dropdown when clicking outside
+
+  const closeDropdown = () => {
+    setIsOpen(false);
+    setSearchTerm('');
+  };
+
   useEffect(() => {
-    const handleClickOutside = (event: any) => {
-      if (dropdownRef.current && !dropdownRef.current?.contains(event.target)) {
-        setIsOpen(false);
-        setSearchTerm('');
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        closeDropdown();
       }
     };
-    
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-  
-  // Focus search input when dropdown opens
+
   useEffect(() => {
-    if (isOpen && searchInputRef.current) {
-      searchInputRef.current?.focus();
-    }
+    if (isOpen && searchInputRef.current) searchInputRef.current.focus();
   }, [isOpen]);
-  
-  // Handle keyboard navigation
-  const handleKeyDown = (e: any) => {
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!isOpen) {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        setIsOpen(true);
-      }
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setIsOpen(true); }
       return;
     }
-    
     switch (e.key) {
-      case 'ArrowDown':
-        e.preventDefault();
-        setHighlightedIndex(prev =>
-          prev < filteredOptions.length - 1 ? prev + 1 : prev
-        );
-        break;
-      case 'ArrowUp':
-        e.preventDefault();
-        setHighlightedIndex(prev => prev > 0 ? prev - 1 : 0);
-        break;
-      case 'Enter':
-        e.preventDefault();
-        if (filteredOptions[highlightedIndex]) {
-          handleSelect(filteredOptions[highlightedIndex].value);
-        }
-        break;
-      case 'Escape':
-        e.preventDefault();
-        setIsOpen(false);
-        setSearchTerm('');
-        break;
+      case 'ArrowDown': e.preventDefault(); setHighlightedIndex(prev => prev < filteredOptions.length - 1 ? prev + 1 : prev); break;
+      case 'ArrowUp': e.preventDefault(); setHighlightedIndex(prev => prev > 0 ? prev - 1 : 0); break;
+      case 'Enter': e.preventDefault(); if (filteredOptions[highlightedIndex]) handleSelect(filteredOptions[highlightedIndex].value); break;
+      case 'Escape': e.preventDefault(); closeDropdown(); break;
     }
   };
-  
+
   const handleSelect = (optionValue: string) => {
     setSelectedItem(optionValue);
     onChange(optionValue);
-    setIsOpen(false);
-    setSearchTerm('');
+    closeDropdown();
     setHighlightedIndex(0);
   };
-  
-  const clearSelection = (e: any) => {
+
+  const clearSelection = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setSelectedItem('')
+    setSelectedItem('');
     onChange('');
   };
-  
+
+  const isLabelFloating = isOpen || !!selectedItem;
+
   return (
-    <Fragment>
-      <div ref={dropdownRef} className="relative">
-        <fieldset className="relative rounded-full border-[1.5px] border-[#E4E7EC] px-[16px] py-[12px]">
-          <legend className={`px-3 font-medium ${labelClass}`}>{label}</legend>
-          
-          <div
-            className={`w-full cursor-pointer bg-transparent outline-none pr-8 text-[#101828] ${valueClass} ${className} flex items-center justify-between`}
-            onClick={() => setIsOpen(!isOpen)}
-            onKeyDown={handleKeyDown}
-            tabIndex={0}
-            role="combobox"
-            aria-expanded={isOpen}
-            aria-haspopup="listbox"
-          >
-            <span className={!displayValue ? 'text-[#9A9A9A]' : ''}>
-              {displayValue || placeholder}
-            </span>
-            <div className="flex items-center gap-2">
-              {displayValue && (
-                <X
-                  className="w-[16px] h-[16px] text-[#9A9A9A] hover:text-[#101828] transition-colors"
-                  onClick={clearSelection}
-                />
-              )}
-              <ChevronDown
-                className={`w-[20px] h-[20px] text-[#9A9A9A] transition-transform ${isOpen ? 'rotate-180' : ''}`}
-              />
-            </div>
-          </div>
-        </fieldset>
-        
-        {isOpen && (
-          <div className="absolute z-50 w-full mt-2 bg-white border-[1.5px] border-[#E4E7EC] rounded-2xl shadow-lg max-h-[300px] overflow-hidden">
-            {/* Search input */}
-            <div className="p-3 border-b border-[#E4E7EC]">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-[#9A9A9A]" />
-                <input
-                  ref={searchInputRef}
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    setHighlightedIndex(0);
-                  }}
-                  onKeyDown={handleKeyDown}
-                  placeholder={placeholder}
-                  className="w-full pl-10 pr-4 py-2 rounded-full border border-[#E4E7EC] outline-none focus:border-[#101828] transition-colors"
-                />
-              </div>
-            </div>
-            
-            {/* Options list */}
-            <div className="overflow-y-auto max-h-[240px]" role="listbox">
-              {filteredOptions.length > 0 ? (
-                filteredOptions.map((opt, index) => (
-                  <div
-                    key={opt.value}
-                    onClick={() => handleSelect(opt.value)}
-                    className={`px-4 py-3 cursor-pointer transition-colors ${
-                      opt.value === selectedItem
-                        ? 'bg-[#F9FAFB] text-[#101828] font-medium'
-                        : 'hover:bg-[#F9FAFB]'
-                    } ${
-                      index === highlightedIndex ? 'bg-[#F3F4F6]' : ''
-                    }`}
-                    role="option"
-                    aria-selected={opt.value === selectedItem}
-                  >
-                    {opt.label}
-                  </div>
-                ))
-              ) : (
-                <div className="px-4 py-8 text-center text-[#9A9A9A]">
-                  No options found
-                </div>
-              )}
-            </div>
-          </div>
+    <div ref={dropdownRef} className="relative w-full mb-5">
+      <div
+        className={cn(
+          "relative w-full h-14 rounded-full border bg-white flex items-center px-8 cursor-pointer transition-all duration-200",
+          isOpen ? "border-blue-500 ring-1 ring-blue-500/10 shadow-sm" : "border-gray-300",
+          className
         )}
+        onClick={() => isOpen ? closeDropdown() : setIsOpen(true)}
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
+        role="combobox"
+        aria-expanded={isOpen}
+        aria-haspopup="listbox"
+      >
+        <span
+          className={cn(
+            "absolute left-7 px-2 font-medium transition-all duration-200 pointer-events-none z-10 bg-white rounded-sm",
+            isLabelFloating
+              ? "-top-[9px] text-xs text-gray-600 scale-90 origin-left"
+              : "top-1/2 -translate-y-1/2 text-sm text-gray-400",
+            isOpen && "text-blue-600",
+            labelClass
+          )}
+        >
+          {label}
+        </span>
+
+        <div className={cn("flex-1 flex items-center gap-2 truncate text-base text-[#101828]", isLabelFloating && "pt-5 pb-1", valueClass)}>
+          {selectedOption?.logoUrl && (
+            <img src={selectedOption.logoUrl} alt="" className="w-6 h-6 rounded-full object-contain" />
+          )}
+          <span className={!displayValue ? 'text-gray-400' : ''}>{displayValue || placeholder}</span>
+        </div>
+
+        <div className="flex items-center gap-2 ml-2">
+          {displayValue && (
+            <X className="w-4 h-4 text-[#9A9A9A] hover:text-[#101828] transition-colors" onClick={clearSelection} />
+          )}
+          <ChevronDown className={cn("w-5 h-5 text-[#9A9A9A] opacity-70 transition-transform duration-200", isOpen && "rotate-180")} />
+        </div>
       </div>
-    </Fragment>
+
+      <div
+        className={cn(
+          "absolute z-[9999] mt-2 w-full overflow-hidden rounded-[20px] border border-gray-200 bg-white shadow-2xl transition-all duration-150 ease-out",
+          isOpen
+            ? "pointer-events-auto max-h-[340px] translate-y-0 scale-100 opacity-100"
+            : "pointer-events-none max-h-0 -translate-y-2 scale-95 opacity-0",
+        )}
+        aria-hidden={!isOpen}
+      >
+        <div className="border-b border-gray-100 p-2">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9A9A9A]" />
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={searchTerm}
+              onChange={(e) => { setSearchTerm(e.target.value); setHighlightedIndex(0); }}
+              onKeyDown={handleKeyDown}
+              placeholder={placeholder}
+              className="w-full rounded-xl border border-gray-200 py-2.5 pl-9 pr-4 text-sm outline-none transition-all focus:border-blue-500 focus:ring-1 focus:ring-blue-500/10"
+            />
+          </div>
+        </div>
+        <div className="max-h-[240px] overflow-y-auto p-1.5" role="listbox">
+          {filteredOptions.length > 0 ? (
+            filteredOptions.map((opt, index) => (
+              <div
+                key={opt.value}
+                onClick={() => handleSelect(opt.value)}
+                className={cn(
+                  "flex cursor-pointer items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition-colors",
+                  opt.value === selectedItem ? 'bg-blue-50 font-bold text-blue-900' : 'text-gray-900 hover:bg-gray-50',
+                  index === highlightedIndex && opt.value !== selectedItem ? 'bg-gray-50' : ''
+                )}
+                role="option"
+                aria-selected={opt.value === selectedItem}
+              >
+                {opt.logoUrl && (
+                  <img src={opt.logoUrl} alt="" className="h-5 w-5 rounded-full object-contain" />
+                )}
+                <span>{opt.label}</span>
+              </div>
+            ))
+          ) : (
+            <div className="px-4 py-8 text-center text-sm font-medium text-gray-400">No options found</div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };

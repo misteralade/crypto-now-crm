@@ -1,4 +1,5 @@
 import {
+  API_KIT,
   axiosGetRequestHandler,
   axiosPatchRequestHandler,
   axiosPostRequestHandler,
@@ -9,11 +10,15 @@ import type {
 } from '../schemas/transaction.schema'
 import type {
   BaseApiResponse,
+  AdminTransactionStatsResponse,
   GetTransactionCountAPIResponse, GetTransactionDetailsAPIResponse,
   GetTransactionTypeByPercentageAPIResponse,
   GetTransactionVolumeAPIResponse,
   GetTransactionVolumeTrendAPIResponse,
   GetUsersWithTopTransactionVolumeAPIResponse,
+  AdminRetryPendingPayoutsResponse,
+  AdminRetryDepositConfirmationResponse,
+  AdminForceTriggerPayoutResponse,
   SearchTransactionsAPIResponse,
   UploadAPIResponse,
 } from '../types/response.payload.types'
@@ -24,7 +29,6 @@ class TransactionServiceApi {
   private constructor() {}
 
   public static getInstance(): TransactionServiceApi {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!TransactionServiceApi.instance) {
       TransactionServiceApi.instance = new TransactionServiceApi()
     }
@@ -32,35 +36,42 @@ class TransactionServiceApi {
     return TransactionServiceApi.instance
   }
 
-  async getTransactionVolume(queryParams?: Record<string, any>) {
+  async getTransactionVolume(queryParams?: Record<string, unknown>) {
     return (await axiosGetRequestHandler(
       '/transaction/transaction-volume',
       queryParams,
     )) as GetTransactionVolumeAPIResponse
   }
 
-  async getTransactionVolumeTrend(queryParams?: Record<string, any>) {
+  async getTransactionVolumeTrend(queryParams?: Record<string, unknown>) {
     return (await axiosGetRequestHandler(
       '/transaction/transaction-volume/trend',
       queryParams,
     )) as GetTransactionVolumeTrendAPIResponse
   }
 
-  async getTransactionCount(queryParams?: Record<string, any>) {
+  async getTransactionCount(queryParams?: Record<string, unknown>) {
     return (await axiosGetRequestHandler(
       '/transaction/transaction-count',
       queryParams,
     )) as GetTransactionCountAPIResponse
   }
 
-  async getTransactionTypeByPercentage(queryParams?: Record<string, any>) {
+  async getAdminTransactionStats(queryParams?: Record<string, unknown>) {
+    return (await axiosGetRequestHandler(
+      '/transaction/admin/stats',
+      queryParams,
+    )) as BaseApiResponse<AdminTransactionStatsResponse>
+  }
+
+  async getTransactionTypeByPercentage(queryParams?: Record<string, unknown>) {
     return (await axiosGetRequestHandler(
       '/transaction/transaction-type-percentage',
       queryParams,
     )) as GetTransactionTypeByPercentageAPIResponse
   }
 
-  async getUsersWithTopTransactionVolume(queryParams?: Record<string, any>) {
+  async getUsersWithTopTransactionVolume(queryParams?: Record<string, unknown>) {
     return (await axiosGetRequestHandler(
       '/transaction/top-users-by-transaction-volume',
       queryParams,
@@ -75,7 +86,7 @@ class TransactionServiceApi {
   }
 
   async adminUpdateTransactionStatusAndAdminNotes(
-    sessionId: any,
+    sessionId: string,
     payload: UpdateTransactionStatusRequestType,
   ) {
     return (await axiosPatchRequestHandler(
@@ -102,6 +113,14 @@ class TransactionServiceApi {
   async adminGetTransactionDetails(sessionId: string) {
     return await axiosGetRequestHandler(`/transaction/admin/details/${sessionId}`) as GetTransactionDetailsAPIResponse
   }
+
+  async adminDownloadTransactionLedgerCsv(sessionId: string) {
+    const response = await API_KIT.get(`/transaction/admin/details/${sessionId}/ledger/export`, {
+      responseType: 'blob',
+    })
+
+    return response.data as Blob
+  }
   
   async adminLockTransaction(sessionId: string) {
     return (await axiosPostRequestHandler(
@@ -126,6 +145,27 @@ class TransactionServiceApi {
     }
     
     throw new Error(response.message);
+  }
+
+  async adminRetryPendingPayouts(sessionId?: string, forceProceed = false) {
+    return (await axiosPostRequestHandler(
+      '/transaction/admin/retry-pending-payouts',
+      { sessionId, forceProceed },
+    )) as BaseApiResponse<AdminRetryPendingPayoutsResponse>
+  }
+
+  async adminRetryDepositConfirmation(sessionId: string) {
+    return (await axiosPostRequestHandler(
+      '/transaction/admin/retry-deposit-confirmation',
+      { sessionId },
+    )) as BaseApiResponse<AdminRetryDepositConfirmationResponse>
+  }
+
+  async adminForceTriggerPayout(sessionId: string, forceProceed = false) {
+    return (await axiosPostRequestHandler(
+      '/transaction/admin/force-trigger-payout',
+      { sessionId, forceProceed },
+    )) as BaseApiResponse<AdminForceTriggerPayoutResponse>
   }
 }
 

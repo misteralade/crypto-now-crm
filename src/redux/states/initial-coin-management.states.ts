@@ -1,84 +1,90 @@
 import type {
   CreateSupportedCryptoAndAdminWalletRequestType,
   EditSupportedCryptoAndAdminWalletRequestType,
-  SearchSupportedCryptoWalletRequestSchema
+  SearchSupportedCryptoWalletRequestSchema,
 } from "../../schemas/crypto.schema";
 
-export const searchSupportedCryptoInitialState: SearchSupportedCryptoWalletRequestSchema = {
-  createdBy: undefined,
-  name: undefined,
-  description: undefined,
-  symbol: undefined,
-  isActive: true,
-  logoUrl: undefined,
-  websiteUrl: undefined,
-  whitepaperUrl: undefined,
-  additionalInfo: undefined,
-  isStableCoin: undefined,
-  maxTransactionLimit: undefined,
-  minTransactionLimit: undefined,
-  maxTradeAmountForAnonymous: undefined,
-  minTradeAmountForAnonymous: undefined,
+export const searchSupportedCryptoInitialState: SearchSupportedCryptoWalletRequestSchema =
+  {
+    createdBy: undefined,
+    name: undefined,
+    description: undefined,
+    symbol: undefined,
+    isActive: true,
+    logoUrl: undefined,
+    websiteUrl: undefined,
+    whitepaperUrl: undefined,
+    additionalInfo: undefined,
+    isStableCoin: undefined,
+    maxTransactionLimit: undefined,
+    minTransactionLimit: undefined,
+    maxTradeAmountForAnonymous: undefined,
+    minTradeAmountForAnonymous: undefined,
 
-  // Include Related Entities
-  includeAdmin: false,
-  includePlatformExchange: false,
-  includeTransactions: false,
-  includeAdminCryptoWallets: false,
-  includeExchangeRates: false,
-  includeUserCryptoWallets: false,
+    // Include Related Entities
+    includeAdmin: false,
+    includePlatformExchange: false,
+    includeTransactions: false,
+    includeAdminCryptoWallets: true,
+    includeExchangeRates: false,
+    includeUserCryptoWallets: false,
 
-  // BasicSearchQuerySchema fields
-  page: 1,
-  size: 10,
-  sortModel: {
-    colId: 'createdAt',
-    orderBy: 'DESC',
-  }
-};
+    // BasicSearchQuerySchema fields
+    // No pagination in the Coin Management UI — fetch the full (small) list of supported cryptos in one page.
+    page: 1,
+    size: 100,
+    sortModel: {
+      colId: "createdAt",
+      orderBy: "DESC",
+    },
+  };
 
-export const createSupportedCryptoAndWalletInitialState: CreateSupportedCryptoAndAdminWalletRequestType = {
-  name: '',
-  symbol: '',
-  description: undefined,
-  isStableCoin: false,
-  logoUrl: undefined,
-  maxTransactionLimit: undefined,
-  minTransactionLimit: undefined,
-  maxTradeAmountForAnonymous: undefined,
-  minTradeAmountForAnonymous: undefined,
-  websiteUrl: undefined,
-  whitepaperUrl: undefined,
-  additionalInfo: undefined,
+export const createSupportedCryptoAndWalletInitialState: CreateSupportedCryptoAndAdminWalletRequestType =
+  {
+    name: "",
+    symbol: "",
+    description: undefined,
+    isStableCoin: false,
+    logoUrl: undefined,
+    maxTransactionLimit: undefined,
+    minTransactionLimit: undefined,
+    maxTradeAmountForAnonymous: undefined,
+    minTradeAmountForAnonymous: undefined,
+    websiteUrl: undefined,
+    whitepaperUrl: undefined,
+    additionalInfo: undefined,
 
-  // Wallet
-  walletAddress: '',
-  walletLabel: undefined,
-  walletType: "BOTH",
-  network: undefined,
-  isPrimary: true,
-  isVerified: true,
+    // Networks & Wallets
+    networks: [],
+    wallets: [],
 
-  // Common
-  isActive: true,
-}
+    // Common
+    isActive: true,
+    blockchainEnvironment: "testnet",
+    buyEnabled: true,
+    sellEnabled: false,
+    coinGeckoId: "",
+    buyPrecision: -1,
+  };
 
-export const editSupportedCryptoInitialState: EditSupportedCryptoAndAdminWalletRequestType = {
-  name: undefined,
-  symbol: undefined,
-  description: undefined,
-  isStableCoin: undefined,
-  logoUrl: undefined,
-  maxTransactionLimit: undefined,
-  minTransactionLimit: undefined,
-  maxTradeAmountForAnonymous: undefined,
-  minTradeAmountForAnonymous: undefined,
-  buyRate: undefined,
-  sellRate: undefined,
-  websiteUrl: undefined,
-  whitepaperUrl: undefined,
-  additionalInfo: undefined,
+export const editSupportedCryptoInitialState: EditSupportedCryptoAndAdminWalletRequestType =
+  {
+    name: undefined,
+    symbol: undefined,
+    description: undefined,
+    isStableCoin: undefined,
+    logoUrl: undefined,
+    maxTransactionLimit: undefined,
+    minTransactionLimit: undefined,
+    maxTradeAmountForAnonymous: undefined,
+    minTradeAmountForAnonymous: undefined,
+    buyRate: undefined,
+    sellRate: undefined,
+    websiteUrl: undefined,
+    whitepaperUrl: undefined,
+    additionalInfo: undefined,
+    blockchainEnvironment: undefined,
 
-  // Common
-  isActive: undefined,
-}
+    // Common
+    isActive: undefined,
+  };

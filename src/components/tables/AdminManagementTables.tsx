@@ -1,18 +1,24 @@
-import {Fragment} from "react";
 import {StatusColumn} from "./global";
 import type {TableColumn} from "../table";
-import momentClient from "../../util/moment";
 import type {SearchAdminResponsePayload} from "../../types/response.payload.types.ts";
 
+type SearchAdminTableRow = {
+  id: string
+  name: string
+  username: string
+  email: string
+  role: string
+  status: boolean
+}
+
 export const SearchAdminDataColumn = (
-  handleUpdateAdminStatus: (id: string, status: boolean) => void,
-  handleDeleteUser: (id: string) => void,
+  currentAdminId?: string | null,
 ): Array<TableColumn> => [
   {
     key: 'id',
     header: 'Admin ID',
     render: (value) => (
-      <span className="overflow-hidden text-[#101828] text-sm whitespace-nowrap text-ellipsis">
+      <span className="overflow-hidden text-sm whitespace-nowrap text-ellipsis tabular-nums text-[#101828]">
         {value}
       </span>
     ),
@@ -20,10 +26,13 @@ export const SearchAdminDataColumn = (
   {
     key: 'name',
     header: 'Name',
-    render: (value) => (
-      <span className="overflow-hidden text-[#101828] text-sm whitespace-nowrap text-ellipsis">
-        {value}
-      </span>
+    render: (value, row) => (
+      <div className="min-w-0">
+        <p className="overflow-hidden text-ellipsis whitespace-nowrap text-sm font-medium text-[#101828]">
+          {value}{' '}
+          {row.id === currentAdminId && <span className="ml-1 rounded-full bg-blue-100 px-1.5 py-0.5 text-2xs font-bold uppercase tracking-wider text-blue-700">You</span>}
+        </p>
+      </div>
     ),
   },
   {
@@ -51,48 +60,13 @@ export const SearchAdminDataColumn = (
       <StatusColumn status={String(value)} />
     ),
   },
-  {
-    key: 'date',
-    header: 'Last Active',
-    render: (value) => (
-      <span className="overflow-hidden text-ellipsis truncate text-sm font-medium leading-tight text-[#667085] whitespace-nowrap">
-        {value}
-      </span>
-    ),
-  },
-  {
-    key: 'action',
-    header: (
-      <Fragment>
-        <div className="py-3 text-left text-sm font-medium text-gray-500">
-          <span className="flex items-center gap-2"></span>
-        </div>
-      </Fragment>
-    ),
-    render: (_, row) => (
-      <div className="flex items-center justify-start gap-2 lg:gap-x-[16px] whitespace-nowrap">
-        <button
-          className={`px-2.5 md:px-3 py-1 rounded-full text-[11px] cursor-pointer hover:opacity-80 md:text-xs font-medium ${row.status === true ? 'bg-[#FCE8E8] text-[#EB5757]' : 'bg-[#FDF2E7] text-[#F2994A]'}`}
-          onClick={() => handleUpdateAdminStatus(row.id, !row.status)}
-        >
-          {row.status === true ? 'Suspend' : 'Unsuspend'}
-        </button>
-        
-        <button
-          className="px-3 py-1 font-medium text-[12px] bg-[#EF4444] text-white rounded-full hover:opacity-70 cursor-pointer hover:cursor-pointer"
-          onClick={() => handleDeleteUser(row.id)}
-        >
-          Delete
-        </button>
-      </div>
-    ),
-  },
+
 ]
 
 export const SearchAdminDataRow = (
   data: Array<SearchAdminResponsePayload> | undefined,
 ) => {
-  const rowItems: Array<any> = []
+  const rowItems: Array<SearchAdminTableRow> = []
 
   if (!data) {
     return rowItems
@@ -102,10 +76,10 @@ export const SearchAdminDataRow = (
     rowItems.push({
       id: item.id,
       name: `${item.firstName} ${item.lastName}`,
+      username: item.username,
       email: item.email,
-      role: item.adminRoles[0].role.name,
+      role: item.adminRoles[0]?.role?.name || 'N/A',
       status: item.active,
-      date: momentClient.formatToNormalisedDateAndTime(item.lastActive),
     })
 
     return

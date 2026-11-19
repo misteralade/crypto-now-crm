@@ -1,20 +1,22 @@
 import { Fragment } from 'react'
-import { ArrowLeft } from 'lucide-react'
 import { useUserDetailsPage } from "../hooks/pages/useUserDetailsPage";
 import { LoadingSpinner } from "../components/global/LoadingSpinner";
 import PageHeader from "../components/global/pageHeader.tsx";
 import AuthenticatedLayout from "../layout/AuthenticatedLayout.tsx";
-import { useNavigate } from "@tanstack/react-router";
-import { ROUTES } from "../util/constants.util.ts";
 import EditUserModal from "../components/pages/users/EditUserModal.tsx";
 import UserInformationSection from "../components/pages/users/details/UserInformationSection.tsx";
 import BankDetailsSection from "../components/pages/users/details/BankDetailsSection.tsx";
 import TransactionSummarySection from "../components/pages/users/details/TransactionSummarySection.tsx";
+import CustodialWalletsSection from "../components/pages/users/details/CustodialWalletsSection.tsx";
+import { useCryptoQuery } from "../queries/crypto.querries.ts";
+import { useBankQuery } from "../queries/bank.querries.ts";
 
 const UserDetails = () => {
-  const navigate = useNavigate();
+  const { allSupportedCrypto } = useCryptoQuery();
+  const { platformSupportedBanks } = useBankQuery();
   const {
     // 🧩 Values
+    userId,
     userProfile,
     loadingUserProfile,
     userProfileSummary,
@@ -27,43 +29,25 @@ const UserDetails = () => {
     openEditModal,
     closeEditModal,
     handleUpdateUserProfile,
+    handleUpdateUserBankAccount,
     isEditModalOpen,
     isUpdatingProfile,
     editModalInitialValues,
   } = useUserDetailsPage();
 
-  const goBack = () => {
-    navigate({ to: ROUTES.USERS })
-  }
-
   return (
     <AuthenticatedLayout>
-      <div className="p-6 mx-auto">
-        <PageHeader title="User Details" />
-        
+      <PageHeader 
+        title="User Details" 
+        subtitle={userProfile ? `${userProfile.profile?.firstName ?? ''} ${userProfile.profile?.lastName ?? ''}`.trim() || undefined : undefined}
+      />
+      <div className="px-4 sm:px-6 pb-6 mx-auto">
         {(loadingUserProfile || loadingUserProfileSummary) ? (
           <div className="flex items-center justify-center min-h-[80vh]">
             <LoadingSpinner size="lg" message="Loading user details..." />
           </div>
         ) : (
           <Fragment>
-            <div className="flex items-center justify-between w-full mt-10">
-              <div className="text-lg text-[#858585] font-medium flex items-center gap-2">
-                All Users / {userProfileSummary?.user?.profile?.firstName || userProfile?.profile?.firstName}{' '}
-                {userProfileSummary?.user?.profile?.lastName || userProfile?.profile?.lastName}
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={goBack}
-                  className="flex items-center gap-2 text-[#03034D] hover:opacity-80 hover:cursor-pointer"
-                >
-                  <ArrowLeft size={20} />
-                  <span className="text-sm font-medium">Back to Users</span>
-                </button>
-              </div>
-            </div>
-
             {/* User Information Section */}
             <UserInformationSection
               user={userProfile || userProfileSummary?.user || undefined}
@@ -77,7 +61,12 @@ const UserDetails = () => {
             <BankDetailsSection
               bankDetails={userProfileSummary?.bankDetails}
               loading={loadingUserProfileSummary}
+              banks={platformSupportedBanks ?? []}
+              onUpdateAccount={handleUpdateUserBankAccount}
             />
+
+            {/* Custodial Wallets Section */}
+            <CustodialWalletsSection userId={userId} supportedCryptos={allSupportedCrypto} />
 
             {/* Transaction Summary Section */}
             <TransactionSummarySection

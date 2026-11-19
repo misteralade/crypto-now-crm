@@ -1,6 +1,6 @@
 import { useAddCoinPage } from '../hooks/pages/useAddCoinPage'
 import AuthenticatedLayout from "../layout/AuthenticatedLayout.tsx";
-import CoinManagementHeader from "../components/pages/coinManagement/CoinManagementHeader.tsx";
+import PageHeader from "../components/global/pageHeader.tsx";
 import UploadCoinIcon from "../components/pages/coinManagement/UploadCoinIcon.tsx";
 import CoinDetails from "../components/pages/coinManagement/add-coin/CoinDetails.tsx";
 import TradeLimits from "../components/pages/coinManagement/add-coin/TradeLimits.tsx";
@@ -21,38 +21,34 @@ const AddCoin = () => {
 
   return (
     <AuthenticatedLayout>
-      <div className="p-6 mx-auto">
-        {/* Header */}
-        <CoinManagementHeader />
+      <PageHeader
+        title="Add New Coin"
+        subtitle="Configure network parameters, trade limits, and market details"
+      />
+
+      <div className="px-4 sm:px-6 pb-8 max-w-4xl">
+        <UploadCoinIcon
+          onChangeInputField={handleCreateCoinInputChange}
+          uploadCryptoLogoIcon={uploadCryptoLogoIconMutation}
+        />
         
-        <div>
-          <h2 className="text-2xl lg:text-4xl font-medium text-[#0E0F0C] mb-8 mt-4">
-            Add new coin
-          </h2>
-          
-          <UploadCoinIcon
-            onChangeInputField={handleCreateCoinInputChange}
-            uploadCryptoLogoIcon={uploadCryptoLogoIconMutation}
-          />
-          
-          <CoinDetails onChangeInputField={handleCreateCoinInputChange} />
-          
-          <TradeLimits onChangeInputField={handleCreateCoinInputChange} />
-          
-          <OptionalFields onChangeInputField={handleCreateCoinInputChange} />
-        </div>
+        <CoinDetails onChangeInputField={handleCreateCoinInputChange} />
+        
+        <TradeLimits onChangeInputField={handleCreateCoinInputChange} />
+        
+        <OptionalFields onChangeInputField={handleCreateCoinInputChange} />
         
         {/* Action buttons */}
-        <div className="flex flex-col sm:flex-row justify-end items-center gap-4 mt-8 pt-6">
+        <div className="flex flex-col sm:flex-row justify-end items-center gap-3 mt-6 pt-5 border-t border-slate-200">
           <button
             onClick={goBack}
-            className="px-4 py-2 text-lg font-medium text-[#03034D] hover:opacity-70 transition-colors w-full sm:w-auto cursor-pointer"
+            className="h-9 px-4 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold text-xs w-full sm:w-auto transition-colors cursor-pointer touch-manipulation"
           >
-            Go back
+            Cancel
           </button>
           <button
             onClick={saveCoin}
-            className="px-12 py-[16px] bg-[#03034D] text-lg font-medium text-white rounded-full hover:bg-[#FF8B5A] transition-colors w-full sm:w-auto cursor-pointer"
+            className="h-9 px-5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-xs w-full sm:w-auto transition-colors cursor-pointer touch-manipulation"
           >
             Save Coin
           </button>

@@ -1,37 +1,37 @@
-import { useMemo } from 'react'
-import ManageTransactionsControls from "../components/pages/manageTransactions/ManageTransactionsControls.tsx";
+import { useMemo } from "react";
+import { Filter, RefreshCcw } from "lucide-react";
 import PageHeader from "../components/global/pageHeader.tsx";
-import {TransactionsManagementColumn, TransactionsManagementDataRow } from '../components/tables/TransactionsManagementTables.tsx';
-import {useTransactionsTable} from "../hooks/tables/useTransactionsTable.ts";
+import { useNavbarSearch } from "../layout/navbar-search-context.tsx";
+import { cn } from "../lib/utils";
+import {
+  TransactionsManagementColumn,
+  TransactionsManagementDataRow,
+} from "../components/tables/TransactionsManagementTables.tsx";
+import { useTransactionsTable } from "../hooks/tables/useTransactionsTable.ts";
 import Table from "../components/table.tsx";
-import TableFooter from '../components/tables/TableFooter.tsx';
-import ManageTransactionFilterModal from '../components/pages/manageTransactions/ManageTransactionFilterModal.tsx';
-import TransactionDetailsDrawer from "../components/pages/manageTransactions/TransactionDetailsDrawer.tsx";
-import { useManageTransactionsPage } from '../hooks/pages/useManageTransactionsPage';
+import TableFooter from "../components/tables/TableFooter.tsx";
+import ManageTransactionFilterModal from "../components/pages/manageTransactions/ManageTransactionFilterModal.tsx";
 import AuthenticatedLayout from "../layout/AuthenticatedLayout.tsx";
+import { useManageTransactionsPage } from "../hooks/pages/useManageTransactionsPage";
 
 const ManageTransactions = () => {
   const {
     // 🧩 Values
     searchTransactions,
+    sortModel,
+    activeFilters,
     loadingSearchTransactions,
     allSupportedCrypto,
     loadingAllSupportedCrypto,
-    selectedTransactionIds,
-    transactionDetail,
-    loadingTransactionDetails,
-    showTransactionDetails,
 
     // ⚙️ Functions
-    handleSelectTransactionId,
-    handleSelectAllTransactionIds,
     handleSortBy,
-    handleShowTransactionDetails,
-    handleTransactionUpdateField,
-    handleTransactionUpdate,
-    handleTransactionReceiptUpload,
     handlePageSizeChange: updatePageSize,
-  } = useManageTransactionsPage()
+    isFetchingTransactions,
+    filteredUserId,
+    filteredUserName,
+    clearUserFilter,
+  } = useManageTransactionsPage();
 
   const {
     // 🧩 Values
@@ -48,10 +48,9 @@ const ManageTransactions = () => {
     // ⚙️ Functions
     handlePageChange,
     handlePageSizeChange,
-    toggleApplyAction,
     toggleApplyFilter,
     handleSearchQuery,
-    resetSearchFilter,
+    handleUserEmail,
     handleFromDate,
     handleToDate,
     handleMinAmountRange,
@@ -59,29 +58,51 @@ const ManageTransactions = () => {
     handleSelectedCryptoId,
     handleSelectedStatus,
     handleViewTransactionDetails,
-  } = useTransactionsTable();
+    resetSearchFilter,
+  } = useTransactionsTable({
+    timeline: "all",
+  });
+
+  useNavbarSearch(
+    useMemo(
+      () => ({
+        placeholder: "Search transaction by session ID, amount...",
+        value: query,
+        onChange: handleSearchQuery,
+      }),
+      [query, handleSearchQuery]
+    )
+  );
+
+  const handleRefreshTransactions = () => {
+    resetSearchFilter();
+  };
+
+  const filterLabels = [
+    (activeFilters.userEmail || activeFilters.userId) && 'User',
+    (activeFilters.createdAtFrom || activeFilters.createdAtTo) && 'Date',
+    (activeFilters.minUsdAmount !== undefined || activeFilters.maxUsdAmount !== undefined) && 'Amount',
+    activeFilters.cryptoCurrencyId && 'Asset',
+    activeFilters.status && 'Status',
+    activeFilters.priority && 'Priority',
+  ].filter(Boolean);
 
   const columns = useMemo(
     () =>
       TransactionsManagementColumn(
-        handleSelectTransactionId,
-        handleSelectAllTransactionIds,
         handleSortBy,
-        handleShowTransactionDetails,
         handleViewTransactionDetails,
-        selectedTransactionIds,
-        searchTransactions?.transactions.length || 0,
+        sortModel,
       ),
     [
-      handleSelectTransactionId,
-      handleSelectAllTransactionIds,
-      selectedTransactionIds,
+      handleSortBy,
+      handleViewTransactionDetails,
+      sortModel,
     ],
   );
 
   const data = useMemo(
     () =>
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       TransactionsManagementDataRow(
         !loadingSearchTransactions ? searchTransactions?.transactions : [],
       ) || [],
@@ -90,38 +111,82 @@ const ManageTransactions = () => {
 
   return (
     <AuthenticatedLayout>
-      <div className="p-6 mx-auto bg-white">
-        {/* header */}
-        <PageHeader title="Manage Transactions" />
-        
-        {/* Controls */}
-        <ManageTransactionsControls
-          onOpenFilter={toggleApplyFilter}
-          onApplyAction={toggleApplyAction}
-          searchValue={query}
-          onSearchChange={handleSearchQuery}
-        />
-        
-        {/* Transactions Table */}
-        <Table data={data} columns={columns} loading={loadingSearchTransactions} />
-        
-        <TableFooter
-          currentPage={searchTransactions?.page || 1}
-          totalPages={searchTransactions?.totalPages || 1}
-          pageSize={pageSize}
-          totalItems={searchTransactions?.count || 100}
-          onPageChange={handlePageChange}
-          onPageSizeChange={(size: number) => {
-            handlePageSizeChange(size)
-            updatePageSize(size)
-          }}
-        />
-        
+      <PageHeader
+        title="Transactions"
+        actions={
+          <div className="flex items-center gap-2">
+            <button
+              onClick={toggleApplyFilter}
+              className={cn("inline-flex h-8.5 items-center justify-center gap-1.5 rounded-lg border px-3 text-xs font-semibold shadow-2xs transition-all cursor-pointer touch-manipulation", filterLabels.length ? "border-blue-600 bg-blue-50 text-blue-700" : "border-slate-200/90 bg-white text-slate-700 hover:bg-slate-50")}
+            >
+              <Filter className="h-3.5 w-3.5 text-slate-500" />
+              <span>{filterLabels.length ? `Filter: ${filterLabels[0]}${filterLabels.length > 1 ? ` +${filterLabels.length - 1}` : ''}` : 'Filter'}</span>
+            </button>
+
+            <button
+              onClick={handleRefreshTransactions}
+              disabled={!!isFetchingTransactions}
+              className="inline-flex h-8.5 items-center justify-center gap-1.5 rounded-lg border border-slate-200/90 bg-white px-3 text-xs font-semibold text-slate-700 shadow-2xs transition-colors hover:bg-slate-50 disabled:opacity-50 active:scale-98 cursor-pointer touch-manipulation"
+              title="Refresh Transactions"
+            >
+              <RefreshCcw
+                className={cn("h-3.5 w-3.5 text-slate-500", isFetchingTransactions && "animate-spin")}
+              />
+              <span className="hidden sm:inline">Refresh</span>
+            </button>
+          </div>
+        }
+      />
+
+      <div className="px-4 sm:px-6 pb-6 space-y-3">
+        {filteredUserId && (
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-blue-100 bg-blue-50/60 px-4 py-2 text-xs text-blue-900">
+            <span>
+              Showing transactions for <strong className="font-semibold">{filteredUserName ?? "this user"}</strong> only
+            </span>
+            <button
+              type="button"
+              onClick={clearUserFilter}
+              className="font-medium text-blue-600 hover:underline cursor-pointer"
+            >
+              Clear filter
+            </button>
+          </div>
+        )}
+
+        <div className="bg-white rounded-xl border border-slate-200/80 shadow-xs overflow-hidden">
+          {/* Transactions Table */}
+          <div className="overflow-hidden">
+            <Table
+              data={data}
+              columns={columns}
+              loading={loadingSearchTransactions}
+              onRowClick={(row) => handleViewTransactionDetails(row.id)}
+            />
+          </div>
+
+          <div className="px-4 py-3 bg-white border-t border-slate-100">
+            <TableFooter
+              currentPage={searchTransactions?.page || 1}
+              totalPages={searchTransactions?.totalPages || 1}
+              pageSize={pageSize}
+              totalItems={searchTransactions?.count || 100}
+              onPageChange={handlePageChange}
+              onPageSizeChange={(size: number) => {
+                handlePageSizeChange(size);
+                updatePageSize(size);
+              }}
+            />
+          </div>
+        </div>
+
         {/* Filter Modal */}
         <ManageTransactionFilterModal
           isOpen={showFilter}
           onClose={toggleApplyFilter}
-          onReset={resetSearchFilter}
+          onReset={() => { resetSearchFilter(); if (filteredUserId) clearUserFilter(); }}
+          userEmail={activeFilters.userEmail || ''}
+          onApplyEmail={(email) => { if (email && filteredUserId) clearUserFilter(); handleUserEmail(email); }}
           fromDate={fromDate}
           toDate={toDate}
           minAmountRange={minAmountRange}
@@ -130,25 +195,18 @@ const ManageTransactions = () => {
           handleToDate={handleToDate}
           handleMinAmountRange={handleMinAmountRange}
           handleMaxAmountRange={handleMaxAmountRange}
-          supportedCryptos={!loadingAllSupportedCrypto ? allSupportedCrypto : []}
+          supportedCryptos={
+            !loadingAllSupportedCrypto ? allSupportedCrypto : []
+          }
           selectedCryptoId={selectedCryptoId}
           handleSelectedCryptoId={handleSelectedCryptoId}
           selectedStatus={selectedStatus}
           handleSelectedStatus={handleSelectedStatus}
         />
-        
-        {/* Transaction Details Drawer */}
-        <TransactionDetailsDrawer
-          isOpen={showTransactionDetails}
-          onClose={handleShowTransactionDetails}
-          transaction={!loadingTransactionDetails ? transactionDetail : undefined}
-          handleTransactionUpdateField={handleTransactionUpdateField}
-          handleTransactionUpdate={handleTransactionUpdate}
-          handleTransactionReceiptUpload={handleTransactionReceiptUpload}
-        />
+
       </div>
     </AuthenticatedLayout>
-  )
-}
+  );
+};
 
-export default ManageTransactions
+export default ManageTransactions;
