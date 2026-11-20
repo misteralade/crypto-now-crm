@@ -52,6 +52,13 @@ export interface SweepPreviewData {
     requiredEstimate: number;
     sufficient: boolean;
   } | null;
+  /** Internal TRX balance reserved for Bandwidth top-ups on CatFee USDT sweeps. */
+  bandwidthWalletStatus: {
+    address: string;
+    balance: number;
+    requiredEstimate: number;
+    sufficient: boolean;
+  } | null;
 }
 
 // Per-asset row driving the Treasury summary grid.

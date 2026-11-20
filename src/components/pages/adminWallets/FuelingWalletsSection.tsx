@@ -6,7 +6,7 @@ import { QUERY_KEYS } from "../../../queries/querries.keys";
 import { CRYPTO_SYMBOL } from "../../../util/crypto-symbol";
 import { Zap, RefreshCw, Copy, Check, Pencil, X } from "lucide-react";
 import type { SearchSupportedCryptoData } from "../../../types/response.payload.types";
-import { ADMIN_WALLET_OWNERSHIP, CRYPTO_NETWORK } from "../../../util/enum";
+import { ADMIN_WALLET_FUNDING_PURPOSE, ADMIN_WALLET_OWNERSHIP, ADMIN_WALLET_TYPE, CRYPTO_NETWORK } from "../../../util/enum";
 import {
   useAdminGeneratePlatformFuelingWalletMutation,
   useAdminGetWalletBalanceMutation,
@@ -41,6 +41,7 @@ const CatFeeAddress = ({ cryptoId, address, walletId }: { cryptoId: string; addr
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-sm font-semibold text-[#03034D]">
           CatFee funding account <span className="rounded-full bg-indigo-50 px-2 py-1 text-xs text-indigo-700">External</span>
+          <span className="rounded-full bg-amber-50 px-2 py-1 text-xs text-amber-700">Energy rental</span>
         </div>
         {address && !isEditing && <button type="button" aria-label="Edit CatFee address" title="Edit address" onClick={() => setIsEditing(true)} className="rounded-lg p-2 text-indigo-600 hover:bg-indigo-50"><Pencil className="h-4 w-4" /></button>}
       </div>
@@ -75,6 +76,7 @@ const FuelingWalletCard = ({
       isActive: boolean;
       cachedBalance?: string | number;
       cachedBalanceUpdatedAt?: string | null;
+      fundingPurpose?: ADMIN_WALLET_FUNDING_PURPOSE | null;
     };
   };
   onGenerate: () => void;
@@ -95,8 +97,38 @@ const FuelingWalletCard = ({
   );
   const [copied, setCopied] = useState(false);
   const balanceMutation = useAdminGetWalletBalanceMutation();
+  const queryClient = useQueryClient();
+  const activeMutation = useMutation({
+    mutationFn: async (isActive: boolean) => {
+      if (!row.fuelingWallet?.id) throw new Error("Fueling wallet is unavailable.");
+      const result = await cryptoServiceApi.adminSetTrc20FuelingWalletActive(
+        row.fuelingWallet.id,
+        isActive,
+      );
+      if (!result.success) throw new Error(result.message);
+      return result.message;
+    },
+    onSuccess: (message) => {
+      toast.success(message);
+      void queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CRYPTO.ALL_SUPPORTED_CRYPTO_CURRENCIES] });
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+  const purposeMutation = useMutation({
+    mutationFn: async (fundingPurpose: ADMIN_WALLET_FUNDING_PURPOSE) => {
+      if (!row.fuelingWallet?.id) throw new Error("Fueling wallet is unavailable.");
+      const result = await cryptoServiceApi.adminSetFuelingWalletPurpose(row.fuelingWallet.id, fundingPurpose);
+      if (!result.success) throw new Error(result.message);
+      return result.message;
+    },
+    onSuccess: (message) => {
+      toast.success(message);
+      void queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CRYPTO.ALL_SUPPORTED_CRYPTO_CURRENCIES] });
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
 
-  const depositAsset = row.network === "ERC20" ? "ETH (Ethereum)" : "TRX (Tron)";
+  const depositAsset = row.network === CRYPTO_NETWORK.ERC20 ? "ETH (Ethereum)" : "TRX (Tron)";
   const fuelsAsset = `${row.cryptoSymbol} (${row.network})`;
 
   const handleRefresh = () => {
@@ -155,6 +187,28 @@ const FuelingWalletCard = ({
       </div>
 
       <div className="space-y-2 border-t border-[#ECECEC]/70 pt-3">
+        {row.fuelingWallet && (
+          <div className="flex items-center justify-between gap-3 text-xs">
+            <span className="text-gray-500 font-medium">Funding purpose</span>
+            {row.network === CRYPTO_NETWORK.TRC20 && row.cryptoSymbol === CRYPTO_SYMBOL.USDT ? (
+              <select
+                aria-label="TRON fueling wallet purpose"
+                value={row.fuelingWallet.fundingPurpose ?? ""}
+                disabled={purposeMutation.isPending}
+                onChange={(event) => purposeMutation.mutate(event.target.value as ADMIN_WALLET_FUNDING_PURPOSE)}
+                className="rounded-lg border border-indigo-100 bg-white px-2 py-1 text-xs font-semibold text-[#03034D]"
+              >
+                <option value="">Purpose not set</option>
+                <option value={ADMIN_WALLET_FUNDING_PURPOSE.BANDWIDTH}>TRX Bandwidth</option>
+                <option value={ADMIN_WALLET_FUNDING_PURPOSE.NETWORK_FEES}>Network fees</option>
+              </select>
+            ) : (
+              <span className="rounded-full bg-indigo-50 px-2.5 py-1 text-2xs font-semibold text-indigo-700">
+                Network fees
+              </span>
+            )}
+          </div>
+        )}
         <div className="flex justify-between items-center text-xs">
           <span className="text-gray-500 font-medium">Required Gas Asset</span>
           <span className="font-bold text-[#03034D] bg-indigo-50 px-2.5 py-0.5 rounded-lg text-2xs">
@@ -225,8 +279,31 @@ const FuelingWalletCard = ({
             {isGenerating ? "Generating..." : "Generate Fueling Wallet"}
           </button>
         ) : (
-          <div className="text-2xs text-gray-500 leading-normal bg-blue-50/50 p-2.5 rounded-xl border border-blue-100 w-full">
-            <strong className="text-blue-800">Operational note:</strong> {row.fuelingWallet.isActive ? <>Deposit <strong>{row.network === "ERC20" ? "ETH" : "TRX"}</strong> directly into this address to cover transaction gas fees for custodial sweeping.</> : "Retained for records. This wallet is inactive and is not used for sweeps."}
+          <div className="w-full space-y-2">
+            <div className="text-2xs text-gray-500 leading-normal bg-blue-50/50 p-2.5 rounded-xl border border-blue-100">
+              <strong className="text-blue-800">Operational note:</strong>{" "}
+              {row.network === CRYPTO_NETWORK.TRC20 && row.cryptoSymbol === CRYPTO_SYMBOL.USDT
+                ? row.fuelingWallet.isActive
+                  ? <>CatFee covers Energy. This wallet sends TRX when a custodial wallet needs Bandwidth.</>
+                  : <>This wallet is inactive. Enable it to send TRX for Bandwidth on CatFee USDT sweeps.</>
+                : row.fuelingWallet.isActive
+                  ? <>Deposit <strong>{row.network === "ERC20" ? "ETH" : "TRX"}</strong> directly into this address to cover transaction gas fees for custodial sweeping.</>
+                  : "Retained for records. This wallet is inactive and is not used for sweeps."}
+            </div>
+            {row.network === CRYPTO_NETWORK.TRC20 && row.cryptoSymbol === CRYPTO_SYMBOL.USDT && (
+              <button
+                type="button"
+                onClick={() => activeMutation.mutate(!row.fuelingWallet?.isActive)}
+                disabled={activeMutation.isPending}
+                className="w-full rounded-lg border border-indigo-200 bg-white px-3 py-2 text-xs font-semibold text-indigo-700 hover:bg-indigo-50 disabled:opacity-50"
+              >
+                {activeMutation.isPending
+                  ? "Saving..."
+                  : row.fuelingWallet.isActive
+                    ? "Disable TRX Bandwidth funding"
+                    : "Enable TRX Bandwidth funding"}
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -246,10 +323,14 @@ const FuelingWalletsSection = ({ cryptos }: FuelingWalletsSectionProps) => {
 
     return networksNeedingFuel.map((network) => {
       const fuelingWallet = (crypto.adminCryptoWallets ?? []).find(
-        (w) => w.network === network && w.walletType === "FUELING" && w.ownershipType !== ADMIN_WALLET_OWNERSHIP.EXTERNAL,
+        (w) => w.network === network && w.walletType === ADMIN_WALLET_TYPE.FUELING && w.ownershipType !== ADMIN_WALLET_OWNERSHIP.EXTERNAL &&
+          w.fundingPurpose === (network === CRYPTO_NETWORK.TRC20 && crypto.symbol.toUpperCase() === CRYPTO_SYMBOL.USDT
+            ? ADMIN_WALLET_FUNDING_PURPOSE.BANDWIDTH
+            : ADMIN_WALLET_FUNDING_PURPOSE.NETWORK_FEES),
       );
       const external = (crypto.adminCryptoWallets ?? []).find(
-        (w) => w.network === network && w.walletType === "FUELING" && w.ownershipType === ADMIN_WALLET_OWNERSHIP.EXTERNAL,
+        (w) => w.network === network && w.walletType === ADMIN_WALLET_TYPE.FUELING && w.ownershipType === ADMIN_WALLET_OWNERSHIP.EXTERNAL &&
+          w.fundingPurpose === ADMIN_WALLET_FUNDING_PURPOSE.ENERGY_RENTAL,
       );
       return {
         cryptoId: crypto.id,

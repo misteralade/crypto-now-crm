@@ -361,6 +361,7 @@ export type AdminCryptoWalletResponsePayload = {
   isActive: boolean;
   network: string;
   walletType?: string;
+  fundingPurpose?: import("../util/enum").ADMIN_WALLET_FUNDING_PURPOSE | null;
   ownershipType?: import("../util/enum").ADMIN_WALLET_OWNERSHIP;
   derivationPath?: string;
   walletLabel?: string;

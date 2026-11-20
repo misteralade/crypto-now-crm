@@ -351,6 +351,9 @@ export default function SweepConfigModal({
   const fuelingWalletStatus = previewData?.fuelingWalletStatus ?? null;
   const insufficientFuelBalance = !!fuelingWalletStatus && !fuelingWalletStatus.sufficient;
   const showFuelingWalletCard = !!fuelingWalletStatus;
+  const bandwidthWalletStatus = previewData?.bandwidthWalletStatus ?? null;
+  const insufficientBandwidthBalance = !!bandwidthWalletStatus && !bandwidthWalletStatus.sufficient;
+  const showBandwidthWalletCard = !!bandwidthWalletStatus && bandwidthWalletStatus.requiredEstimate > 0;
 
   if (!shouldRender) return null;
   const previewAmountToSweep = showPreview && previewData
@@ -372,7 +375,7 @@ export default function SweepConfigModal({
         )
       : "";
   const confirmSweepDisabled =
-    initiateSweepMutation.isPending || previewAmountToSweep <= 0 || insufficientFuelBalance;
+    initiateSweepMutation.isPending || previewAmountToSweep <= 0 || insufficientFuelBalance || insufficientBandwidthBalance;
 
   const handlePreview = () => {
     if (!network || !cryptocurrencyId) {
@@ -402,6 +405,14 @@ export default function SweepConfigModal({
     if (insufficientFuelBalance && fuelingWalletStatus && previewData) {
       toast.error(
         `Fueling wallet has insufficient balance. Required: ~${fuelingWalletStatus.requiredEstimate.toFixed(6)} ${previewData.feeAssetSymbol}, Available: ${fuelingWalletStatus.balance.toFixed(6)} ${previewData.feeAssetSymbol}`
+      );
+      return;
+    }
+    if (insufficientBandwidthBalance && bandwidthWalletStatus) {
+      toast.error(
+        bandwidthWalletStatus.address
+          ? "The internal TRX wallet needs more balance for Bandwidth top-ups."
+          : "Enable the retained internal TRX wallet for Bandwidth top-ups before sweeping."
       );
       return;
     }
@@ -505,12 +516,6 @@ export default function SweepConfigModal({
   const symbol = selectedCrypto?.symbol.toUpperCase() ?? "";
   const refreshing = refreshBalancesMutation.isPending;
   const amountDecimals = network === "BTC" ? 8 : 6;
-
-  // Format wallet address as xxx...xxx
-  function formatWalletAddress(address: string, visible: number = 6): string {
-    if (!address || address.length <= visible * 2) return address;
-    return `${address.slice(0, visible)}...${address.slice(-visible)}`;
-  }
 
   const previewFeeExplanation = previewData
     ? previewData.feePresentation
@@ -902,8 +907,8 @@ export default function SweepConfigModal({
                       </span>
                     </div>
                     {fuelingWalletStatus.address && (
-                      <p className="font-mono text-2xs text-[#03034D]">
-                        {formatWalletAddress(fuelingWalletStatus.address)}
+                      <p className="break-all font-mono text-2xs text-[#03034D]">
+                        {fuelingWalletStatus.address}
                       </p>
                     )}
                     <div className="space-y-1 mt-2">
@@ -929,6 +934,44 @@ export default function SweepConfigModal({
                             ? `The fueling wallet does not have enough ${previewData.feeAssetSymbol} for this sweep. Top it up before sweeping.`
                             : `No ${previewData.feeAssetSymbol} in the fueling wallet to cover gas. Top it up before sweeping.`
                           : `No active fueling wallet configured for this network. Gas cannot be funded.`}
+                      </p>
+                    )}
+                  </div>
+                )}
+                {showBandwidthWalletCard && bandwidthWalletStatus && (
+                  <div className={`border-t border-[#ECEFFD] pt-2 space-y-1 px-2 py-2 rounded-lg ${insufficientBandwidthBalance ? 'bg-red-50 border border-red-200' : ''}`}>
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-xs font-semibold text-[--color-text-primary]">
+                        TRX Bandwidth Wallet
+                      </p>
+                      <span className={`rounded-full px-2 py-0.5 text-2xs font-semibold ${insufficientBandwidthBalance ? 'bg-red-100 text-red-700' : 'bg-[#DCDDFD] text-[#03034D]'}`}>
+                        {insufficientBandwidthBalance ? 'Needs more TRX' : 'TRX top-ups'}
+                      </span>
+                    </div>
+                    {bandwidthWalletStatus.address && (
+                      <p className="break-all font-mono text-2xs text-[#03034D]">
+                        {bandwidthWalletStatus.address}
+                      </p>
+                    )}
+                    <div className="space-y-1 mt-2">
+                      <div className="flex justify-between text-2xs">
+                        <span className="text-[#667085]">Required, including top-up fees:</span>
+                        <span className="text-[#03034D] font-semibold">
+                          ~{bandwidthWalletStatus.requiredEstimate.toFixed(6)} TRX
+                        </span>
+                      </div>
+                      <div className={`flex justify-between text-2xs ${insufficientBandwidthBalance ? 'text-red-600' : 'text-[#667085]'}`}>
+                        <span>Available:</span>
+                        <span className="font-semibold">
+                          {bandwidthWalletStatus.balance.toFixed(6)} TRX
+                        </span>
+                      </div>
+                    </div>
+                    {insufficientBandwidthBalance && (
+                      <p className="text-2xs text-red-700 font-semibold mt-2">
+                        {bandwidthWalletStatus.address
+                          ? 'Top up the internal TRX wallet to fund Bandwidth.'
+                          : 'Enable the retained internal TRX wallet to fund Bandwidth.'}
                       </p>
                     )}
                   </div>

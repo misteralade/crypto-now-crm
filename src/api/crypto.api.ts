@@ -11,6 +11,7 @@ import type {
   SearchSupportedCryptoWalletRequestSchema,
   CreateAdminWalletRequestType,
 } from '../schemas/crypto.schema.js'
+import type { ADMIN_WALLET_FUNDING_PURPOSE } from '../util/enum.js'
 import type {
   BaseApiResponse, GetAllSupportedCryptoAPIResponse, GetSupportedCryptoAPIResponse,
   SearchSupportedCryptoAPIResponse, UploadAPIResponse,
@@ -119,6 +120,14 @@ class CryptoServiceApi {
 
   async adminSetCatFeeAddress(cryptoId: string, address: string) {
     return await axiosPutRequestHandler('/crypto/admin/wallet/fueling/catfee', { cryptoId, address }) as BaseApiResponse<AdminCryptoWalletResponsePayload>;
+  }
+
+  async adminSetTrc20FuelingWalletActive(walletId: string, isActive: boolean) {
+    return await axiosPatchRequestHandler(`/crypto/admin/wallet/${encodeURIComponent(walletId)}/fueling-status`, { isActive }) as BaseApiResponse<null>;
+  }
+
+  async adminSetFuelingWalletPurpose(walletId: string, fundingPurpose: ADMIN_WALLET_FUNDING_PURPOSE) {
+    return await axiosPatchRequestHandler(`/crypto/admin/wallet/${encodeURIComponent(walletId)}/funding-purpose`, { fundingPurpose }) as BaseApiResponse<null>;
   }
 
   async adminCreatePlatformWallet(payload: CreateAdminWalletRequestType) {
