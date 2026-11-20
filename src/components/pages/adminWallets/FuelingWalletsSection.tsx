@@ -90,7 +90,7 @@ const FuelingWalletCard = ({
     row.fuelingWallet?.cachedBalance != null
       ? {
           balance: Number(row.fuelingWallet.cachedBalance),
-          symbol: row.network === "ERC20" ? "ETH" : "TRX",
+          symbol: row.network === CRYPTO_NETWORK.ERC20 ? "ETH" : "TRX",
           updatedAt: row.fuelingWallet.cachedBalanceUpdatedAt,
         }
       : null
@@ -195,10 +195,13 @@ const FuelingWalletCard = ({
                 aria-label="TRON fueling wallet purpose"
                 value={row.fuelingWallet.fundingPurpose ?? ""}
                 disabled={purposeMutation.isPending}
-                onChange={(event) => purposeMutation.mutate(event.target.value as ADMIN_WALLET_FUNDING_PURPOSE)}
+                onChange={(event) => {
+                  if (event.target.value.length === 0) return;
+                  purposeMutation.mutate(event.target.value as ADMIN_WALLET_FUNDING_PURPOSE);
+                }}
                 className="rounded-lg border border-indigo-100 bg-white px-2 py-1 text-xs font-semibold text-[#03034D]"
               >
-                <option value="">Purpose not set</option>
+                <option value="" disabled>Purpose not set</option>
                 <option value={ADMIN_WALLET_FUNDING_PURPOSE.BANDWIDTH}>TRX Bandwidth</option>
                 <option value={ADMIN_WALLET_FUNDING_PURPOSE.NETWORK_FEES}>Network fees</option>
               </select>
@@ -283,14 +286,18 @@ const FuelingWalletCard = ({
             <div className="text-2xs text-gray-500 leading-normal bg-blue-50/50 p-2.5 rounded-xl border border-blue-100">
               <strong className="text-blue-800">Operational note:</strong>{" "}
               {row.network === CRYPTO_NETWORK.TRC20 && row.cryptoSymbol === CRYPTO_SYMBOL.USDT
-                ? row.fuelingWallet.isActive
-                  ? <>CatFee covers Energy. This wallet sends TRX when a custodial wallet needs Bandwidth.</>
-                  : <>This wallet is inactive. Enable it to send TRX for Bandwidth on CatFee USDT sweeps.</>
+                ? row.fuelingWallet.fundingPurpose === ADMIN_WALLET_FUNDING_PURPOSE.BANDWIDTH
+                  ? row.fuelingWallet.isActive
+                    ? <>CatFee covers Energy. This wallet sends TRX when a custodial wallet needs Bandwidth.</>
+                    : <>This wallet is inactive. Enable it to send TRX for Bandwidth on CatFee USDT sweeps.</>
+                  : <>CatFee sweeps need an internal TRX wallet assigned to Bandwidth funding.</>
                 : row.fuelingWallet.isActive
                   ? <>Deposit <strong>{row.network === "ERC20" ? "ETH" : "TRX"}</strong> directly into this address to cover transaction gas fees for custodial sweeping.</>
                   : "Retained for records. This wallet is inactive and is not used for sweeps."}
             </div>
-            {row.network === CRYPTO_NETWORK.TRC20 && row.cryptoSymbol === CRYPTO_SYMBOL.USDT && (
+            {row.network === CRYPTO_NETWORK.TRC20 &&
+              row.cryptoSymbol === CRYPTO_SYMBOL.USDT &&
+              row.fuelingWallet.fundingPurpose === ADMIN_WALLET_FUNDING_PURPOSE.BANDWIDTH && (
               <button
                 type="button"
                 onClick={() => activeMutation.mutate(!row.fuelingWallet?.isActive)}
