@@ -54,3 +54,9 @@ export enum BLOCKCHAIN_ENVIRONMENT {
   TESTNET = "testnet",
   MAINNET = "mainnet",
 }
+
+export enum ADMIN_WALLET_OWNERSHIP {
+  INTERNAL = "INTERNAL",
+  EXTERNAL = "EXTERNAL",
+  UNKNOWN = "UNKNOWN",
+}

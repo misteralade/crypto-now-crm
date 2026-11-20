@@ -3,6 +3,7 @@ import {
   axiosGetRequestHandler,
   axiosPatchRequestHandler,
   axiosPostRequestHandler,
+  axiosPutRequestHandler,
   API_KIT,
 } from './index.js'
 import type {
@@ -16,6 +17,7 @@ import type {
   AdminGetUserCustodialWalletsAPIResponse,
   AdminCustodialWalletDetailsAPIResponse,
   AdminTreasuryWalletsAPIResponse,
+  AdminCryptoWalletResponsePayload,
   RefreshCustodialWalletBalanceAPIResponse,
   AdminGenerateUserCustodialWalletsAPIResponse,
 } from "../types/response.payload.types";
@@ -113,6 +115,10 @@ class CryptoServiceApi {
 
   async adminGeneratePlatformFuelingWallet(cryptoId: string, network: string) {
     return await axiosPostRequestHandler(`/crypto/admin/wallet/fueling/generate`, { cryptoId, network }) as BaseApiResponse<any>;
+  }
+
+  async adminSetCatFeeAddress(cryptoId: string, address: string) {
+    return await axiosPutRequestHandler('/crypto/admin/wallet/fueling/catfee', { cryptoId, address }) as BaseApiResponse<AdminCryptoWalletResponsePayload>;
   }
 
   async adminCreatePlatformWallet(payload: CreateAdminWalletRequestType) {

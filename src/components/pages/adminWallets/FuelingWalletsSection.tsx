@@ -1,7 +1,12 @@
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-toastify";
+import { cryptoServiceApi } from "../../../api/crypto.api";
+import { QUERY_KEYS } from "../../../queries/querries.keys";
+import { CRYPTO_SYMBOL } from "../../../util/crypto-symbol";
 import { Zap, RefreshCw, Copy, Check } from "lucide-react";
 import type { SearchSupportedCryptoData } from "../../../types/response.payload.types";
-import { CRYPTO_NETWORK } from "../../../util/enum";
+import { ADMIN_WALLET_OWNERSHIP, CRYPTO_NETWORK } from "../../../util/enum";
 import {
   useAdminGeneratePlatformFuelingWalletMutation,
   useAdminGetWalletBalanceMutation,
@@ -12,6 +17,34 @@ interface FuelingWalletsSectionProps {
 }
 
 const NETWORKS_REQUIRING_FUELING = new Set<string>([CRYPTO_NETWORK.ERC20, CRYPTO_NETWORK.TRC20]);
+
+const CatFeeAddress = ({ cryptoId, address, walletId }: { cryptoId: string; address?: string; walletId?: string }) => {
+  const [value, setValue] = useState(address ?? "");
+  const [balance, setBalance] = useState<number | null>(null);
+  const balanceMutation = useAdminGetWalletBalanceMutation();
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: async () => {
+      const result = await cryptoServiceApi.adminSetCatFeeAddress(cryptoId, value.trim());
+      if (!result.success) throw new Error(result.message);
+    },
+    onSuccess: () => {
+      toast.success("CatFee address saved");
+      void queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CRYPTO.ALL_SUPPORTED_CRYPTO_CURRENCIES] });
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+  return (
+    <div className="rounded-xl border border-indigo-100 p-3 space-y-2">
+      <div className="flex items-center gap-2 text-xs font-semibold">
+        CatFee top-up address <span className="rounded-full bg-indigo-50 px-2 py-1 text-indigo-700">External</span>
+      </div>
+      <input aria-label="CatFee top-up address" value={value} onChange={(event) => setValue(event.target.value)} className="w-full rounded-lg border p-2 text-xs" />
+      <button type="button" disabled={mutation.isPending || !value.trim()} onClick={() => mutation.mutate()} className="rounded-lg bg-indigo-600 px-3 py-2 text-xs text-white disabled:opacity-50">Save address</button>
+      {walletId && <div className="flex items-center gap-3 text-xs"><span>CatFee balance: {balance === null ? "Not checked" : `${balance.toFixed(6)} TRX`}</span><button type="button" disabled={balanceMutation.isPending} onClick={() => balanceMutation.mutate(walletId, { onSuccess: (data) => setBalance(data.balance) })} className="text-indigo-600">Refresh balance</button></div>}
+    </div>
+  );
+};
 
 // Isolated card component for clean, premium state management and individual balance syncing
 const FuelingWalletCard = ({
@@ -24,6 +57,8 @@ const FuelingWalletCard = ({
     cryptoSymbol: string;
     cryptoName: string;
     network: string;
+    catFeeAddress?: string;
+    catFeeWalletId?: string;
     fuelingWallet?: {
       id: string;
       walletAddress: string;
@@ -52,6 +87,7 @@ const FuelingWalletCard = ({
 
   const depositAsset = row.network === "ERC20" ? "ETH (Ethereum)" : "TRX (Tron)";
   const fuelsAsset = `${row.cryptoSymbol} (${row.network})`;
+  const hasCatFeeExternalAddress = row.catFeeAddress !== undefined;
 
   const handleRefresh = () => {
     if (!row.fuelingWallet?.id) return;
@@ -94,7 +130,7 @@ const FuelingWalletCard = ({
             {row.network} Network
           </span>
           <h4 className="text-sm font-bold text-[#03034D] mt-2">
-            Fuels sweeps for: <span className="text-indigo-600 font-extrabold">{fuelsAsset}</span>
+            {hasCatFeeExternalAddress ? "Retained internal wallet for:" : "Fuels sweeps for:"} <span className="text-indigo-600 font-extrabold">{fuelsAsset}</span>
           </h4>
         </div>
         {row.fuelingWallet ? (
@@ -109,6 +145,7 @@ const FuelingWalletCard = ({
       </div>
 
       <div className="space-y-2 border-t border-[#ECECEC]/70 pt-3">
+        {row.catFeeAddress !== undefined && <CatFeeAddress cryptoId={row.cryptoId} address={row.catFeeAddress} walletId={row.catFeeWalletId} />}
         <div className="flex justify-between items-center text-xs">
           <span className="text-gray-500 font-medium">Required Gas Asset</span>
           <span className="font-bold text-[#03034D] bg-indigo-50 px-2.5 py-0.5 rounded-lg text-2xs">
@@ -168,7 +205,7 @@ const FuelingWalletCard = ({
       </div>
 
       <div className="flex items-center justify-between gap-3 pt-2">
-        {!row.fuelingWallet ? (
+        {!row.fuelingWallet && !hasCatFeeExternalAddress ? (
           <button
             type="button"
             onClick={onGenerate}
@@ -180,7 +217,7 @@ const FuelingWalletCard = ({
           </button>
         ) : (
           <div className="text-2xs text-gray-500 leading-normal bg-blue-50/50 p-2.5 rounded-xl border border-blue-100 w-full">
-            ⚠️ <strong className="text-blue-800">Operational Note:</strong> Deposit <strong>{row.network === "ERC20" ? "ETH" : "TRX"}</strong> directly into this address to cover transaction gas fees for custodial sweeping.
+            <strong className="text-blue-800">Operational note:</strong> {hasCatFeeExternalAddress ? "USDT on TRON uses CatFee Energy Rental. This internal wallet is retained and is not used for those sweeps." : <>Deposit <strong>{row.network === "ERC20" ? "ETH" : "TRX"}</strong> directly into this address to cover transaction gas fees for custodial sweeping.</>}
           </div>
         )}
       </div>
@@ -200,13 +237,18 @@ const FuelingWalletsSection = ({ cryptos }: FuelingWalletsSectionProps) => {
 
     return networksNeedingFuel.map((network) => {
       const fuelingWallet = (crypto.adminCryptoWallets ?? []).find(
-        (w) => w.network === network && w.walletType === "FUELING",
+        (w) => w.network === network && w.walletType === "FUELING" && w.ownershipType !== ADMIN_WALLET_OWNERSHIP.EXTERNAL,
+      );
+      const external = (crypto.adminCryptoWallets ?? []).find(
+        (w) => w.network === network && w.walletType === "FUELING" && w.ownershipType === ADMIN_WALLET_OWNERSHIP.EXTERNAL,
       );
       return {
         cryptoId: crypto.id,
         cryptoSymbol: crypto.symbol.toUpperCase(),
         cryptoName: crypto.name,
         network,
+        catFeeAddress: network === CRYPTO_NETWORK.TRC20 && crypto.symbol.toUpperCase() === CRYPTO_SYMBOL.USDT ? external?.walletAddress ?? "" : undefined,
+        catFeeWalletId: external?.id,
         fuelingWallet,
       };
     });
