@@ -530,11 +530,11 @@ export default function SweepConfigModal({
       }}
     >
       <div
-        className={`w-full max-w-lg overflow-hidden rounded-2xl border border-[#E4E7EC] bg-white shadow-2xl ${
+        className={`w-full max-w-lg max-h-[calc(100dvh-2rem)] flex flex-col overflow-hidden rounded-2xl border border-[#E4E7EC] bg-white shadow-2xl ${
           isClosing ? "animate-modal-content-out" : "animate-modal-content-in"
         }`}
       >
-        <div className="flex items-center justify-between border-b border-[--color-border] px-6 py-4">
+        <div className="flex shrink-0 items-center justify-between border-b border-[--color-border] px-6 py-4">
           <h2 className="text-lg font-semibold text-[--color-text-primary]">
             Initiate Treasury Sweep
           </h2>
@@ -561,7 +561,7 @@ export default function SweepConfigModal({
         </div>
 
         {/* Scrollable Content Area */}
-        <div className="max-h-[calc(100vh-250px)] overflow-y-auto p-6 custom-scrollbar">
+        <div className="min-h-0 flex-1 overflow-y-auto p-6 custom-scrollbar">
           <div className="space-y-5">
             <div className="grid grid-cols-2 gap-2 rounded-xl bg-[--color-bg-light] p-2">
               <div
@@ -992,7 +992,7 @@ export default function SweepConfigModal({
           </div>
         </div>
 
-        <div className="flex gap-2.5 border-t border-slate-200 bg-slate-50/50 px-5 py-3.5">
+        <div className="flex shrink-0 gap-2.5 border-t border-slate-200 bg-slate-50/50 px-5 py-3.5">
           <button
             type="button"
             onClick={requestClose}
