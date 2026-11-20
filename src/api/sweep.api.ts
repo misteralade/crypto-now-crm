@@ -27,6 +27,7 @@ export interface SweepPreviewData {
     limitLabel: string;
     fuelingReserveLabel: string;
     explanation: string;
+    hideBreakdown?: boolean;
   };
   feeAssetSymbol: string;
   feeHandling: 'deducted_from_swept_asset' | 'paid_from_source_native_balance';

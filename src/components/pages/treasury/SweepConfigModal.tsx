@@ -836,7 +836,7 @@ export default function SweepConfigModal({
                     {previewData.feeAssetSymbol}
                   </span>
                 </div>
-                {previewData.feeLimitAmount !== undefined && (
+                {!previewData.feePresentation?.hideBreakdown && previewData.feeLimitAmount !== undefined && (
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-[#667085]">
                       {previewData.feePresentation?.limitLabel ?? "Fee limit"}
@@ -846,7 +846,7 @@ export default function SweepConfigModal({
                     </span>
                   </div>
                 )}
-                {!!previewData.fuelingTransferFeeReserveAmount && (
+                {!previewData.feePresentation?.hideBreakdown && !!previewData.fuelingTransferFeeReserveAmount && (
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-[#667085]">
                       {previewData.feePresentation?.fuelingReserveLabel ?? "Native token reserved for top-ups"}
