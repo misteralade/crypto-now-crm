@@ -241,11 +241,13 @@ export const useSweepQuery = () => {
     mutationFn: async (params: RefreshBalancesParams) => {
       return await sweepServiceApi.refreshBalances(params);
     },
-    onSuccess: ({ success, message }) => {
-      if (success) {
-        // Reflect new totals in the summary grid and the modal preview.
+    onSuccess: ({ success, message, data }) => {
+      if (data) {
+        // Partial refreshes also save successful wallet reads.
         queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SWEEP.BALANCE_SUMMARY] });
         queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SWEEP.PREVIEW] });
+      }
+      if (success) {
         toast.success(message || 'Balances refreshed');
       } else {
         toast.error(message);

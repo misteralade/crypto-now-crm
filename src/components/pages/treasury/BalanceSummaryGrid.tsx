@@ -122,7 +122,7 @@ function BalanceCard({ row, onRefresh, onWalletCountClick, refreshing, refreshEr
 
       {refreshError && (
         <p role="alert" className="mt-3 rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-xs text-red-700">
-          {row.symbol} on {networkLabel} could not be refreshed. {refreshError}
+          {refreshError}
         </p>
       )}
 

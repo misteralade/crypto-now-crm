@@ -68,6 +68,7 @@ export interface BalanceSummaryRow {
 export interface RefreshBalancesResult {
   cryptocurrencyId: string;
   network: string;
+  blockchainEnvironment: string;
   walletsConsidered: number;
   refreshed: number;
   failed: number;
