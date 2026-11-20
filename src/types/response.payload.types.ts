@@ -341,6 +341,7 @@ export type SearchSupportedCryptoData = {
   websiteUrl: string;
   whitepaperUrl: string;
   networks: string[];
+  sellSupportedNetworks?: string[];
   blockchainEnvironment: "testnet" | "mainnet";
   adminCryptoWallets: Array<AdminCryptoWalletResponsePayload>;
 };

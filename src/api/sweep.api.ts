@@ -18,6 +18,16 @@ export interface SweepPreviewData {
   liveBalanceAmount: number;
   estimatedSweepableAmount: number;
   estimatedFeeAmount: number;
+  /** Present when the displayed estimate has a separate caller-side fee limit. */
+  feeLimitAmount?: number;
+  /** Native asset allowance for funding transactions, when applicable. */
+  fuelingTransferFeeReserveAmount?: number;
+  feePresentation?: {
+    estimateLabel: string;
+    limitLabel: string;
+    fuelingReserveLabel: string;
+    explanation: string;
+  };
   feeAssetSymbol: string;
   feeHandling: 'deducted_from_swept_asset' | 'paid_from_source_native_balance';
   walletsSweepable: number;
@@ -62,6 +72,7 @@ export interface RefreshBalancesResult {
   refreshed: number;
   failed: number;
   totalBalance: number;
+  errors: Array<{ walletAddress: string; message: string }>;
   startedAt: string;
   completedAt: string;
 }

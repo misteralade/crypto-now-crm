@@ -70,6 +70,13 @@ function getZeroSweepReason(
     walletsMissingSweepSetup: number;
     walletsSweepable: number;
     estimatedFeeAmount: number;
+    feeLimitAmount?: number;
+    feePresentation?: {
+      estimateLabel: string;
+      limitLabel: string;
+      fuelingReserveLabel: string;
+      explanation: string;
+    };
   },
   symbol: string
 ) {
@@ -485,9 +492,13 @@ export default function SweepConfigModal({
 
   const handleRefreshBalances = async () => {
     if (!network || !cryptocurrencyId) return;
-    await refreshBalancesMutation.mutateAsync({ network, cryptocurrencyId });
-    // Pull the (now-invalidated) preview again so the modal reflects fresh totals.
-    if (showPreview) await refetchPreview();
+    try {
+      await refreshBalancesMutation.mutateAsync({ network, cryptocurrencyId });
+      // Pull the (now-invalidated) preview again so the modal reflects fresh totals.
+      if (showPreview) await refetchPreview();
+    } catch {
+      // The mutation reports the provider error and keeps the saved balances intact.
+    }
   };
 
   const symbol = selectedCrypto?.symbol.toUpperCase() ?? "";
@@ -501,7 +512,9 @@ export default function SweepConfigModal({
   }
 
   const previewFeeExplanation = previewData
-    ? previewData.feeHandling === "deducted_from_swept_asset"
+    ? previewData.feePresentation
+      ? previewData.feePresentation.explanation
+      : previewData.feeHandling === "deducted_from_swept_asset"
       ? `Fees are paid in ${previewData.feeAssetSymbol} and deducted from the swept amount.`
       : `Network fees are paid in ${previewData.feeAssetSymbol} from the fueling wallet.`
     : "";
@@ -811,7 +824,11 @@ export default function SweepConfigModal({
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-[#667085]">Estimated network fees</span>
+                  <span className="text-[#667085]">
+                    {previewData.feePresentation
+                      ? previewData.feePresentation.estimateLabel
+                      : "Estimated network fees"}
+                  </span>
                   <span className="font-semibold tabular-nums text-[#667085]">
                     {previewData.estimatedFeeAmount.toFixed(
                       previewData.feeAssetSymbol === "BTC" ? 8 : 6
@@ -819,6 +836,26 @@ export default function SweepConfigModal({
                     {previewData.feeAssetSymbol}
                   </span>
                 </div>
+                {previewData.feeLimitAmount !== undefined && (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-[#667085]">
+                      {previewData.feePresentation?.limitLabel ?? "Fee limit"}
+                    </span>
+                    <span className="font-semibold tabular-nums text-[#667085]">
+                      {previewData.feeLimitAmount.toFixed(6)} {previewData.feeAssetSymbol}
+                    </span>
+                  </div>
+                )}
+                {!!previewData.fuelingTransferFeeReserveAmount && (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-[#667085]">
+                      {previewData.feePresentation?.fuelingReserveLabel ?? "Native token reserved for top-ups"}
+                    </span>
+                    <span className="font-semibold tabular-nums text-[#667085]">
+                      {previewData.fuelingTransferFeeReserveAmount.toFixed(6)} {previewData.feeAssetSymbol}
+                    </span>
+                  </div>
+                )}
                 {previewAmountToSweep === 0 && (
                   <div className="rounded-lg border border-amber-100 bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-900">
                     {zeroSweepReason}
@@ -858,7 +895,9 @@ export default function SweepConfigModal({
                         Fueling Wallet
                       </p>
                       <span className={`rounded-full px-2 py-0.5 text-2xs font-semibold ${insufficientFuelBalance ? 'bg-red-100 text-red-700' : 'bg-[#DCDDFD] text-[#03034D]'}`}>
-                        {insufficientFuelBalance ? 'No Gas' : 'Gas Fees'}
+                        {insufficientFuelBalance
+                          ? previewData.feePresentation ? 'Insufficient native token' : 'No Gas'
+                          : 'Gas Fees'}
                       </span>
                     </div>
                     {fuelingWalletStatus.address && (
@@ -868,7 +907,9 @@ export default function SweepConfigModal({
                     )}
                     <div className="space-y-1 mt-2">
                       <div className="flex justify-between text-2xs">
-                        <span className="text-[#667085]">Estimated required:</span>
+                        <span className="text-[#667085]">
+                          {previewData.feePresentation ? "Required in fueling wallet:" : "Estimated required:"}
+                        </span>
                         <span className="text-[#03034D] font-semibold">
                           ~{fuelingWalletStatus.requiredEstimate.toFixed(6)} {previewData.feeAssetSymbol}
                         </span>
@@ -883,7 +924,9 @@ export default function SweepConfigModal({
                     {insufficientFuelBalance && (
                       <p className="text-2xs text-red-700 font-semibold mt-2">
                         {fuelingWalletStatus.address
-                          ? `No ${previewData.feeAssetSymbol} in the fueling wallet to cover gas. Top it up before sweeping.`
+                          ? previewData.feePresentation
+                            ? `The fueling wallet does not have enough ${previewData.feeAssetSymbol} for this sweep. Top it up before sweeping.`
+                            : `No ${previewData.feeAssetSymbol} in the fueling wallet to cover gas. Top it up before sweeping.`
                           : `No active fueling wallet configured for this network. Gas cannot be funded.`}
                       </p>
                     )}

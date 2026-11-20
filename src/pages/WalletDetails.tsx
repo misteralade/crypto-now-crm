@@ -130,7 +130,7 @@ export default function WalletDetails() {
   };
 
   const refreshBalance = () => {
-    void refreshMutation.mutateAsync();
+    refreshMutation.mutate();
   };
 
   return (

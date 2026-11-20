@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Zap, RefreshCw, Copy, Check } from "lucide-react";
 import type { SearchSupportedCryptoData } from "../../../types/response.payload.types";
+import { CRYPTO_NETWORK } from "../../../util/enum";
 import {
   useAdminGeneratePlatformFuelingWalletMutation,
   useAdminGetWalletBalanceMutation,
@@ -10,7 +11,7 @@ interface FuelingWalletsSectionProps {
   cryptos: SearchSupportedCryptoData[];
 }
 
-const NETWORKS_REQUIRING_FUELING = new Set(["ERC20", "TRC20"]);
+const NETWORKS_REQUIRING_FUELING = new Set<string>([CRYPTO_NETWORK.ERC20, CRYPTO_NETWORK.TRC20]);
 
 // Isolated card component for clean, premium state management and individual balance syncing
 const FuelingWalletCard = ({
@@ -191,8 +192,10 @@ const FuelingWalletsSection = ({ cryptos }: FuelingWalletsSectionProps) => {
   const generateFuelingWalletMutation = useAdminGeneratePlatformFuelingWalletMutation();
 
   const rows = cryptos.flatMap((crypto) => {
+    if (!crypto.sellEnabled) return [];
+
     // Check cryptocurrency's supported networks configuration
-    const networksNeedingFuel = (crypto.networks ?? [])
+    const networksNeedingFuel = (crypto.sellSupportedNetworks ?? [])
       .filter((n) => NETWORKS_REQUIRING_FUELING.has(n));
 
     return networksNeedingFuel.map((network) => {

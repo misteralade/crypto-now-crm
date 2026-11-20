@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import moment from "moment";
 import { useSweepQuery } from "../../../queries/sweep.querries.ts";
 import type { BalanceSummaryRow } from "../../../api/sweep.api.ts";
@@ -42,10 +42,11 @@ interface BalanceCardProps {
   onRefresh: (row: BalanceSummaryRow) => void;
   onWalletCountClick?: (row: BalanceSummaryRow) => void;
   refreshing: boolean;
+  refreshError: string | null;
 }
 
 // Single asset card with totals + refresh action.
-function BalanceCard({ row, onRefresh, onWalletCountClick, refreshing }: BalanceCardProps) {
+function BalanceCard({ row, onRefresh, onWalletCountClick, refreshing, refreshError }: BalanceCardProps) {
   const networkLabel = NETWORK_LABELS[row.network] ?? row.network;
   const freshness = formatRefreshedAt(row.oldestRefreshedAt, row.walletCount);
   const everRefreshed = !!row.oldestRefreshedAt;
@@ -118,6 +119,12 @@ function BalanceCard({ row, onRefresh, onWalletCountClick, refreshing }: Balance
           </span>
         </p>
       </div>
+
+      {refreshError && (
+        <p role="alert" className="mt-3 rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-xs text-red-700">
+          {row.symbol} on {networkLabel} could not be refreshed. {refreshError}
+        </p>
+      )}
 
       <div className="mt-4 flex items-center justify-between gap-2 border-t border-[#F2F4F7] pt-3">
         <div className="flex items-center gap-1.5 text-xs text-[#667085]">
@@ -199,6 +206,7 @@ interface BalanceSummaryGridProps {
 export default function BalanceSummaryGrid({ onWalletCountClick }: BalanceSummaryGridProps) {
   const { useBalanceSummary, refreshBalancesMutation } = useSweepQuery();
   const { data, isLoading, isError, refetch } = useBalanceSummary();
+  const [refreshErrors, setRefreshErrors] = useState<Record<string, string>>({});
 
   // Track which (cryptocurrencyId+network) pair is currently refreshing for per-card spinner state.
   const refreshingKey = useMemo(() => {
@@ -207,11 +215,27 @@ export default function BalanceSummaryGrid({ onWalletCountClick }: BalanceSummar
     return vars ? `${vars.cryptocurrencyId}:${vars.network}` : null;
   }, [refreshBalancesMutation.isPending, refreshBalancesMutation.variables]);
 
-  const handleRefresh = (row: BalanceSummaryRow) => {
-    refreshBalancesMutation.mutate({
-      cryptocurrencyId: row.cryptocurrencyId,
-      network: row.network,
+  const handleRefresh = async (row: BalanceSummaryRow) => {
+    const key = `${row.cryptocurrencyId}:${row.network}`;
+    setRefreshErrors((current) => {
+      const next = { ...current };
+      delete next[key];
+      return next;
     });
+    try {
+      const response = await refreshBalancesMutation.mutateAsync({
+        cryptocurrencyId: row.cryptocurrencyId,
+        network: row.network,
+      });
+      if (!response.success) {
+        setRefreshErrors((current) => ({ ...current, [key]: response.message }));
+      }
+    } catch (error) {
+      const message = error instanceof Error
+        ? error.message
+        : "The saved total was left unchanged.";
+      setRefreshErrors((current) => ({ ...current, [key]: message }));
+    }
   };
 
   return (
@@ -275,6 +299,7 @@ export default function BalanceSummaryGrid({ onWalletCountClick }: BalanceSummar
                 onRefresh={handleRefresh}
                 onWalletCountClick={onWalletCountClick}
                 refreshing={refreshingKey === key}
+                refreshError={refreshErrors[key] ?? null}
               />
             );
           })}
