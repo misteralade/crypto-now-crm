@@ -151,7 +151,7 @@ const EditCoinDetails = ({
           <Switch id="buyEnabled" label="Buy enabled" checked={editedBuyEnabled ?? buyEnabled} onCheckedChange={(checked) => { setEditedBuyEnabled(checked); onChangeInputField("buyEnabled", checked); }} />
           <Switch id="sellEnabled" label="Sell enabled" checked={sellEnabled} disabled />
         </div>
-        <PillInput label="Buy decimal places" id="buyPrecision" type="number" min={0} max={8} value={editedBuyPrecision ?? (buyPrecision == null ? "" : String(buyPrecision))} onChange={(event) => { setEditedBuyPrecision(event.target.value); onChangeInputField("buyPrecision", event.target.valueAsNumber); }} />
+        <PillInput label="Precision" id="buyPrecision" type="number" min={0} max={8} value={editedBuyPrecision ?? (buyPrecision == null ? "" : String(buyPrecision))} onChange={(event) => { setEditedBuyPrecision(event.target.value); onChangeInputField("buyPrecision", event.target.valueAsNumber); }} />
         <div>
           <label className="block text-sm font-semibold text-[#454745] mb-3">
             Coin Status

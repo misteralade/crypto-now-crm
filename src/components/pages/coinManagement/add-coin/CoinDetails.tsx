@@ -153,8 +153,8 @@ const CoinDetails = ({ onChangeInputField }: CoinDetailsProps) => {
         <Switch id="buyEnabled" label="Buy enabled" defaultChecked onCheckedChange={(checked) => onChangeInputField("buyEnabled", checked)} />
         <Switch id="sellEnabled" label="Sell enabled" checked={false} disabled />
         <div>
-          <PillInput label="Buy decimal places" id="buyPrecision" type="number" min={0} max={8} onChange={(event) => onChangeInputField("buyPrecision", Number.isFinite(event.target.valueAsNumber) ? event.target.valueAsNumber : -1)} />
-          <p className="text-xs text-gray-500 mt-1">Use the lowest decimal places across selected networks.</p>
+          <PillInput label="Precision" id="buyPrecision" type="number" min={0} max={8} onChange={(event) => onChangeInputField("buyPrecision", Number.isFinite(event.target.valueAsNumber) ? event.target.valueAsNumber : -1)} />
+          <p className="text-xs text-gray-500 mt-1">Set the lowest supported precision across selected networks.</p>
         </div>
         <p className="text-xs text-gray-500">Sell support and address validation require separate backend configuration.</p>
         <div>

@@ -8,6 +8,7 @@ import momentClient from '../util/moment'
 import ConfirmModal from '../components/global/ConfirmModal'
 import { useAdminAuth } from '../hooks/useAdminAuth'
 import { PERMISSIONS } from '../util/permissions.util'
+import moment from 'moment'
 
 const DetailItem = ({
   label,
@@ -163,7 +164,12 @@ const AdminDetails = () => {
 
                   <div className="mt-5 space-y-3">
                     <DetailItem label="Created" value={momentClient.formatToNormalisedDateAndTime(adminDetails.createdAt)} />
-                    <DetailItem label="Last Active" value={momentClient.formatToNormalisedDateAndTime(adminDetails.lastActive)} />
+                    <DetailItem
+                      label="Last Active"
+                      value={adminDetails.lastActive && moment(adminDetails.lastActive).isValid()
+                        ? momentClient.formatToNormalisedDateAndTime(adminDetails.lastActive)
+                        : 'Never'}
+                    />
                   </div>
                 </section>
 
