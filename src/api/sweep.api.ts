@@ -27,6 +27,7 @@ export interface SweepPreviewData {
     limitLabel: string;
     fuelingReserveLabel: string;
     explanation: string;
+    fuelingCoverageLabel?: string;
     hideBreakdown?: boolean;
   };
   feeAssetSymbol: string;

@@ -76,6 +76,7 @@ function getZeroSweepReason(
       limitLabel: string;
       fuelingReserveLabel: string;
       explanation: string;
+      fuelingCoverageLabel?: string;
     };
   },
   symbol: string
@@ -908,7 +909,7 @@ export default function SweepConfigModal({
                     <div className="space-y-1 mt-2">
                       <div className="flex justify-between text-2xs">
                         <span className="text-[#667085]">
-                          {previewData.feePresentation ? "Required in fueling wallet:" : "Estimated required:"}
+                          {previewData.feePresentation?.fuelingCoverageLabel ?? (previewData.feePresentation ? "Required in fueling wallet:" : "Estimated required:")}
                         </span>
                         <span className="text-[#03034D] font-semibold">
                           ~{fuelingWalletStatus.requiredEstimate.toFixed(6)} {previewData.feeAssetSymbol}
