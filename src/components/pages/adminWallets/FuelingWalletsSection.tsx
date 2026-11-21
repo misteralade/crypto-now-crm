@@ -97,36 +97,6 @@ const FuelingWalletCard = ({
   );
   const [copied, setCopied] = useState(false);
   const balanceMutation = useAdminGetWalletBalanceMutation();
-  const queryClient = useQueryClient();
-  const activeMutation = useMutation({
-    mutationFn: async (isActive: boolean) => {
-      if (!row.fuelingWallet?.id) throw new Error("Fueling wallet is unavailable.");
-      const result = await cryptoServiceApi.adminSetTrc20FuelingWalletActive(
-        row.fuelingWallet.id,
-        isActive,
-      );
-      if (!result.success) throw new Error(result.message);
-      return result.message;
-    },
-    onSuccess: (message) => {
-      toast.success(message);
-      void queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CRYPTO.ALL_SUPPORTED_CRYPTO_CURRENCIES] });
-    },
-    onError: (error: Error) => toast.error(error.message),
-  });
-  const purposeMutation = useMutation({
-    mutationFn: async (fundingPurpose: ADMIN_WALLET_FUNDING_PURPOSE) => {
-      if (!row.fuelingWallet?.id) throw new Error("Fueling wallet is unavailable.");
-      const result = await cryptoServiceApi.adminSetFuelingWalletPurpose(row.fuelingWallet.id, fundingPurpose);
-      if (!result.success) throw new Error(result.message);
-      return result.message;
-    },
-    onSuccess: (message) => {
-      toast.success(message);
-      void queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CRYPTO.ALL_SUPPORTED_CRYPTO_CURRENCIES] });
-    },
-    onError: (error: Error) => toast.error(error.message),
-  });
 
   const depositAsset = row.network === CRYPTO_NETWORK.ERC20 ? "ETH (Ethereum)" : "TRX (Tron)";
   const fuelsAsset = `${row.cryptoSymbol} (${row.network})`;
@@ -190,26 +160,9 @@ const FuelingWalletCard = ({
         {row.fuelingWallet && (
           <div className="flex items-center justify-between gap-3 text-xs">
             <span className="text-gray-500 font-medium">Funding purpose</span>
-            {row.network === CRYPTO_NETWORK.TRC20 && row.cryptoSymbol === CRYPTO_SYMBOL.USDT ? (
-              <select
-                aria-label="TRON fueling wallet purpose"
-                value={row.fuelingWallet.fundingPurpose ?? ""}
-                disabled={purposeMutation.isPending}
-                onChange={(event) => {
-                  if (event.target.value.length === 0) return;
-                  purposeMutation.mutate(event.target.value as ADMIN_WALLET_FUNDING_PURPOSE);
-                }}
-                className="rounded-lg border border-indigo-100 bg-white px-2 py-1 text-xs font-semibold text-[#03034D]"
-              >
-                <option value="" disabled>Purpose not set</option>
-                <option value={ADMIN_WALLET_FUNDING_PURPOSE.BANDWIDTH}>TRX Bandwidth</option>
-                <option value={ADMIN_WALLET_FUNDING_PURPOSE.NETWORK_FEES}>Network fees</option>
-              </select>
-            ) : (
               <span className="rounded-full bg-indigo-50 px-2.5 py-1 text-2xs font-semibold text-indigo-700">
-                Network fees
+                {row.fuelingWallet.fundingPurpose === ADMIN_WALLET_FUNDING_PURPOSE.BANDWIDTH ? "TRX Bandwidth" : row.fuelingWallet.fundingPurpose === ADMIN_WALLET_FUNDING_PURPOSE.NETWORK_FEES ? "Network fees" : "Purpose not set"}
               </span>
-            )}
           </div>
         )}
         <div className="flex justify-between items-center text-xs">
@@ -289,28 +242,12 @@ const FuelingWalletCard = ({
                 ? row.fuelingWallet.fundingPurpose === ADMIN_WALLET_FUNDING_PURPOSE.BANDWIDTH
                   ? row.fuelingWallet.isActive
                     ? <>CatFee covers Energy. This wallet sends TRX when a custodial wallet needs Bandwidth.</>
-                    : <>This wallet is inactive. Enable it to send TRX for Bandwidth on CatFee USDT sweeps.</>
+                    : <>This wallet is inactive and does not fund Bandwidth.</>
                   : <>CatFee sweeps need an internal TRX wallet assigned to Bandwidth funding.</>
                 : row.fuelingWallet.isActive
                   ? <>Deposit <strong>{row.network === "ERC20" ? "ETH" : "TRX"}</strong> directly into this address to cover transaction gas fees for custodial sweeping.</>
                   : "Retained for records. This wallet is inactive and is not used for sweeps."}
             </div>
-            {row.network === CRYPTO_NETWORK.TRC20 &&
-              row.cryptoSymbol === CRYPTO_SYMBOL.USDT &&
-              row.fuelingWallet.fundingPurpose === ADMIN_WALLET_FUNDING_PURPOSE.BANDWIDTH && (
-              <button
-                type="button"
-                onClick={() => activeMutation.mutate(!row.fuelingWallet?.isActive)}
-                disabled={activeMutation.isPending}
-                className="w-full rounded-lg border border-indigo-200 bg-white px-3 py-2 text-xs font-semibold text-indigo-700 hover:bg-indigo-50 disabled:opacity-50"
-              >
-                {activeMutation.isPending
-                  ? "Saving..."
-                  : row.fuelingWallet.isActive
-                    ? "Disable TRX Bandwidth funding"
-                    : "Enable TRX Bandwidth funding"}
-              </button>
-            )}
           </div>
         )}
       </div>
