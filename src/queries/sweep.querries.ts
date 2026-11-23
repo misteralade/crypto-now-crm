@@ -10,6 +10,8 @@ import { QUERY_KEYS } from './querries.keys.js';
 import { toast } from 'react-toastify';
 
 const TERMINAL_STATUSES = ['COMPLETED', 'FAILED', 'PARTIAL'];
+const PREVIEW_RETRY_BASE_DELAY_MS = 1_000;
+const PREVIEW_RETRY_MAX_DELAY_MS = 30_000;
 const BTC_MAX_TOTAL_AMOUNT_VALIDATION_MESSAGE =
   'Total amount cap (maxTotalAmount) is not supported for Bitcoin sweeps. Omit maxTotalAmount to sweep the full eligible amount.';
 
@@ -104,6 +106,7 @@ export const useSweepQuery = () => {
       enabled: !!params?.cryptocurrencyId && !!params?.network,
       staleTime: 30_000,
       retry: 1,
+      retryDelay: (attempt) => Math.min(PREVIEW_RETRY_BASE_DELAY_MS * 2 ** attempt, PREVIEW_RETRY_MAX_DELAY_MS),
     });
   };
 
