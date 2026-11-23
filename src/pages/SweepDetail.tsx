@@ -8,6 +8,7 @@ import { cn } from '../lib/utils.ts';
 import { Clock, Globe, Target, Wallet, CheckCircle2, AlertCircle, RefreshCcw, Layers3, ReceiptText } from 'lucide-react';
 import Table, { type TableColumn } from '../components/table.tsx';
 import ConfirmModal from '../components/global/ConfirmModal.tsx';
+import { formatSweepFailure } from '../util/api-error.util';
 
 const SWEEP_STATUS = {
   COMPLETED: { label: 'Completed', color: '#037847', bg: 'bg-[#E8F8F0]', border: 'border-emerald-200', dot: 'bg-green-500' },
@@ -139,8 +140,8 @@ export default function SweepDetail() {
               {ws.label}
             </span>
             {row.error && (
-              <p className="text-2xs font-medium leading-tight whitespace-normal break-words text-red-500" title={row.error}>
-                {row.error}
+              <p className="text-2xs font-medium leading-tight whitespace-normal break-words text-red-500" title={formatSweepFailure(row.error)}>
+                {formatSweepFailure(row.error)}
               </p>
             )}
           </div>
@@ -377,7 +378,7 @@ export default function SweepDetail() {
             <AlertCircle className="mt-0.5 shrink-0" size={20} />
             <div className="space-y-1">
               <p className="font-bold leading-none">Execution Error</p>
-              <p className="font-mono text-xs opacity-90">{sweep.failureReason}</p>
+              <p className="text-xs leading-relaxed opacity-90">{formatSweepFailure(sweep.failureReason)}</p>
             </div>
           </div>
         )}

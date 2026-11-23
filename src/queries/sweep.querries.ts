@@ -8,6 +8,7 @@ import {
 } from '../api/sweep.api.js';
 import { QUERY_KEYS } from './querries.keys.js';
 import { toast } from 'react-toastify';
+import { ApiRequestError, HTTP_STATUS } from '../util/api-error.util';
 
 const TERMINAL_STATUSES = ['COMPLETED', 'FAILED', 'PARTIAL'];
 const PREVIEW_RETRY_BASE_DELAY_MS = 1_000;
@@ -105,7 +106,7 @@ export const useSweepQuery = () => {
       },
       enabled: !!params?.cryptocurrencyId && !!params?.network,
       staleTime: 30_000,
-      retry: 1,
+      retry: (failureCount, error) => !(error instanceof ApiRequestError && error.status === HTTP_STATUS.TOO_MANY_REQUESTS) && failureCount < 1,
       retryDelay: (attempt) => Math.min(PREVIEW_RETRY_BASE_DELAY_MS * 2 ** attempt, PREVIEW_RETRY_MAX_DELAY_MS),
     });
   };

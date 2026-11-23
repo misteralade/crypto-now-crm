@@ -5,6 +5,7 @@ import {LOCAL_STORAGE_KEYS, ROUTES} from "../util/constants.util.ts";
 import type {AxiosRequestHeaders} from "axios";
 import type {BaseApiResponse} from "../types/response.payload.types";
 import {router} from "../main";
+import { toApiRequestError } from "../util/api-error.util";
 
 export const API_KIT = axios.create({
   baseURL: BASIC.API_BASE_URL,
@@ -60,12 +61,7 @@ export const axiosPostRequestHandler = async (
     });
     return request.data as BaseApiResponse<any>;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      const msg = error.response?.data?.message || error.response?.data?.error?.message || error.message;
-      throw new Error(msg);
-    } else {
-      throw new Error("An unexpected error occurred");
-    }
+    throw toApiRequestError(error);
   }
 };
 
@@ -75,12 +71,7 @@ export const axiosPutRequestHandler = async (url: string, data: any) => {
 
     return request.data as BaseApiResponse<any>;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      const msg = error.response?.data?.message || error.response?.data?.error?.message || error.message;
-      throw new Error(msg);
-    } else {
-      throw new Error("An unexpected error occurred");
-    }
+    throw toApiRequestError(error);
   }
 };
 
@@ -90,12 +81,7 @@ export const axiosDeleteRequestHandler = async (url: string) => {
 
     return request.data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      const msg = error.response?.data?.message || error.response?.data?.error?.message || error.message;
-      throw new Error(msg);
-    } else {
-      throw new Error("An unexpected error occurred");
-    }
+    throw toApiRequestError(error);
   }
 };
 
@@ -107,12 +93,7 @@ export const axiosGetRequestHandler = async (url: string, params?: any) => {
 
     return request.data as BaseApiResponse<any>;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      const msg = error.response?.data?.message || error.response?.data?.error?.message || error.message;
-      throw new Error(msg);
-    } else {
-      throw new Error("An unexpected error occurred");
-    }
+    throw toApiRequestError(error);
   }
 };
 
@@ -122,11 +103,6 @@ export const axiosPatchRequestHandler = async (url: string, params?: any) => {
 
     return request.data as BaseApiResponse<any>;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      const msg = error.response?.data?.message || error.response?.data?.error?.message || error.message;
-      throw new Error(msg);
-    } else {
-      throw new Error("An unexpected error occurred");
-    }
+    throw toApiRequestError(error);
   }
 };
