@@ -10,6 +10,7 @@ import { LoadingSpinner } from "../../global/LoadingSpinner.tsx";
 interface SweepConfigModalProps {
   open: boolean;
   onClose: () => void;
+  selection?: { cryptocurrencyId: string; network: string; walletIds: string[] };
 }
 
 const NETWORK_OPTIONS = [
@@ -123,6 +124,7 @@ function getZeroSweepReason(
 export default function SweepConfigModal({
   open,
   onClose,
+  selection,
 }: SweepConfigModalProps) {
   const navigate = useNavigate();
   const {
@@ -133,8 +135,8 @@ export default function SweepConfigModal({
   } = useSweepQuery();
   const { allSupportedCrypto } = useCryptoQuery();
 
-  const [network, setNetwork] = useState("");
-  const [cryptocurrencyId, setCryptocurrencyId] = useState("");
+  const [network, setNetwork] = useState(selection?.network ?? "");
+  const [cryptocurrencyId, setCryptocurrencyId] = useState(selection?.cryptocurrencyId ?? "");
   const [previewRequested, setPreviewRequested] = useState(false);
   const [maxAmountInput, setMaxAmountInput] = useState("");
   const [dustThresholdInput, setDustThresholdInput] = useState("");
@@ -265,6 +267,7 @@ export default function SweepConfigModal({
       ? {
           network,
           cryptocurrencyId,
+          walletIds: selection?.walletIds,
           dustThresholdOverride: previewDustThresholdOverride,
           maxTotalAmount: previewMaxTotalAmount,
         }
@@ -279,6 +282,10 @@ export default function SweepConfigModal({
       return;
     }
     if (!isBtcLimitedSweepUi && amountTouched) return;
+    if (selection) {
+      setMaxAmountInput("");
+      return;
+    }
     if (matchedSummaryRow) {
       const nextAmount = formatSuggestedSweepAmount(
         matchedSummaryRow.totalBalance,
@@ -297,6 +304,7 @@ export default function SweepConfigModal({
     isBtcLimitedSweepUi,
     maxAmountInput,
     matchedSummaryRow,
+    selection,
     network,
     cryptocurrencyId,
   ]);
@@ -433,8 +441,9 @@ export default function SweepConfigModal({
       const result = await initiateSweepMutation.mutateAsync({
         network,
         cryptocurrencyId,
-        options:
-          sweepOptions && Object.keys(sweepOptions).length > 0
+        options: selection
+          ? { ...sweepOptions, walletIds: selection.walletIds }
+          : sweepOptions && Object.keys(sweepOptions).length > 0
             ? sweepOptions
             : undefined,
       });
@@ -590,13 +599,14 @@ export default function SweepConfigModal({
             </div>
 
             <div className="space-y-4">
+              {selection && <p className="text-sm text-[#475467]">{selection.walletIds.length} wallets selected for this sweep.</p>}
               <LabeledPillSelect
                 label="Select Cryptocurrency"
                 value={cryptocurrencyId}
                 placeholder="Select crypto to sweep"
                 onValueChange={resetPreviewAndSetCrypto}
                 options={cryptoOptions}
-                disabled={cryptoOptions.length === 0}
+                disabled={Boolean(selection) || cryptoOptions.length === 0}
               />
 
               <LabeledPillSelect
@@ -607,7 +617,7 @@ export default function SweepConfigModal({
                 }
                 onValueChange={resetPreviewAndSetNetwork}
                 options={networkOptions}
-                disabled={!cryptocurrencyId || networkOptions.length === 0}
+                disabled={Boolean(selection) || !cryptocurrencyId || networkOptions.length === 0}
               />
 
               {!hasFuelingWallet && (
@@ -1002,7 +1012,7 @@ export default function SweepConfigModal({
                         </span>
                       )}
                   </span>
-                  <button
+                  {!selection && <button
                     type="button"
                     onClick={handleRefreshBalances}
                     disabled={refreshing}
@@ -1022,7 +1032,7 @@ export default function SweepConfigModal({
                       />
                     </svg>
                     {refreshing ? "Refreshing..." : "Refresh now"}
-                  </button>
+                  </button>}
                 </div>
               </div>
             )}

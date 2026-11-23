@@ -49,7 +49,7 @@ const Modal = ({ open, onClose, title, description, size = 'md', children }: Mod
 
   return (
     <div className={`fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/50 backdrop-blur-xs p-0 sm:p-4 ${isClosing ? 'animate-modal-backdrop-out' : 'animate-modal-backdrop-in'}`}>
-      <div className={cn(
+      <div role="dialog" aria-modal="true" aria-label={title} className={cn(
         'bg-white rounded-t-2xl sm:rounded-xl border border-slate-200/80 shadow-2xl w-full p-5 sm:p-6 max-h-[92vh] overflow-y-auto transition-all',
         sizeClasses[size] || 'max-w-md',
         isClosing ? 'animate-modal-content-out' : 'animate-modal-content-in'

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ExternalLink, RefreshCw, Copy } from "lucide-react";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { toast } from "react-toastify";
@@ -7,6 +7,10 @@ import PageHeader from "../components/global/pageHeader.tsx";
 import Table, { type TableColumn } from "../components/table.tsx";
 import { useAdminTreasuryWalletsQuery, useAdminRefreshCustodialWalletBalanceMutation } from "../queries/crypto.querries.ts";
 import type { AdminCustodialWalletDetailsResponsePayload } from "../types/response.payload.types.ts";
+import SweepConfigModal from "../components/pages/treasury/SweepConfigModal.tsx";
+import WalletToolbar from "../components/pages/treasury/WalletToolbar.tsx";
+import WalletFilterModal from "../components/pages/treasury/WalletFilterModal.tsx";
+import { EMPTY_WALLET_FILTERS, type WalletFilters } from "../components/pages/treasury/wallet-filters.ts";
 
 function formatDate(value: string | Date | null | undefined) {
   if (!value) return "-";
@@ -96,10 +100,77 @@ export default function TreasuryWalletsPage() {
   );
 
   const rows = useMemo(() => wallets ?? [], [wallets]);
+  const [query, setQuery] = useState("");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [showSweep, setShowSweep] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState<WalletFilters>(EMPTY_WALLET_FILTERS);
+  useEffect(() => {
+    setSelected(new Set());
+  }, [cryptocurrencyId, network]);
+
+  const purposes = useMemo(
+    () => Array.from(new Set(rows.map((row) => row.wallet.walletPurpose))),
+    [rows],
+  );
+  const visibleRows = useMemo(() => {
+    const term = query.trim().toLowerCase();
+    return rows.filter(({ wallet, user }) => {
+      const balance = Number(wallet.cachedBalance);
+      const searchFields = [wallet.id, wallet.walletAddress, getOwnerLabel(wallet, user), user?.email];
+      const matchesSearch = !term || searchFields.some((value) => value?.toLowerCase().includes(term));
+      const matchesBalance = (!filters.min || balance >= Number(filters.min)) &&
+        (!filters.max || balance <= Number(filters.max));
+      const matchesPurpose = !filters.purpose || wallet.walletPurpose === filters.purpose;
+      const matchesStatus = !filters.status || String(wallet.isActive) === filters.status;
+      return matchesSearch && matchesBalance && matchesPurpose && matchesStatus;
+    });
+  }, [rows, query, filters]);
+  const selectableRows = useMemo(() => visibleRows.filter((row) => row.wallet.isActive), [visibleRows]);
+  const allVisibleSelected = selectableRows.length > 0 &&
+    selectableRows.every((row) => selected.has(row.wallet.id));
+  const toggleWallet = (id: string) => setSelected((current) => {
+    const next = new Set(current);
+    if (next.has(id)) {
+      next.delete(id);
+    } else {
+      next.add(id);
+    }
+    return next;
+  });
+  const toggleVisible = useCallback(() => setSelected((current) => {
+    const next = new Set(current);
+    selectableRows.forEach(({ wallet }) => {
+      if (allVisibleSelected) next.delete(wallet.id);
+      else next.add(wallet.id);
+    });
+    return next;
+  }), [selectableRows, allVisibleSelected]);
 
   const columns: TableColumn<AdminCustodialWalletDetailsResponsePayload>[] =
     useMemo(
       () => [
+        {
+          key: "select",
+          header: (
+            <input
+              type="checkbox"
+              aria-label="Select all visible active wallets"
+              checked={allVisibleSelected}
+              onChange={toggleVisible}
+            />
+          ),
+          render: (_, row) => (
+            <input
+              type="checkbox"
+              aria-label={`Select wallet ${row.wallet.id}`}
+              checked={selected.has(row.wallet.id)}
+              disabled={!row.wallet.isActive}
+              onClick={(event) => event.stopPropagation()}
+              onChange={() => toggleWallet(row.wallet.id)}
+            />
+          ),
+        },
         {
           key: "wallet",
           header: "Wallet Address",
@@ -215,7 +286,7 @@ export default function TreasuryWalletsPage() {
           ),
         },
       ],
-      [navigate, symbol]
+      [navigate, symbol, selected, allVisibleSelected, toggleVisible]
     );
 
   return (
@@ -243,8 +314,16 @@ export default function TreasuryWalletsPage() {
         </div>
 
         <div className="bg-white rounded-2xl border border-[#EEF1FF] p-4 md:p-6 shadow-sm">
+          <WalletToolbar
+            query={query}
+            selectedCount={selected.size}
+            onQueryChange={setQuery}
+            onOpenFilters={() => setShowFilters(true)}
+            onClearSelection={() => setSelected(new Set())}
+            onSweep={() => setShowSweep(true)}
+          />
           <Table<AdminCustodialWalletDetailsResponsePayload>
-            data={rows}
+            data={visibleRows}
             columns={columns}
             loading={isLoading}
             onRowClick={(row) => {
@@ -260,6 +339,24 @@ export default function TreasuryWalletsPage() {
           />
         </div>
       </div>
+      {showFilters && (
+        <WalletFilterModal
+          filters={filters}
+          purposes={purposes}
+          onClose={() => setShowFilters(false)}
+          onApply={(nextFilters) => {
+            setFilters(nextFilters);
+            setShowFilters(false);
+          }}
+        />
+      )}
+      {showSweep && (
+        <SweepConfigModal
+          open
+          onClose={() => setShowSweep(false)}
+          selection={{ cryptocurrencyId, network, walletIds: Array.from(selected) }}
+        />
+      )}
     </AuthenticatedLayout>
   );
 }

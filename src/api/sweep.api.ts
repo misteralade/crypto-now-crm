@@ -156,6 +156,7 @@ export interface SweepHistoryData {
 }
 
 export interface SweepPreviewParams {
+  walletIds?: string[];
   cryptocurrencyId: string;
   network: string;
   targetWalletAddresses?: string[];
@@ -167,6 +168,7 @@ export interface InitiateSweepParams {
   cryptocurrencyId: string;
   network: string;
   options?: {
+    walletIds?: string[];
     dustThresholdOverride?: number;
     targetWalletAddresses?: string[];
     note?: string;
