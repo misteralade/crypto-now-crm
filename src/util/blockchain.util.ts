@@ -1,5 +1,5 @@
 import type {CryptoNetworkType} from "../schemas/enum.schema.ts";
-import { CRYPTO_NETWORK } from "./enum.ts";
+import { BLOCKCHAIN_ENVIRONMENT, CRYPTO_NETWORK } from "./enum.ts";
 
 interface ExplorerConfig {
   name: string
@@ -240,6 +240,21 @@ export const getTransactionExplorerUrl = (
   if (!config) return null
   
   return `${config.baseUrl}${config.txPath}${txHash}`
+}
+
+/** Return a BTC explorer link only when both the transaction ID and network are known. */
+export const getBtcTransactionExplorerUrl = (
+  txHash: string | null | undefined,
+  environment: string | null | undefined,
+): string | null => {
+  if (!txHash || !/^[a-fA-F0-9]{64}$/.test(txHash)) return null
+  if (environment === BLOCKCHAIN_ENVIRONMENT.MAINNET) {
+    return getTransactionExplorerUrl(txHash, CRYPTO_NETWORK.BTC)
+  }
+  if (environment === BLOCKCHAIN_ENVIRONMENT.TESTNET) {
+    return `https://mempool.space/testnet/tx/${txHash}`
+  }
+  return null
 }
 
 /**

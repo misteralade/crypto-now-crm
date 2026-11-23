@@ -5,7 +5,8 @@ import PageHeader from '../components/global/pageHeader.tsx';
 import { useSweepQuery } from '../queries/sweep.querries.ts';
 import type { SweepWalletResult } from '../api/sweep.api.ts';
 import { cn } from '../lib/utils.ts';
-import { Clock, Globe, Target, Wallet, CheckCircle2, AlertCircle, RefreshCcw, Layers3, ReceiptText } from 'lucide-react';
+import { Clock, Globe, Target, Wallet, CheckCircle2, AlertCircle, RefreshCcw } from 'lucide-react';
+import BtcSweepTransactions from '../components/pages/treasury/BtcSweepTransactions.tsx';
 import Table, { type TableColumn } from '../components/table.tsx';
 import ConfirmModal from '../components/global/ConfirmModal.tsx';
 import { formatSweepFailure } from '../util/api-error.util';
@@ -56,14 +57,6 @@ export const formatSweepAmount = (value: string | number) => {
   return Number(value).toFixed(8).replace(/\.?0+$/, '');
 };
 
-function formatBtcFee(value: number) {
-  return Number(value).toFixed(8).replace(/\.?0+$/, '');
-}
-
-function getBatchLabel(batchIndex: number) {
-  return `Batch #${batchIndex}`;
-}
-
 export default function SweepDetail() {
   const navigate = useNavigate();
   const { sweepId } = useParams({ strict: false }) as { sweepId: string };
@@ -74,7 +67,7 @@ export default function SweepDetail() {
   const isRestartable = sweep && ['COMPLETED', 'FAILED', 'PARTIAL', 'IN_PROGRESS'].includes(sweep.status);
   const isTerminal = sweep && ['COMPLETED', 'FAILED', 'PARTIAL'].includes(sweep.status);
   const batchSummaries = sweep?.batchSummaries ?? [];
-  const isBatchSweep = Boolean(sweep?.isBatchTransaction && batchSummaries.length > 0);
+  const isBatchSweep = batchSummaries.length > 0 && (Boolean(sweep?.isBatchTransaction) || batchSummaries.length > 1);
   const results: SweepWalletResult[] = useMemo(() => {
     return [...(sweep?.sweepResults ?? [])]
       .filter((row) => !isZeroOrInvalidSkippedResult(row))
@@ -95,10 +88,10 @@ export default function SweepDetail() {
         <div className="flex items-center gap-2 group flex-nowrap">
           <Wallet size={14} className="text-gray-400 group-hover:text-[#575AE5] transition-colors shrink-0" />
           <span className="font-mono text-xs font-medium text-gray-700 shrink-0">{shortAddress(val as string)}</span>
-          {isBatchSweep && row.btcBatchIndex != null && (
-            <span className="inline-flex items-center justify-center rounded-full bg-amber-100 px-2.5 py-0.5 text-2xs font-bold uppercase tracking-wider text-amber-700 shrink-0 whitespace-nowrap min-w-fit w-max">
-              Batch {row.btcBatchIndex}
-            </span>
+          {isBatchSweep && batchSummaries.length > 1 && row.btcBatchIndex != null && batchSummaries.some((transaction) => transaction.batchIndex === row.btcBatchIndex) && (
+            <a href={`#sweep-transaction-${row.btcBatchIndex}`} onClick={(event) => event.stopPropagation()} onKeyDown={(event) => event.stopPropagation()} className="text-xs font-medium text-[#575AE5] hover:underline">
+              Transaction {batchSummaries.findIndex((transaction) => transaction.batchIndex === row.btcBatchIndex) + 1}
+            </a>
           )}
         </div>
       )
@@ -115,16 +108,11 @@ export default function SweepDetail() {
     {
       key: 'amount',
       header: 'Amount Swept',
-      render: (val, row) => (
+      render: (val) => (
         <div className="space-y-1">
           <span className="font-mono text-xs font-bold text-[#575AE5] tabular-nums">
             {val ? formatSweepAmount(Number(val)) : '-'}
           </span>
-          {Number(row.allocatedFeeAmount ?? 0) > 0 && (
-            <p className="text-2xs font-medium text-gray-500">
-              {isBatchSweep ? 'Allocated fee share:' : 'Fee deducted:'} {formatBtcFee(Number(row.allocatedFeeAmount))} BTC
-            </p>
-          )}
         </div>
       )
     },
@@ -275,76 +263,11 @@ export default function SweepDetail() {
     </section>
 
         {isBatchSweep && (
-          <section className="rounded-[2rem] border border-amber-200 bg-gradient-to-br from-amber-50 to-white p-1">
-            <div className="rounded-[1.8rem] bg-white p-5 md:p-6">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                <div className="space-y-1">
-                  <div className="inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-2xs font-bold uppercase tracking-wider text-amber-700">
-                    <Layers3 size={12} />
-                    Batch transaction summary
-                  </div>
-                  <h3 className="text-lg font-black text-[#03034D]">Shared BTC sweep transactions</h3>
-                  <p className="text-xs font-medium text-gray-500">
-                    One on-chain transaction can fund multiple wallets. The total amount and fee are shown once per batch, with the affected wallets listed below.
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-right">
-                  <p className="text-2xs font-bold uppercase tracking-widest text-amber-700">Batches</p>
-                  <p className="text-xl font-black text-amber-900 tabular-nums">{batchSummaries.length}</p>
-                </div>
-              </div>
-
-              <div className="mt-4 grid gap-4 lg:grid-cols-2">
-                {batchSummaries.map((batch) => (
-                  <div key={batch.batchIndex} className="rounded-2xl border border-amber-200 bg-white p-4 shadow-sm">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-2xs font-bold uppercase tracking-widest text-amber-600">
-                          {getBatchLabel(batch.batchIndex)}
-                        </p>
-                        <p className="text-sm font-black text-[#03034D]">{batch.walletCount} wallets affected</p>
-                      </div>
-                      <div className="rounded-full bg-amber-50 px-2.5 py-1 text-2xs font-bold uppercase tracking-wider text-amber-700">
-                        Shared tx
-                      </div>
-                    </div>
-
-                    <div className="mt-4 grid grid-cols-2 gap-3">
-                      <div className="rounded-xl bg-gray-50 p-3">
-                        <p className="text-2xs font-bold uppercase tracking-widest text-gray-400">Batch amount sent</p>
-                        <p className="mt-1 text-base font-black text-[#03034D] tabular-nums">
-                          {formatSweepAmount(batch.netAmount)} BTC
-                        </p>
-                      </div>
-                      <div className="rounded-xl bg-amber-50 p-3">
-                        <p className="text-2xs font-bold uppercase tracking-widest text-amber-700">Fee incurred</p>
-                        <p className="mt-1 text-base font-black text-amber-900 tabular-nums">
-                          {formatBtcFee(batch.feeAmount)} BTC
-                        </p>
-                      </div>
-                      <div className="rounded-xl bg-gray-50 p-3">
-                        <p className="text-2xs font-bold uppercase tracking-widest text-gray-400">Gross input</p>
-                        <p className="mt-1 text-sm font-bold text-[#03034D] tabular-nums">
-                          {formatSweepAmount(batch.grossInputAmount)} BTC
-                        </p>
-                      </div>
-                      <div className="rounded-xl bg-gray-50 p-3">
-                        <p className="text-2xs font-bold uppercase tracking-widest text-gray-400">Inputs</p>
-                        <p className="mt-1 text-sm font-bold text-[#03034D] tabular-nums">
-                          {batch.inputCount}
-                        </p>
-                      </div>
-                    </div>
-
-                    <p className="mt-3 flex items-center gap-2 text-2xs font-medium text-gray-500">
-                      <ReceiptText size={12} />
-                      Tx hash {batch.txHash ? shortAddress(batch.txHash) : 'not available'}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
+          <BtcSweepTransactions
+            transactions={batchSummaries}
+            environment={sweep?.blockchainEnvironment}
+            formatAmount={formatSweepAmount}
+          />
         )}
 
         {isTestnetEnvironment(sweep?.blockchainEnvironment) && (
