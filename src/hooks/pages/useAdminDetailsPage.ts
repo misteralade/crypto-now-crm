@@ -48,6 +48,21 @@ export const useAdminDetailsPage = () => {
     onError: (error) => toast.error(error.message),
   })
 
+  const updateName = useMutation({
+    mutationFn: ({ firstName, lastName }: { firstName: string; lastName: string }) =>
+      adminServiceApi.updateAdminName(adminId, firstName, lastName),
+    onSuccess: async ({ success, message }) => {
+      if (!success) { toast.error(message); return }
+      toast.success(message)
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN.GET_ADMIN_DETAILS, adminId] }),
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN.SEARCH_ADMINS] }),
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.AUTH.GET_OWN_PROFILE] }),
+      ])
+    },
+    onError: (error) => toast.error(error.message),
+  })
+
   const deleteAdmin = useMutation({
     mutationFn: () => adminServiceApi.adminSoftDeleteAdmin(adminId),
     onSuccess: async ({ success, message }) => {
@@ -77,6 +92,7 @@ export const useAdminDetailsPage = () => {
     loadError: isError,
     retry: refetch,
     updateStatus,
+    updateName,
     deleteAdmin,
     isCurrentAdmin: adminDetails?.id === currentAdminId,
     goBack,

@@ -1,5 +1,5 @@
 import { Fragment, useState } from 'react'
-import { ArrowLeft, BadgeCheck, CalendarClock, Mail, ShieldUser, User } from 'lucide-react'
+import { ArrowLeft, BadgeCheck, CalendarClock, Mail, Pencil, ShieldUser, User } from 'lucide-react'
 import AuthenticatedLayout from '../layout/AuthenticatedLayout'
 import PageHeader from '../components/global/pageHeader'
 import { LoadingSpinner } from '../components/global/LoadingSpinner'
@@ -11,6 +11,7 @@ import { PERMISSIONS } from '../util/permissions.util'
 import moment from 'moment'
 import { useEnableTwoFactorAuthenticationMutation, useOwnAdminProfileQuery } from '../queries/auth.query'
 import { getAdminDisplayName } from '../util/admin-display.util'
+import EditAdminNameModal from '../components/pages/manageAdmins/EditAdminNameModal'
 
 const DetailItem = ({
   label,
@@ -47,12 +48,14 @@ const AdminDetails = () => {
     loadError,
     retry,
     updateStatus,
+    updateName,
     deleteAdmin,
   } = useAdminDetailsPage()
   const { hasPermission } = useAdminAuth()
   const { data: ownProfile, isLoading: loadingProfile, isError: profileError, refetch: refreshProfile } = useOwnAdminProfileQuery()
   const enableTwoFactor = useEnableTwoFactorAuthenticationMutation()
   const [showDelete, setShowDelete] = useState(false)
+  const [showEditName, setShowEditName] = useState(false)
 
   const fullName = adminDetails
     ? getAdminDisplayName(adminDetails)
@@ -83,7 +86,14 @@ const AdminDetails = () => {
                     </div>
                     <div>
                       <p className="text-sm font-medium uppercase tracking-wide text-[#9A9A9A]">Admin Profile</p>
-                      <h3 className="mt-1 text-2xl font-semibold text-[#101828]">{fullName}</h3>
+                      <div className="mt-1 flex items-center gap-2">
+                        <h3 className="text-2xl font-semibold text-[#101828]">{fullName}</h3>
+                        {hasPermission(PERMISSIONS.ADMIN.WRITE) && (
+                          <button type="button" aria-label="Edit admin name" onClick={() => setShowEditName(true)} className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-800">
+                            <Pencil className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
                       <p className="mt-1 text-sm text-[#667085]">@{adminDetails.username}</p>
                     </div>
                   </div>
@@ -245,6 +255,19 @@ const AdminDetails = () => {
       <ConfirmModal open={showDelete} actionType="delete" onClose={() => setShowDelete(false)}
         onConfirm={() => { if (!deleteAdmin.isPending) deleteAdmin.mutate() }}
         message="Are you sure you want to delete this admin?" confirmText="Delete Admin" />
+      {showEditName && adminDetails && (
+        <EditAdminNameModal
+          firstName={adminDetails.firstName}
+          lastName={adminDetails.lastName}
+          saving={updateName.isPending}
+          onClose={() => { if (!updateName.isPending) setShowEditName(false) }}
+          onSave={(firstName, lastName) => {
+            updateName.mutate({ firstName, lastName }, {
+              onSuccess: (result) => { if (result.success) setShowEditName(false) },
+            })
+          }}
+        />
+      )}
     </AuthenticatedLayout>
   )
 }
