@@ -45,7 +45,7 @@ class AuthServiceApi {
     return await axiosGetRequestHandler("/admin/auth/profile") as any;
   }
 
-  async toggleTwoFactorAuthentication(): Promise<BaseApiResponse<null>> {
+  async enableTwoFactorAuthentication(): Promise<BaseApiResponse<null>> {
     return await axiosPatchRequestHandler("/admin/auth/two-factor-authentication", {}) as BaseApiResponse<null>;
   }
 

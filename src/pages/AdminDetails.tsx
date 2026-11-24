@@ -9,6 +9,7 @@ import ConfirmModal from '../components/global/ConfirmModal'
 import { useAdminAuth } from '../hooks/useAdminAuth'
 import { PERMISSIONS } from '../util/permissions.util'
 import moment from 'moment'
+import { useEnableTwoFactorAuthenticationMutation, useOwnAdminProfileQuery } from '../queries/auth.query'
 
 const DetailItem = ({
   label,
@@ -48,6 +49,8 @@ const AdminDetails = () => {
     deleteAdmin,
   } = useAdminDetailsPage()
   const { hasPermission } = useAdminAuth()
+  const { data: ownProfile, isLoading: loadingProfile, isError: profileError, refetch: refreshProfile } = useOwnAdminProfileQuery()
+  const enableTwoFactor = useEnableTwoFactorAuthenticationMutation()
   const [showDelete, setShowDelete] = useState(false)
 
   const fullName = adminDetails
@@ -125,6 +128,32 @@ const AdminDetails = () => {
               </section>
 
               <aside className="space-y-6">
+                {isCurrentAdmin && (
+                  <section className="rounded-3xl border border-[#ECECEC] bg-white p-6 shadow-sm">
+                    <div className="flex items-center gap-3">
+                      <div className="flex size-10 items-center justify-center rounded-2xl bg-[#F5F5FF] text-[#03034D]">
+                        <ShieldUser className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h4 className="text-lg font-semibold text-[#101828]">Two-factor authentication</h4>
+                        <p className="text-sm text-[#667085]">Receive a code by email when you sign in.</p>
+                      </div>
+                    </div>
+                    <div className="mt-5">
+                      {loadingProfile ? (
+                        <p className="text-sm text-[#667085]">Loading security settings...</p>
+                      ) : profileError || !ownProfile ? (
+                        <p className="text-sm text-red-600">Could not load security settings. <button type="button" onClick={() => void refreshProfile()} className="font-semibold underline">Try again</button></p>
+                      ) : ownProfile.twoFactorEnabled ? (
+                        <p className="text-sm font-semibold text-emerald-700">Enabled</p>
+                      ) : (
+                        <button type="button" disabled={enableTwoFactor.isPending} onClick={() => enableTwoFactor.mutate()} className="rounded-xl bg-[#03034D] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50">
+                          {enableTwoFactor.isPending ? 'Enabling...' : 'Enable two-factor authentication'}
+                        </button>
+                      )}
+                    </div>
+                  </section>
+                )}
                 <section className="rounded-3xl border border-[#ECECEC] bg-white p-6 shadow-sm">
                   <div className="flex items-center gap-3">
                     <div className="flex size-10 items-center justify-center rounded-2xl bg-[#F5F5FF] text-[#03034D]">

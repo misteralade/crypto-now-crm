@@ -18,26 +18,23 @@ export const useOwnAdminProfileQuery = () => {
   });
 };
 
-export const useToggleTwoFactorAuthenticationMutation = () => {
+export const useEnableTwoFactorAuthenticationMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationKey: [QUERY_KEYS.AUTH.TOGGLE_TWO_FACTOR_AUTHENTICATION],
     mutationFn: async () => {
-      toast.loading("Updating two-factor authentication...");
-      return await authServiceApi.toggleTwoFactorAuthentication();
+      return await authServiceApi.enableTwoFactorAuthentication();
     },
     onSuccess: ({ success, message }) => {
-      toast.dismiss();
       if (success) {
-        toast.success(message || "Two-factor authentication updated successfully.");
+        toast.success(message || "Two-factor authentication enabled.");
         queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.AUTH.GET_OWN_PROFILE] });
       } else {
         toast.error(message || "Failed to update two-factor authentication.");
       }
     },
     onError: (error: Error) => {
-      toast.dismiss();
       toast.error(error.message || "Failed to update two-factor authentication.");
     },
   });
