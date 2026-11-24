@@ -10,6 +10,7 @@ import { useAdminAuth } from '../hooks/useAdminAuth'
 import { PERMISSIONS } from '../util/permissions.util'
 import moment from 'moment'
 import { useEnableTwoFactorAuthenticationMutation, useOwnAdminProfileQuery } from '../queries/auth.query'
+import { getAdminDisplayName } from '../util/admin-display.util'
 
 const DetailItem = ({
   label,
@@ -54,7 +55,7 @@ const AdminDetails = () => {
   const [showDelete, setShowDelete] = useState(false)
 
   const fullName = adminDetails
-    ? `${adminDetails.firstName} ${adminDetails.lastName}`.trim()
+    ? getAdminDisplayName(adminDetails)
     : 'Admin Details'
 
   return (

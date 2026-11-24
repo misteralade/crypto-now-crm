@@ -1,6 +1,7 @@
 import {StatusColumn} from "./global";
 import type {TableColumn} from "../table";
 import type {SearchAdminResponsePayload} from "../../types/response.payload.types.ts";
+import { getAdminDisplayName, getAdminRoleNames } from '../../util/admin-display.util';
 
 type SearchAdminTableRow = {
   id: string
@@ -75,10 +76,10 @@ export const SearchAdminDataRow = (
   data.map((item: SearchAdminResponsePayload) => {
     rowItems.push({
       id: item.id,
-      name: `${item.firstName} ${item.lastName}`,
+      name: getAdminDisplayName(item),
       username: item.username,
       email: item.email,
-      role: item.adminRoles[0]?.role?.name || 'N/A',
+      role: getAdminRoleNames(item).join(', ') || 'N/A',
       status: item.active,
     })
 
